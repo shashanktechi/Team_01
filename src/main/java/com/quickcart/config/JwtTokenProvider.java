@@ -59,10 +59,25 @@ public class JwtTokenProvider {
     public Long getUserIdFromJwtToken(String token) {
         Object userIdObj = Jwts.parserBuilder().setSigningKey(key).build()
                 .parseClaimsJws(token).getBody().get("userId");
-        if(userIdObj instanceof Integer) {
+        if (userIdObj == null) {
+            return null;
+        }
+        if (userIdObj instanceof Integer) {
              return ((Integer) userIdObj).longValue();
         }
         return (Long) userIdObj;
+    }
+
+    public Long getStoreIdFromJwtToken(String token) {
+        Object storeIdObj = Jwts.parserBuilder().setSigningKey(key).build()
+                .parseClaimsJws(token).getBody().get("storeId");
+        if (storeIdObj == null) {
+            return null;
+        }
+        if (storeIdObj instanceof Integer) {
+             return ((Integer) storeIdObj).longValue();
+        }
+        return (Long) storeIdObj;
     }
 
     public boolean validateJwtToken(String authToken) {

@@ -17,13 +17,13 @@ public class AuthController {
     private AuthService authService;
 
     @PostMapping("/otp/send")
-    public ResponseEntity<?> sendOtp(@RequestBody AuthRequest request) {
+    public ResponseEntity<?> sendOtp(@RequestBody @jakarta.validation.Valid AuthRequest request) {
         authService.sendOtp(request.getPhone());
         return ResponseEntity.ok(Map.of("message", "OTP sent to WhatsApp"));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody @jakarta.validation.Valid AuthRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok(response);
     }

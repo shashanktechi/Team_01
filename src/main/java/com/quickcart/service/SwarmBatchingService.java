@@ -26,16 +26,27 @@ public class SwarmBatchingService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Transactional
     @SuppressWarnings("null")
     public Swarm batchOrdersForDelivery(@org.springframework.lang.NonNull Long deliveryPartnerId, double currentLat, double currentLng) {
         User partner = userRepository.findById(deliveryPartnerId)
                 .orElseThrow(() -> new RuntimeException("Partner not found"));
 
-        // Dummy logic: fetch pending orders and assign to a swarm
-        List<Order> pendingOrders = orderRepository.findAll().stream()
+        // 1. Fetch nearest pending order IDs
+        List<Long> ids = orderRepository.findPendingOrderIdsNear(currentLat, currentLng);
+        if (ids.isEmpty()) {
+            return null;
+        }
+
+        // 2. Fetch and acquire pessimistic write lock on those orders
+        List<Order> lockedOrders = orderRepository.findByIdInForUpdate(ids);
+
+        // 3. Filter only those that are still PENDING (double check to prevent race conditions)
+        List<Order> pendingOrders = lockedOrders.stream()
                 .filter(o -> "PENDING".equals(o.getStatus()))
-                .limit(3)
                 .collect(Collectors.toList());
 
         if (pendingOrders.isEmpty()) {
@@ -53,8 +64,13 @@ public class SwarmBatchingService {
             order.setSwarm(swarm);
             order.setDeliveryPartner(partner);
             order.setStatus("CONFIRMED");
-            orderRepository.save(order);
+            Order savedOrder = orderRepository.save(order);
+            if (savedOrder.getCustomer() != null) {
+                notificationService.notifyCustomer(savedOrder.getCustomer().getId(), savedOrder);
+            }
         }
+
+        notificationService.notifyDelivery(deliveryPartnerId, swarm);
 
         return swarm;
     }

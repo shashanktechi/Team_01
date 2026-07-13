@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
-import com.pgvector.PGvector;
 
 @Data
 @NoArgsConstructor
@@ -33,7 +32,8 @@ public class Product {
 
     // pgvector column mapping
     @Column(columnDefinition = "vector(384)")
-    private PGvector embedding;
+    @Convert(converter = com.quickcart.util.VectorConverter.class)
+    private float[] embedding;
 
     @Column(name = "typical_shelf_life_hours")
     private Integer typicalShelfLifeHours;

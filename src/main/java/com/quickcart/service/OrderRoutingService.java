@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Service
+@SuppressWarnings("null")
 public class OrderRoutingService {
 
     @Autowired
@@ -36,6 +37,9 @@ public class OrderRoutingService {
     
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Transactional
     public Order routeOrder(
@@ -100,6 +104,10 @@ public class OrderRoutingService {
 
         order.setTotalAmount(totalAmount);
         order.setEstimatedDeliveryTime(25); // simple mock for now
-        return orderRepository.save(order);
+        Order savedOrder = orderRepository.save(order);
+        if (savedOrder.getStore() != null) {
+            notificationService.notifyStore(savedOrder.getStore().getId(), savedOrder);
+        }
+        return savedOrder;
     }
 }
