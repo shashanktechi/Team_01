@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import java.math.BigDecimal;
 
 @Data
 @NoArgsConstructor
@@ -36,7 +37,7 @@ public class Store {
     private String verificationStatus = "PENDING"; // PENDING, APPROVED, REJECTED
 
     @Column(name = "freshness_score", precision = 3, scale = 1)
-    private Double freshnessScore = 5.0;
+    private BigDecimal freshnessScore = new BigDecimal("5.0");
 
     @Column(name = "is_open")
     private Boolean isOpen = true;

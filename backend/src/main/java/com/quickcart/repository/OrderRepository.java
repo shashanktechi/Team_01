@@ -25,4 +25,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByIdInForUpdate(@Param("ids") List<Long> ids);
 
     List<Order> findByDeliveryPartnerId(Long deliveryPartnerId);
+
+    List<Order> findByStoreIdAndStatus(Long storeId, String status);
 }

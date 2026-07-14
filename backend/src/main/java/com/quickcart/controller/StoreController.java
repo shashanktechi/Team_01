@@ -41,7 +41,9 @@ public class StoreController {
 
     @GetMapping("/orders/incoming")
     public ResponseEntity<?> getIncomingOrders() {
-        return ResponseEntity.ok(Map.of("message", "Incoming orders"));
+        Long storeId = currentUserProvider.getCurrentStoreId();
+        if (storeId == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        return ResponseEntity.ok(orderRepository.findByStoreIdAndStatus(storeId, "PENDING"));
     }
     
     @PutMapping("/orders/{id}/status")

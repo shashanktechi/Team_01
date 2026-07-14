@@ -1,9 +1,11 @@
 package com.quickcart.controller;
 
 import com.quickcart.config.CurrentUserProvider;
+import com.quickcart.dto.request.LocationRequest;
 import com.quickcart.repository.OrderRepository;
 import com.quickcart.repository.SwarmRepository;
 import com.quickcart.service.NotificationService;
+import com.quickcart.service.SwarmBatchingService;
 import com.quickcart.entity.Order;
 import com.quickcart.entity.Swarm;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +33,9 @@ public class DeliveryController {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private SwarmBatchingService swarmBatchingService;
 
     @GetMapping("/tasks")
     public ResponseEntity<?> getAssignedTasks() {
@@ -77,5 +82,15 @@ public class DeliveryController {
             "orderId", orderId,
             "newStatus", statusStr
         ));
+    }
+
+    @PostMapping("/batch")
+    public ResponseEntity<?> claimBatch(@RequestBody @jakarta.validation.Valid LocationRequest body) {
+        Long partnerId = currentUserProvider.getCurrentUserId();
+        if (partnerId == null) {
+            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+        }
+        Swarm swarm = swarmBatchingService.batchOrdersForDelivery(partnerId, body.getLat(), body.getLng());
+        return swarm != null ? ResponseEntity.ok(swarm) : ResponseEntity.noContent().build();
     }
 }

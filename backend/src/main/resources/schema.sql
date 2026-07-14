@@ -139,3 +139,21 @@ ALTER TABLE stores ADD COLUMN IF NOT EXISTS logo_url          TEXT;
 ALTER TABLE stores ADD COLUMN IF NOT EXISTS banner_url        TEXT;
 ALTER TABLE orders ADD COLUMN IF NOT EXISTS proof_of_delivery_url TEXT;
 
+-- Missing indexes
+CREATE INDEX IF NOT EXISTS idx_orders_customer_id         ON orders(customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_store_id            ON orders(store_id);
+CREATE INDEX IF NOT EXISTS idx_orders_delivery_partner_id ON orders(delivery_partner_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status              ON orders(status);
+CREATE INDEX IF NOT EXISTS idx_inventory_store_id         ON inventory(store_id);
+CREATE INDEX IF NOT EXISTS idx_inventory_product_id       ON inventory(product_id);
+CREATE INDEX IF NOT EXISTS idx_stores_verification_status ON stores(verification_status);
+CREATE INDEX IF NOT EXISTS idx_stores_location ON stores USING GIST (location);
+CREATE INDEX IF NOT EXISTS idx_products_embedding ON products USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+
+-- Unindexed foreign key indexes
+CREATE INDEX IF NOT EXISTS idx_swarms_delivery_partner_id ON swarms(delivery_partner_id);
+CREATE INDEX IF NOT EXISTS idx_credit_transactions_lender_id ON credit_transactions(lender_id);
+CREATE INDEX IF NOT EXISTS idx_credit_transactions_borrower_id ON credit_transactions(borrower_id);
+CREATE INDEX IF NOT EXISTS idx_credit_transactions_order_id ON credit_transactions(order_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_admin_id ON audit_logs(admin_id);
+
