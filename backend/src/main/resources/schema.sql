@@ -6,8 +6,8 @@ CREATE EXTENSION IF NOT EXISTS vector;
 -- Users Table
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
-    phone VARCHAR(20) UNIQUE NOT NULL,
-    email VARCHAR(255) UNIQUE,
+    phone VARCHAR(20) UNIQUE,
+    email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255),
     full_name VARCHAR(255),
     role VARCHAR(50) NOT NULL, -- CUSTOMER, STORE_ADMIN, DELIVERY_PARTNER, SYSTEM_ADMIN
@@ -123,7 +123,7 @@ CREATE TABLE IF NOT EXISTS daily_demand (
 -- OPT Requests Table
 CREATE TABLE IF NOT EXISTS otp_requests (
     id BIGSERIAL PRIMARY KEY,
-    phone VARCHAR(20) NOT NULL,
+    email VARCHAR(255) NOT NULL,
     otp_hash VARCHAR(255) NOT NULL,
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -131,7 +131,7 @@ CREATE TABLE IF NOT EXISTS otp_requests (
     verified BOOLEAN DEFAULT FALSE
 );
 
-CREATE INDEX IF NOT EXISTS idx_otp_requests_phone ON otp_requests(phone);
+CREATE INDEX IF NOT EXISTS idx_otp_requests_email ON otp_requests(email);
 CREATE INDEX IF NOT EXISTS idx_otp_requests_expires_at ON otp_requests(expires_at);
 CREATE INDEX IF NOT EXISTS idx_otp_requests_created_at ON otp_requests(created_at);
 

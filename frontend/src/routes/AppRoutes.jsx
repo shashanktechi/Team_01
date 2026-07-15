@@ -6,6 +6,8 @@ import AuthLayout from '../layouts/AuthLayout';
 import AppLayout from '../layouts/AppLayout';
 import ProtectedRoute from './ProtectedRoute';
 
+import Landing from '../pages/Landing';
+
 // Auth pages
 import LoginCustomer from '../pages/auth/LoginCustomer';
 import RegisterCustomer from '../pages/auth/RegisterCustomer';
@@ -43,22 +45,23 @@ import Users from '../pages/admin/Users';
 const RoleRedirect = () => {
   const { role, isAuthenticated } = useSelector((state) => state.auth);
   if (!isAuthenticated) {
-    // Redirect to appropriate login page based on last attempted role or default to customer
-    // For now, defaulting to customer login
-    return <Navigate to="/login/customer" replace />;
+    return <Navigate to="/login" replace />;
   }
   switch (role) {
     case 'CUSTOMER': return <Navigate to="/" replace />;
     case 'STORE_ADMIN': return <Navigate to="/shopkeeper/dashboard" replace />;
     case 'DELIVERY_PARTNER': return <Navigate to="/delivery/dashboard" replace />;
     case 'SYSTEM_ADMIN': return <Navigate to="/admin/dashboard" replace />;
-    default: return <Navigate to="/login/customer" replace />;
+    default: return <Navigate to="/login" replace />;
   }
 };
 
 const AppRoutes = () => (
   <BrowserRouter>
     <Routes>
+      {/* Public Landing Page */}
+      <Route path="/login" element={<Landing />} />
+
       {/* Auth routes */}
       <Route element={<AuthLayout />}>
         <Route path="/login/customer" element={<LoginCustomer />} />
@@ -71,6 +74,7 @@ const AppRoutes = () => (
         {/* Keep the old routes for backward compatibility during transition (optional)
         <Route path="/login" element={<Navigate to="/login/customer" replace />} />
         <Route path="/register" element={<Navigate to="/register/customer" replace />} />
+        */}
       </Route>
 
       {/* Customer routes */}

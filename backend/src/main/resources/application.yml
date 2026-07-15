@@ -9,7 +9,7 @@ spring:
   # We use ddl-auto: none and rely on schema.sql for schema initialization
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
     show-sql: true
     properties:
       hibernate:
@@ -17,7 +17,7 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: never
+      mode: always
 
   mail:
     host: smtp.gmail.com
@@ -45,14 +45,18 @@ springdoc:
     path: /swagger-ui.html
 
 aws:
+  access-key-id: ${AWS_ACCESS_KEY_ID:}
+  secret-access-key: ${AWS_SECRET_ACCESS_KEY:}
   s3:
-    bucket: ${S3_BUCKET_NAME}
-    region: ${AWS_REGION}
+    bucket: ${S3_BUCKET_NAME:quickcart1}
+    region: ${AWS_REGION:us-east-1}
 
 ai:
   groq:
-    api-key: ${GROQ_API_KEY}
+    api-key: ${GROQ_API_KEY:}
   nvidia:
-    api-key: ${NVIDIA_API_KEY}
+    api-key: ${NVIDIA_API_KEY:}
   gemini:
-    api-key: ${GEMINI_API_KEY}
+    api-key: ${GEMINI_API_KEY:}
+  xai:
+    api-key: ${XAI_API_KEY:}

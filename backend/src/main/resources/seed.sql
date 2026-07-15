@@ -1,11 +1,11 @@
 -- seed.sql
 
 -- Insert Users
-INSERT INTO users (phone, email, full_name, role, trust_score, is_active) VALUES 
-('+919876543210', 'customer@example.com', 'Ramesh', 'CUSTOMER', 50, true),
-('+919876543211', 'storeadmin@example.com', 'Raj', 'STORE_ADMIN', 50, true),
-('+919876543212', 'delivery@example.com', 'Suresh', 'DELIVERY_PARTNER', 50, true),
-('+919876543213', 'admin@example.com', 'Admin', 'SYSTEM_ADMIN', 100, true);
+INSERT INTO users (phone, email, password_hash, full_name, role, trust_score, is_active) VALUES 
+('+919876543210', 'customer@example.com', NULL, 'Ramesh', 'CUSTOMER', 50, true),
+('+919876543211', 'seller@example.com', NULL, 'Raj', 'STORE_ADMIN', 50, true),
+('+919876543212', 'delivery@example.com', NULL, 'Suresh', 'DELIVERY_PARTNER', 50, true),
+('+919876543213', 'shashankdany8712@gmail.com', '$2a$10$0z8q5w85Xj0H0t/D9.tE4eVN/q15wLhZc09pG2Yq5fB3uF/yE2Wqy', 'Admin', 'SYSTEM_ADMIN', 100, true);
 
 -- Insert Store
 -- Location: HSR Layout, Bangalore (roughly 77.63, 12.91)

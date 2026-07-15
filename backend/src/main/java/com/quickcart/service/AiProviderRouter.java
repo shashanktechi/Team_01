@@ -23,24 +23,78 @@ public class AiProviderRouter {
     @Value("${ai.gemini.api-key:}")
     private String geminiApiKey;
 
+    @Value("${ai.xai.api-key:}")
+    private String xaiApiKey;
+
     private final RestTemplate restTemplate = new RestTemplate();
 
     public String queryAi(String prompt) {
         try {
-            // Attempt Groq first
-            return callGroq(prompt);
-        } catch (Exception e1) {
+            // Attempt xAI (Grok) first
+            return callXai(prompt);
+        } catch (Exception e0) {
             try {
-                // Fallback NVIDIA
-                return callNvidia(prompt);
-            } catch (Exception e2) {
+                // Fallback Gemini
+                return callGemini(prompt);
+            } catch (Exception e1) {
                 try {
-                    // Fallback Gemini
-                    return callGemini(prompt);
-                } catch (Exception e3) {
-                    return "AI Providers unavailable. Static fallback engaged.";
+                    // Fallback NVIDIA
+                    return callNvidia(prompt);
+                } catch (Exception e2) {
+                    try {
+                        // Fallback Groq
+                        return callGroq(prompt);
+                    } catch (Exception e3) {
+                        return "AI Providers unavailable. Static fallback engaged.";
+                    }
                 }
             }
+        }
+    }
+
+    private String callXai(String prompt) {
+        if (xaiApiKey == null || xaiApiKey.trim().isEmpty() || xaiApiKey.contains("your_")) {
+            throw new RuntimeException("xAI API key not configured");
+        }
+
+        try {
+            String url = "https://api.x.ai/v1/chat/completions";
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            headers.setBearerAuth(xaiApiKey);
+
+            Map<String, Object> message = Map.of(
+                "role", "user",
+                "content", prompt
+            );
+
+            Map<String, Object> payload = Map.of(
+                "model", "grok-3-mini",
+                "messages", List.of(message),
+                "max_tokens", 1000,
+                "temperature", 0.7
+            );
+
+            HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
+            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(url, entity, (Class<Map<String, Object>>)(Class<?>)Map.class);
+
+            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+                Map<String, Object> body = response.getBody();
+                if (body != null) {
+                    List<?> choices = (List<?>) body.get("choices");
+                    if (choices != null && !choices.isEmpty()) {
+                        Map<String, Object> firstChoice = (Map<String, Object>) choices.get(0);
+                        Map<String, Object> msg = (Map<String, Object>) firstChoice.get("message");
+                        if (msg != null) {
+                            return (String) msg.get("content");
+                        }
+                    }
+                }
+            }
+            throw new RuntimeException("Invalid response from xAI API");
+        } catch (Exception e) {
+            throw new RuntimeException("xAI API call failed: " + e.getMessage(), e);
         }
     }
 

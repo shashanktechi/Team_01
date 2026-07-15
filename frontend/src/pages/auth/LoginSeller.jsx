@@ -23,11 +23,11 @@ const LoginSeller = () => {
     setLoading(true);
     try {
       if (!email || !password) {
-        setError(t('auth.emailPasswordRequired'));
+        setError('Email address and password are required');
         setLoading(false);
         return;
       }
-      const payload = { email: email.trim(), password };
+      const payload = { email: email.trim().toLowerCase(), password };
       const data = await authApi.login(payload);
       dispatch(setAuth({
         token: data.token,
@@ -36,59 +36,56 @@ const LoginSeller = () => {
         storeId: data.storeId
       }));
 
-      // Redirect based on role - seller should be STORE_ADMIN
       if (data.role === 'STORE_ADMIN') {
         navigate('/shopkeeper/dashboard');
       } else {
-        // Role mismatch - log out and redirect to correct login
         dispatch(setAuth(null));
-        setError(t('auth.roleMismatch'));
+        setError('Unauthorized access. This portal is for Shopkeepers only.');
         setLoading(false);
       }
     } catch (e) {
-      setError(e.response?.data?.message || t('auth.loginFailed'));
+      setError(e.response?.data?.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">
+          Shopkeeper Portal
+        </h2>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
+          {t('auth.sellerLoginSubtitle') || 'Sign in to manage your store'}
+        </p>
+      </div>
+
+      <form className="space-y-5" onSubmit={handleLogin}>
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            {t('auth.loginTitle')}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            {t('auth.sellerLoginSubtitle')}
-          </p>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+            Email Address
+          </label>
+          <div className="relative">
+            <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+            <input
+              type="email"
+              id="login-seller-email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              placeholder="name@example.com"
+              className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+            />
+          </div>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('auth.email')}
-            </label>
-            <div className="relative">
-              <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-              <input
-                type="email"
-                id="login-seller-email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="you@example.com"
-                className="block w-full pl-10 pr-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-              />
-            </div>
-          </div>
-
+        <div>
+          <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+            Password
+          </label>
           <div className="relative">
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              {t('auth.password')}
-            </label>
-            <div className="absolute inset-0"></div>
-            <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+            <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               type={showPw ? 'text' : 'password'}
               id="login-seller-password"
@@ -96,46 +93,46 @@ const LoginSeller = () => {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               placeholder="••••••••"
-              className="block w-full pl-10 pr-10 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              className="block w-full pl-12 pr-12 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
             />
             <button
               type="button"
               onClick={() => setShowPw(!showPw)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
             >
-              {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
+              {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+        </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 disabled:opacity-50 transition"
-          >
-            {loading ? (
-              <>
-                <span className="mr-2"><Loader2 size={20} className="animate-spin" /></span>
-                {t('auth.loggingIn')}
-              </>
-            ) : (
-              t('auth.login')
-            )}
-          </button>
-
-          <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-            {t('auth.dontHaveAccount')}
-            <Link to="/register/seller" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-              {t('auth.signUp')}
-            </Link>
-          </p>
-
-          {error && (
-            <p className="mt-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-md">
-              {error}
-            </p>
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
+        >
+          {loading ? (
+            <>
+              <Loader2 size={18} className="animate-spin mr-2" />
+              Verifying...
+            </>
+          ) : (
+            'Verify & Login'
           )}
-        </form>
-      </div>
+        </button>
+
+        <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
+          Don't have an account?{' '}
+          <Link to="/register/seller" className="font-extrabold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-350">
+            Register
+          </Link>
+        </p>
+
+        {error && (
+          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 px-4 py-3 rounded-2xl border border-red-100 dark:border-red-900/20 text-center font-medium">
+            {error}
+          </p>
+        )}
+      </form>
     </div>
   );
 };

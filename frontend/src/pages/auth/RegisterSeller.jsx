@@ -4,42 +4,40 @@ import { useDispatch } from 'react-redux';
 import { setAuth } from '../../app/authSlice';
 import { authApi } from '../../api/authApi';
 import { useTranslation } from 'react-i18next';
-import { Phone, MessageSquare, Loader2, User, Mail, Lock, Eye, EyeOff, MapPin, Store } from 'lucide-react';
+import { Mail, MessageSquare, Loader2, User, Lock, Eye, EyeOff, MapPin, Check } from 'lucide-react';
 
 const RegisterSeller = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const [step, setStep] = useState(1); // 1=phone, 2=otp, 3=store-details, 4=done
-  const [phone, setPhone] = useState('');
+  const [step, setStep] = useState(1); // 1=email, 2=otp, 3=store-details, 4=done
+  const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [form, setForm] = useState({
     name: '',
-    email: '',
     password: '',
     storeName: '',
     storeAddress: '',
-    storeLat: '',
-    storeLng: '',
+    storeLat: '12.9716',
+    storeLng: '77.5946',
   });
   const [showPw, setShowPw] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSendOtp = async () => {
-    if (!phone.trim()) {
-      setError(t('auth.phoneRequired'));
+    if (!email.trim()) {
+      setError('Email address is required');
       return;
     }
     setLoading(true);
     setError('');
     try {
-      await authApi.sendOtp(phone.trim());
-      setOtpSent(true);
+      await authApi.sendOtp(email.trim());
+      setStep(2);
     } catch (e) {
-      setError(e.response?.data?.message || t('auth.otpSendFailed'));
+      setError(e.response?.data?.message || 'Failed to send OTP. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -48,26 +46,11 @@ const RegisterSeller = () => {
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
-    try {
-      if (!phone || !otp) {
-        setError(t('auth.phoneOtpRequired'));
-        setLoading(false);
-        return;
-      }
-      // Verify OTP first, then proceed to store details
-      const verifyPayload = {
-        phone: phone.trim(),
-        otp
-      };
-      // We'll use a hypothetical verify endpoint or just proceed to next step
-      // For now, we'll simulate OTP verification by setting a flag
-      setStep(3);
-    } catch (e) {
-      setError(e.response?.data?.message || t('auth.otpInvalid'));
-    } finally {
-      setLoading(false);
+    if (!otp.trim()) {
+      setError('OTP is required');
+      return;
     }
+    setStep(3);
   };
 
   const handleRegister = async (e) => {
@@ -75,14 +58,13 @@ const RegisterSeller = () => {
     setError('');
     setLoading(true);
     try {
-      if (!form.name || !form.email || !form.password || !form.storeName || !form.storeAddress || !form.storeLat || !form.storeLng) {
-        setError(t('auth.allFieldsRequired'));
+      if (!form.name || !form.password || !form.storeName || !form.storeAddress || !form.storeLat || !form.storeLng) {
+        setError('All fields are required');
         setLoading(false);
         return;
       }
       const payload = {
-        phone: phone.trim(),
-        email: form.email.trim(),
+        email: email.trim().toLowerCase(),
         password: form.password,
         name: form.name.trim(),
         role: 'STORE_ADMIN',
@@ -90,7 +72,7 @@ const RegisterSeller = () => {
         storeAddress: form.storeAddress.trim(),
         storeLat: parseFloat(form.storeLat),
         storeLng: parseFloat(form.storeLng),
-        otp: otp // Include OTP for verification
+        otp: otp
       };
       const data = await authApi.register(payload);
       dispatch(setAuth({
@@ -100,10 +82,9 @@ const RegisterSeller = () => {
         storeId: data.storeId
       }));
 
-      // Seller registration requires admin approval, so show pending message
       setStep(4);
     } catch (e) {
-      setError(e.response?.data?.message || t('auth.registrationFailed'));
+      setError(e.response?.data?.message || 'Registration failed. Please check details.');
     } finally {
       setLoading(false);
     }
@@ -111,314 +92,261 @@ const RegisterSeller = () => {
 
   const handleGetLocation = () => {
     navigator.geolocation.getCurrentPosition(
-      (pos) => setForm((f) => ({ ...f, storeLat: pos.coords.latitude.toString(), storeLng: pos.coords.longitude.toString() })),
-      () => setError(t('auth.locationAccessDenied'))
+      (pos) => setForm((f) => ({ ...f, storeLat: pos.coords.latitude.toFixed(6), storeLng: pos.coords.longitude.toFixed(6) })),
+      () => setError('Location access denied')
     );
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-900 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-md space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            {t('auth.registerTitle')}
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            {t('auth.sellerRegisterSubtitle')}
-          </p>
-        </div>
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-3xl font-black tracking-tight text-gray-900 dark:text-white">
+          Register Store
+        </h2>
+        <p className="mt-2 text-sm text-gray-500 dark:text-gray-400 font-medium">
+          {t('auth.sellerRegisterSubtitle') || 'Register your store on QuickCart to start selling'}
+        </p>
+      </div>
 
-        <form className="mt-8 space-y-6" onSubmit={step === 2 ? handleVerifyOtp : (step === 3 ? handleRegister : null)}>
-          {step === 1 && (
-            <>
+      <form className="space-y-5" onSubmit={step === 2 ? handleVerifyOtp : (step === 3 ? handleRegister : null)}>
+        {step === 1 && (
+          <>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="email"
+                  id="register-seller-email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                  placeholder="name@example.com"
+                  className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+              <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 font-medium">
+                We will send a 6-digit verification code to this email address.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSendOtp}
+              disabled={loading}
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin mr-2" />
+                  Sending OTP...
+                </>
+              ) : (
+                'Send OTP Code'
+              )}
+            </button>
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                OTP Verification Code
+              </label>
+              <div className="relative">
+                <MessageSquare size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  id="register-seller-otp"
+                  value={otp}
+                  onChange={(e) => setOtp(e.target.value)}
+                  maxLength="6"
+                  autoComplete="one-time-code"
+                  placeholder="123456"
+                  className="block w-full pl-12 pr-4 py-3.5 text-sm font-mono text-center tracking-widest text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
+            >
+              Verify OTP Code
+            </button>
+          </>
+        )}
+
+        {step === 3 && (
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Full Name
+              </label>
+              <div className="relative">
+                <User size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Your full name"
+                  id="register-seller-name"
+                  className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  name="password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                  placeholder="Minimum 8 characters"
+                  id="register-seller-password"
+                  type={showPw ? 'text' : 'password'}
+                  className="block w-full pl-12 pr-12 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPw(!showPw)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500"
+                >
+                  {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-4">
+              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Store Info</span>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('auth.phone')}
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                  Store Name
                 </label>
-                <div className="relative">
-                  <Phone size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  name="storeName"
+                  value={form.storeName}
+                  onChange={(e) => setForm({ ...form, storeName: e.target.value })}
+                  placeholder="Fresh Mart"
+                  id="register-seller-storeName"
+                  className="block w-full px-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                  Store Address
+                </label>
+                <input
+                  name="storeAddress"
+                  value={form.storeAddress}
+                  onChange={(e) => setForm({ ...form, storeAddress: e.target.value })}
+                  placeholder="123 Main St, Area"
+                  id="register-seller-storeAddress"
+                  className="block w-full px-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Latitude
+                  </label>
                   <input
-                    type="tel"
-                    id="register-seller-phone"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\s/g, ''))}
-                    autoComplete="tel"
-                    placeholder="+919876543210"
-                    className="block w-full pl-10 pr-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                    name="storeLat"
+                    value={form.storeLat}
+                    onChange={(e) => setForm({ ...form, storeLat: e.target.value })}
+                    id="register-seller-storeLat"
+                    type="number"
+                    step="0.000001"
+                    className="block w-full px-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                   />
                 </div>
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  {t('auth.phoneWillBeUsed')}
-                </p>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                    Longitude
+                  </label>
+                  <input
+                    name="storeLng"
+                    value={form.storeLng}
+                    onChange={(e) => setForm({ ...form, storeLng: e.target.value })}
+                    id="register-seller-storeLng"
+                    type="number"
+                    step="0.000001"
+                    className="block w-full px-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                  />
+                </div>
               </div>
 
               <button
                 type="button"
-                onClick={handleSendOtp}
-                disabled={loading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 disabled:opacity-50 transition"
+                onClick={handleGetLocation}
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 text-sm font-bold rounded-2xl bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-800 text-gray-700 dark:text-gray-300 transition-all"
               >
-                {loading ? (
-                  <>
-                    <span className="mr-2"><Loader2 size={20} className="animate-spin" /></span>
-                    {t('auth.sendingOtp')}
-                  </>
-                ) : (
-                  t('auth.sendOtp')
-                )}
+                <MapPin size={16} /> Fetch Current Location
               </button>
-            </>
-          )}
-
-          {step === 2 && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('auth.otp')}
-                </label>
-                <div className="relative">
-                  <MessageSquare size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    type="text"
-                    id="register-seller-otp"
-                    value={otp}
-                    onChange={(e) => setOtp(e.target.value)}
-                    maxLength="6"
-                    autoComplete="one-time-code"
-                    placeholder="123456"
-                    className="block w-full pl-10 pr-4 py-3 text-sm font-mono text-center text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
-                <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-                  {t('auth.otpWillExpire')}
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between mt-4">
-                <button
-                  type="button"
-                  onClick={() => setStep(1)}
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-500"
-                >
-                  {t('auth.back')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 disabled:opacity-50 transition"
-                >
-                  {loading ? (
-                    <>
-                      <span className="mr-2"><Loader2 size={20} className="animate-spin" /></span>
-                      {t('auth.verifyOtp')}
-                    </>
-                  ) : (
-                    t('auth.verifyOtp'))
-                  }
-                </button>
-              </div>
-            </>
-          )}
-
-          {step === 3 && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('auth.fullName')}
-                </label>
-                <div className="relative">
-                  <User size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    placeholder="Your full name"
-                    id="register-seller-name"
-                    className="block w-full pl-10 pr-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('auth.email')}
-                </label>
-                <div className="relative">
-                  <Mail size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    name="email"
-                    value={form.email}
-                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    placeholder="you@example.com"
-                    id="register-seller-email"
-                    type="email"
-                    className="block w-full pl-10 pr-4 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  {t('auth.password')}
-                </label>
-                <div className="relative">
-                  <Lock size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                  <input
-                    name="password"
-                    value={form.password}
-                    onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    placeholder="Create a password"
-                    id="register-seller-password"
-                    type={showPw ? 'text' : 'password'}
-                    className="block w-full pl-10 pr-10 py-3 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPw(!showPw)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-500"
-                  >
-                    {showPw ? <EyeOff size={20} /> : <Eye size={20} />}
-                  </button>
-                </div>
-              </div>
-
-              {form.name && form.email && form.password && (
-                <div className="space-y-4 pt-4 border-t border-gray-200 dark:border-gray-700/50">
-                  <p className="text-xs font-bold text-gray-600 dark:text-gray-400 uppercase tracking-wider">
-                    {t('auth.storeDetails')}
-                  </p>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('auth.storeName')}
-                    </label>
-                    <input
-                      name="storeName"
-                      value={form.storeName}
-                      onChange={(e) => setForm({ ...form, storeName: e.target.value })}
-                      placeholder={t('auth.storeNamePlaceholder')}
-                      id="register-seller-storeName"
-                      className="block w-full pl-4 pr-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                      {t('auth.storeAddress')}
-                    </label>
-                    <input
-                      name="storeAddress"
-                      value={form.storeAddress}
-                      onChange={(e) => setForm({ ...form, storeAddress: e.target.value })}
-                      placeholder={t('auth.storeAddressPlaceholder')}
-                      id="register-seller-storeAddress"
-                      className="block w-full pl-4 pr-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                    />
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t('auth.latitude')}
-                      </label>
-                      <input
-                        name="storeLat"
-                        value={form.storeLat}
-                        onChange={(e) => setForm({ ...form, storeLat: e.target.value })}
-                        placeholder={t('auth.latitudePlaceholder')}
-                        id="register-seller-storeLat"
-                        type="number"
-                        step="any"
-                        className="block w-full pl-4 pr-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                        {t('auth.longitude')}
-                      </label>
-                      <input
-                        name="storeLng"
-                        value={form.storeLng}
-                        onChange={(e) => setForm({ ...form, storeLng: e.target.value })}
-                        placeholder={t('auth.longitudePlaceholder')}
-                        id="register-seller-storeLng"
-                        type="number"
-                        step="any"
-                        className="block w-full pl-4 pr-4 py-2 text-sm font-medium text-gray-900 bg-white border border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-gray-100 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                      />
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={handleGetLocation}
-                    className="w-full flex items-center justify-center gap-2 py-2 text-sm font-medium text-indigo-600 border border-indigo-300 dark:border-indigo-400/50 rounded-xl hover:bg-indigo-50 transition"
-                  >
-                    <MapPin size={18} /> {t('auth.useCurrentLocation')}
-                  </button>
-                </div>
-              )}
-
-              <div className="flex items-center justify-between mt-6">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-gray-500"
-                >
-                  {t('auth.back')}
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2 disabled:opacity-50 transition"
-                >
-                  {loading ? (
-                    <>
-                      <span className="mr-2"><Loader2 size={20} className="animate-spin" /></span>
-                      {t('auth.submitting')}
-                    </>
-                  ) : (
-                    t('auth.register'))
-                  }
-                </button>
-              </div>
-            </>
-          )}
-
-          {step === 4 && (
-            <div className="text-center">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-600 text-white mx-auto mb-4">
-                <Store size={20} />
-              </div>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                {t('auth.registrationPendingApproval')}
-              </h3>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                {t('auth.approvalNeeded')}
-              </p>
-              <Link
-                to="/login/seller"
-                className="mt-4 inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:ring-offset-2"
-              >
-                {t('auth.goToLogin')}
-              </Link>
             </div>
-          )}
-        </form>
 
-        <p className="mt-4 text-center text-sm text-gray-500 dark:text-gray-400">
-          {t('auth.alreadyHaveAccount')} {' '}
-          <Link to="/login/seller" className="font-medium text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-            {t('auth.signIn')}
-          </Link>
-        </p>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
+            >
+              {loading ? (
+                <>
+                  <Loader2 size={18} className="animate-spin mr-2" />
+                  Submitting...
+                </>
+              ) : (
+                'Register Store'
+              )}
+            </button>
+          </div>
+        )}
+
+        {step === 4 && (
+          <div className="text-center space-y-4 py-4">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-amber-100 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 mx-auto">
+              <Check className="h-8 w-8" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+              Registration Pending Approval
+            </h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 font-medium">
+              Your store registration has been submitted. An administrator will review and approve your store shortly.
+            </p>
+            <Link
+              to="/login"
+              className="inline-flex items-center justify-center py-3.5 px-6 text-sm font-extrabold rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-500/15 transition-all"
+            >
+              Go to Login
+            </Link>
+          </div>
+        )}
+
+        {step !== 4 && (
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
+            Already have an account?{' '}
+            <Link to="/login/seller" className="font-extrabold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-350">
+              Sign In
+            </Link>
+          </p>
+        )}
 
         {error && (
-          <p className="mt-2 text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-4 py-2 rounded-md">
+          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 px-4 py-3 rounded-2xl border border-red-100 dark:border-red-900/20 text-center font-medium">
             {error}
           </p>
         )}
-      </div>
+      </form>
     </div>
   );
 };

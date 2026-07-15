@@ -8,7 +8,7 @@ import java.time.Instant;
 @Entity
 @Table(name = "otp_requests",
         indexes = {
-                @Index(name = "idx_otp_requests_phone", columnList = "phone"),
+                @Index(name = "idx_otp_requests_email", columnList = "email"),
                 @Index(name = "idx_otp_requests_expires_at", columnList = "expires_at"),
                 @Index(name = "idx_otp_requests_created_at", columnList = "created_at")
         })
@@ -18,8 +18,8 @@ public class OtpRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 20)
-    private String phone;
+    @Column(nullable = false, unique = true, length = 255)
+    private String email;
 
     @Column(nullable = false)
     private String otpHash;

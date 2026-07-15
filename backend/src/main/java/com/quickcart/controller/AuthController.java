@@ -19,8 +19,10 @@ public class AuthController {
 
     @PostMapping("/otp/send")
     public ResponseEntity<?> sendOtp(@RequestBody AuthRequest request) {
-        authService.sendOtp(request.getPhone());
-        return ResponseEntity.ok(Map.of("message", "OTP sent to email"));
+        String target = request.getEmail() != null && !request.getEmail().trim().isEmpty() 
+                ? request.getEmail() : request.getPhone();
+        authService.sendOtp(target);
+        return ResponseEntity.ok(Map.of("message", "OTP sent successfully"));
     }
 
     @PostMapping("/login")

@@ -17,16 +17,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     dispatch(logout());
-    const role = localStorage.getItem('quickcart_role');
-    let redirectTo = '/login/customer'; // default
-    if (role === 'STORE_ADMIN') {
-      redirectTo = '/login/seller';
-    } else if (role === 'DELIVERY_PARTNER') {
-      redirectTo = '/login/delivery';
-    } else if (role === 'SYSTEM_ADMIN') {
-      redirectTo = '/login/admin';
-    }
-    navigate(redirectTo, { replace: true });
+    navigate('/login', { replace: true });
   };
 
   const getRoleLabel = () => {
@@ -44,10 +35,13 @@ const Navbar = () => {
     }
   };
 
+  // Logo routing target: if authenticated -> dashboard
+  const logoTarget = role === 'CUSTOMER' ? '/' : role === 'STORE_ADMIN' ? '/shopkeeper/dashboard' : role === 'DELIVERY_PARTNER' ? '/delivery/dashboard' : '/admin/dashboard';
+
   return (
     <nav className="sticky top-0 z-40 w-full h-14 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-800/50 px-4 md:px-8 flex justify-between items-center transition-colors duration-200">
       <div className="flex items-center gap-2">
-        <Link to="/" className="flex items-center gap-2">
+        <Link to={logoTarget} className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-lg bg-teal flex items-center justify-center">
             <span className="text-white font-bold text-sm">Q</span>
           </div>

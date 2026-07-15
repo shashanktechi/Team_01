@@ -57,6 +57,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(body, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleDataIntegrityViolationExceptions(org.springframework.dao.DataIntegrityViolationException ex) {
+        logger.error("Database integrity violation: ", ex);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", HttpStatus.CONFLICT.value());
+
+        String rootMsg = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
+        String userFriendlyMessage = "A database conflict occurred.";
+
+        if (rootMsg != null) {
+            if (rootMsg.contains("otp_requests_email_key") || rootMsg.contains("otp_requests")) {
+                userFriendlyMessage = "An OTP was already requested for this email. Please wait a moment before trying again.";
+            } else if (rootMsg.contains("users_email_key") || rootMsg.contains("users.email")) {
+                userFriendlyMessage = "An account with this email address already exists.";
+            } else if (rootMsg.contains("users_phone_key")) {
+                userFriendlyMessage = "An account with this phone number already exists.";
+            }
+        }
+        body.put("message", userFriendlyMessage);
+
+        return new ResponseEntity<>(body, HttpStatus.CONFLICT);
+    }
+
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntimeExceptions(RuntimeException ex) {
         Map<String, Object> body = new LinkedHashMap<>();

@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface OtpRequestRepository extends JpaRepository<OtpRequest, Long> {
-    Optional<OtpRequest> findByPhone(String phone);
-    long countByPhoneAndCreatedAfter(String phone, Instant dateTime);
-    void deleteByPhone(String phone);
+    Optional<OtpRequest> findByEmail(String email);
+    long countByEmailAndCreatedAtAfter(String email, Instant dateTime);
+    void deleteByEmail(String email);
 }

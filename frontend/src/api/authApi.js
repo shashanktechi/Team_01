@@ -1,8 +1,9 @@
 import apiClient from './apiClient';
 
 export const authApi = {
-  sendOtp: async (phone) => {
-    const response = await apiClient.post('/auth/otp/send', { phone });
+  sendOtp: async (target) => {
+    const payload = target.includes('@') ? { email: target } : { phone: target };
+    const response = await apiClient.post('/auth/otp/send', payload);
     return response.data;
   },
   register: async (registerData) => {
