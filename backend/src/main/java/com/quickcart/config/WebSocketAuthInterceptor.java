@@ -1,7 +1,9 @@
 package com.quickcart.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.messaging.Message;
+import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -19,7 +21,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
     private JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public Message<?> preSend(Message<?> message, org.springframework.messaging.MessageChannel channel) {
+    public Message<?> preSend(@NonNull Message<?> message, @NonNull MessageChannel channel) {
         org.springframework.messaging.simp.stomp.StompHeaderAccessor accessor =
                 org.springframework.messaging.simp.stomp.StompHeaderAccessor.wrap(message);
 

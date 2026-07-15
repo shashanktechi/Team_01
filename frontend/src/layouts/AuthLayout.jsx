@@ -22,7 +22,7 @@ const AuthLayout = () => {
   }
 
   return (
-    <div className="min-h-screen bg-radial from-teal/10 via-surface to-surface dark:from-teal-dark/10 dark:via-surface-dark dark:to-surface-dark flex flex-col justify-between transition-colors duration-200">
+    <div className="min-h-screen flex-1 bg-radial from-teal/10 via-surface to-surface dark:from-teal-dark/10 dark:via-surface-dark dark:to-surface-dark flex flex-col justify-between transition-colors duration-200">
       <header className="w-full max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 rounded-xl bg-teal flex items-center justify-center shadow-md">

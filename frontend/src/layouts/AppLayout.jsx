@@ -46,13 +46,13 @@ const AppLayout = () => {
   }, [role, userId, storeId]);
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-surface-dark flex flex-col transition-colors duration-200">
+    <div className="min-h-screen bg-surface dark:bg-surface-dark flex flex-col flex-1 transition-colors duration-200">
       <Navbar />
 
       <div className="flex flex-1">
         <Sidebar />
 
-        <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8 pb-24 md:pb-6 max-w-7xl mx-auto w-full">
+        <main className="flex-1 overflow-y-auto px-4 py-6 md:px-8 pb-24 md:pb-6 w-full">
           <Outlet />
         </main>
       </div>

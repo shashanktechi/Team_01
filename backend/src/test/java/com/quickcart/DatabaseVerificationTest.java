@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -33,28 +34,28 @@ public class DatabaseVerificationTest {
             }
 
             // 2. Referential Integrity Checks
-            long count1 = jdbcTemplate.queryForObject(
+            long count1 = Objects.requireNonNullElse(jdbcTemplate.queryForObject(
                     "SELECT count(*) FROM orders o LEFT JOIN users u ON o.customer_id = u.id WHERE u.id IS NULL",
                     Long.class
-            );
+            ), 0L);
             System.out.println("Referential Integrity check 1 (Orders -> Users): " + count1);
 
-            long count2 = jdbcTemplate.queryForObject(
+            long count2 = Objects.requireNonNullElse(jdbcTemplate.queryForObject(
                     "SELECT count(*) FROM orders o LEFT JOIN stores s ON o.store_id = s.id WHERE s.id IS NULL",
                     Long.class
-            );
+            ), 0L);
             System.out.println("Referential Integrity check 2 (Orders -> Stores): " + count2);
 
-            long count3 = jdbcTemplate.queryForObject(
+            long count3 = Objects.requireNonNullElse(jdbcTemplate.queryForObject(
                     "SELECT count(*) FROM inventory i LEFT JOIN stores s ON i.store_id = s.id WHERE s.id IS NULL",
                     Long.class
-            );
+            ), 0L);
             System.out.println("Referential Integrity check 3 (Inventory -> Stores): " + count3);
 
-            long count4 = jdbcTemplate.queryForObject(
+            long count4 = Objects.requireNonNullElse(jdbcTemplate.queryForObject(
                     "SELECT count(*) FROM inventory i LEFT JOIN products p ON i.product_id = p.id WHERE p.id IS NULL",
                     Long.class
-            );
+            ), 0L);
             System.out.println("Referential Integrity check 4 (Inventory -> Products): " + count4);
 
             // 3. Live Spatial Check

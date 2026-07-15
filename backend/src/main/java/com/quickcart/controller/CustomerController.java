@@ -69,7 +69,7 @@ public class CustomerController {
         if (customerId == null) {
             return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
         }
-        Order order = orderRepository.findById(id)
+        Order order = orderRepository.findById(java.util.Objects.requireNonNull(id))
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         if (!order.getCustomer().getId().equals(customerId)) {
             return ResponseEntity.status(403).body(Map.of("error", "Access denied: You do not own this order"));

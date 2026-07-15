@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class WeatherAnalyticsService {
@@ -24,7 +25,7 @@ public class WeatherAnalyticsService {
     private final RestTemplate restTemplate = new RestTemplate();
 
     public WeatherSnapshot getForecastForStore(Long storeId) {
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findById(Objects.requireNonNull(storeId))
                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
         double lat = 12.9716; // default fallback (Bengaluru)
@@ -37,9 +38,10 @@ public class WeatherAnalyticsService {
         try {
             String url = String.format("https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f&current=temperature_2m,precipitation_probability,weather_code", lat, lng);
             @SuppressWarnings("rawtypes")
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Map<?, ?> current = (Map<?, ?>) response.getBody().get("current");
+            ResponseEntity<Map> response = restTemplate.getForEntity(Objects.requireNonNull(url), Map.class);
+            Map<?, ?> body = response.getBody();
+            if (response.getStatusCode().is2xxSuccessful() && body != null) {
+                Map<?, ?> current = (Map<?, ?>) body.get("current");
                 if (current != null) {
                     Number temp = (Number) current.get("temperature_2m");
                     Number rainProb = (Number) current.get("precipitation_probability");
@@ -61,7 +63,7 @@ public class WeatherAnalyticsService {
     }
 
     public double adjustDemandForWeather(Long productId, WeatherSnapshot weather) {
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findById(Objects.requireNonNull(productId))
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         String category = product.getCategory() != null ? product.getCategory().toLowerCase() : "";

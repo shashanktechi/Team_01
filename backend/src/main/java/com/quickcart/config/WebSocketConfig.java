@@ -30,7 +30,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     @Override
-    public void configureClientInboundChannel(org.springframework.messaging.simp.config.ChannelRegistration registration) {
+    public void configureClientInboundChannel(@org.springframework.lang.NonNull org.springframework.messaging.simp.config.ChannelRegistration registration) {
         registration.interceptors(webSocketAuthInterceptor);
     }
 

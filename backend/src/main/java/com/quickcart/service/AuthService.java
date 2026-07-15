@@ -12,7 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class AuthService {
@@ -29,19 +32,44 @@ public class AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private EmailService emailService;
+
+    // In-memory OTP cache: Map<Phone, OTP>
+    // For a real production app, this should be in Redis with an expiration time
+    private final Map<String, String> otpCache = new ConcurrentHashMap<>();
+
     public void sendOtp(String phone) {
-        // Mock OTP sending
-        System.out.println("OTP sent to " + phone + ": 1234");
+        User user = userRepository.findByPhone(phone)
+                .orElseThrow(() -> new RuntimeException("User not found for this phone number"));
+
+        if (user.getEmail() == null || user.getEmail().trim().isEmpty()) {
+            throw new RuntimeException("No email address registered for this account");
+        }
+
+        // Generate a 6-digit OTP
+        String otp = String.format("%06d", new Random().nextInt(999999));
+        
+        // Store in cache
+        otpCache.put(phone, otp);
+
+        // Send via Email
+        emailService.sendOtpEmail(user.getEmail(), otp);
+        System.out.println("OTP sent to " + user.getEmail() + " for phone " + phone + ". OTP is: " + otp);
     }
 
     public AuthResponse login(AuthRequest request) {
         User user = null;
         
         if (request.getPhone() != null && request.getOtp() != null) {
-            // Mock OTP verification
-            if (!"1234".equals(request.getOtp())) {
-                throw new RuntimeException("Invalid OTP");
+            String cachedOtp = otpCache.get(request.getPhone());
+            if (cachedOtp == null || !cachedOtp.equals(request.getOtp())) {
+                throw new RuntimeException("Invalid or expired OTP");
             }
+            
+            // Clear OTP after successful verification
+            otpCache.remove(request.getPhone());
+
             user = userRepository.findByPhone(request.getPhone())
                     .orElseThrow(() -> new RuntimeException("User not found"));
         } else if (request.getEmail() != null && request.getPassword() != null) {

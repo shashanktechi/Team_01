@@ -2,7 +2,7 @@ spring:
   application:
     name: quickcart-backend
   datasource:
-    url: jdbc:postgresql://${DB_HOST:database-1.cu3ikoym0hs3.us-east-1.rds.amazonaws.com}:${DB_PORT:5432}/${DB_NAME:studentdb}
+    url: jdbc:postgresql://${DB_HOST:database-1.cu3ikoym0hs3.us-east-1.rds.amazonaws.com}:${DB_PORT:5432}/${DB_NAME:postgres}
     username: ${DB_USER:admin123}
     password: ${DB_PASSWORD:Sunny2005}
     driver-class-name: org.postgresql.Driver
@@ -17,7 +17,19 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: always
+      mode: never
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: shashankdany8712@gmail.com
+    password: mhuk lhqx oqza uxwu
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 jwt:
   secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}

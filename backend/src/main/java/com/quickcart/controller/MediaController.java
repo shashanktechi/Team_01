@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -109,7 +110,7 @@ public class MediaController {
         if (!expectedKey.equals(request.getObjectKey())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findById(Objects.requireNonNull(storeId))
                 .orElseThrow(() -> new RuntimeException("Store not found"));
         store.setLogoUrl(s3Service.getPublicUrl(request.getObjectKey()));
         storeRepository.save(store);
@@ -144,7 +145,7 @@ public class MediaController {
         if (!expectedKey.equals(request.getObjectKey())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
-        Store store = storeRepository.findById(storeId)
+        Store store = storeRepository.findById(Objects.requireNonNull(storeId))
                 .orElseThrow(() -> new RuntimeException("Store not found"));
         store.setBannerUrl(s3Service.getPublicUrl(request.getObjectKey()));
         storeRepository.save(store);
@@ -180,7 +181,7 @@ public class MediaController {
         if (!request.getObjectKey().startsWith(prefix) || !request.getObjectKey().endsWith(".jpg")) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findById(Objects.requireNonNull(productId))
                 .orElseThrow(() -> new RuntimeException("Product not found"));
         product.setImageUrl(s3Service.getPublicUrl(request.getObjectKey()));
         productRepository.save(product);
@@ -225,7 +226,7 @@ public class MediaController {
     @PostMapping("/orders/{orderId}/proof-of-delivery/upload-url")
     @PreAuthorize("hasRole('DELIVERY_PARTNER')")
     public ResponseEntity<?> getProofOfDeliveryUploadUrl(@PathVariable Long orderId, @RequestBody @Valid UploadUrlRequest request) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findById(Objects.requireNonNull(orderId))
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         Long partnerId = currentUserProvider.getCurrentUserId();
         if (order.getDeliveryPartner() == null || !order.getDeliveryPartner().getId().equals(partnerId)) {
@@ -244,7 +245,7 @@ public class MediaController {
     @PatchMapping("/orders/{orderId}/proof-of-delivery")
     @PreAuthorize("hasRole('DELIVERY_PARTNER')")
     public ResponseEntity<?> confirmProofOfDelivery(@PathVariable Long orderId, @RequestBody @Valid ConfirmMediaRequest request) {
-        Order order = orderRepository.findById(orderId)
+        Order order = orderRepository.findById(Objects.requireNonNull(orderId))
                 .orElseThrow(() -> new RuntimeException("Order not found"));
         Long partnerId = currentUserProvider.getCurrentUserId();
         if (order.getDeliveryPartner() == null || !order.getDeliveryPartner().getId().equals(partnerId)) {

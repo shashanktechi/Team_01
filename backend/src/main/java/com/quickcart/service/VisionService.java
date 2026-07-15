@@ -64,8 +64,9 @@ public class VisionService {
             @SuppressWarnings("rawtypes")
             ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                List<?> candidates = (List<?>) response.getBody().get("candidates");
+            Map<?, ?> body = response.getBody();
+            if (response.getStatusCode().is2xxSuccessful() && body != null) {
+                List<?> candidates = (List<?>) body.get("candidates");
                 if (candidates != null && !candidates.isEmpty()) {
                     Map<?, ?> candidate = (Map<?, ?>) candidates.get(0);
                     Map<?, ?> content = (Map<?, ?>) candidate.get("content");
@@ -129,8 +130,9 @@ public class VisionService {
             @SuppressWarnings("rawtypes")
             ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                List<?> candidates = (List<?>) response.getBody().get("candidates");
+            Map<?, ?> body2 = response.getBody();
+            if (response.getStatusCode().is2xxSuccessful() && body2 != null) {
+                List<?> candidates = (List<?>) body2.get("candidates");
                 if (candidates != null && !candidates.isEmpty()) {
                     Map<?, ?> candidate = (Map<?, ?>) candidates.get(0);
                     Map<?, ?> content = (Map<?, ?>) candidate.get("content");
