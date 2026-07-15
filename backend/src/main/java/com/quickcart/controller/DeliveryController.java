@@ -102,7 +102,7 @@ public class DeliveryController {
 
         Long orderId = request.getOrderId();
         if (orderId == null) {
-            return ResponseEntity.badRequest().build().body(Map.of("error", "orderId is required"));
+            return ResponseEntity.badRequest().body(Map.of("error", "orderId is required"));
         }
 
         Order order = orderRepository.findById(orderId)

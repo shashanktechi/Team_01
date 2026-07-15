@@ -4,7 +4,7 @@ import { useDispatch } from 'react-redux';
 import { setAuth } from '../../app/authSlice';
 import { authApi } from '../../api/authApi';
 import { useTranslation } from 'react-i18next';
-import { Phone, MessageSquare, Loader2, User, Eye, EyeOff } from 'lucide-react';
+import { Phone, MessageSquare, Loader2, User, Eye, EyeOff, Check } from 'lucide-react';
 
 const RegisterCustomer = () => {
   const dispatch = useDispatch();

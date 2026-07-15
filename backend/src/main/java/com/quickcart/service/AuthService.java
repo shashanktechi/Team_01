@@ -10,7 +10,6 @@ import com.quickcart.entity.User;
 import com.quickcart.repository.OtpRequestRepository;
 import com.quickcart.repository.StoreRepository;
 import com.quickcart.repository.UserRepository;
-import com.quickcart.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -130,7 +129,7 @@ public class AuthService {
             otpRequestRepository.save(otpRequest);
 
             // Retrieve user
-            user = userRepository.findByPhone(phone)
+            user = userRepository.findByPhone(request.getPhone())
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
             // Check if account is active
@@ -238,7 +237,6 @@ public class AuthService {
         // Check if phone already registered
         if (userRepository.findByPhone(request.getPhone()).isPresent()) {
             throw new RuntimeException("Phone number already registered");
-        }
         }
         if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
             if (userRepository.findByEmail(request.getEmail()).isPresent()) {

@@ -44,6 +44,7 @@ public class SecurityConfig {
     }
 
     @Bean
+    @SuppressWarnings("null")
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Split comma-separated values and trim whitespace

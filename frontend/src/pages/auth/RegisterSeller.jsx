@@ -3,7 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../../app/authSlice';
 import { authApi } from '../../api/authApi';
-import { useTranslation } from 'react-i181;ashletinoto, fSqrere1, ice Loader2, User, Phone, MessageSquare, MapPin, Eye, EyeOff, Store, Shield from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { Phone, MessageSquare, Loader2, User, Mail, Lock, Eye, EyeOff, MapPin, Store } from 'lucide-react';
 
 const RegisterSeller = () => {
   const dispatch = useDispatch();

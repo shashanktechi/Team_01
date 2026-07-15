@@ -11,6 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Service
+@SuppressWarnings({"unchecked", "null"})
 public class AiProviderRouter {
 
     @Value("${ai.groq.api-key:}")
@@ -68,16 +69,18 @@ public class AiProviderRouter {
             );
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(url, entity, (Class<Map<String, Object>>)(Class<?>)Map.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> body = response.getBody();
-                List<?> choices = (List<?>) body.get("choices");
-                if (choices != null && !choices.isEmpty()) {
-                    Map<String, Object> firstChoice = (Map<String, Object>) choices.get(0);
-                    Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
-                    if (message != null) {
-                        return (String) message.get("content");
+                if (body != null) {
+                    List<?> choices = (List<?>) body.get("choices");
+                    if (choices != null && !choices.isEmpty()) {
+                        Map<String, Object> firstChoice = (Map<String, Object>) choices.get(0);
+                        Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
+                        if (message != null) {
+                            return (String) message.get("content");
+                        }
                     }
                 }
             }
@@ -114,16 +117,18 @@ public class AiProviderRouter {
             );
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(url, entity, (Class<Map<String, Object>>)(Class<?>)Map.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> body = response.getBody();
-                List<?> choices = (List<?>) body.get("choices");
-                if (choices != null && !choices.isEmpty()) {
-                    Map<String, Object> firstChoice = (Map<String, Object>) choices.get(0);
-                    Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
-                    if (message != null) {
-                        return (String) message.get("content");
+                if (body != null) {
+                    List<?> choices = (List<?>) body.get("choices");
+                    if (choices != null && !choices.isEmpty()) {
+                        Map<String, Object> firstChoice = (Map<String, Object>) choices.get(0);
+                        Map<String, Object> message = (Map<String, Object>) firstChoice.get("message");
+                        if (message != null) {
+                            return (String) message.get("content");
+                        }
                     }
                 }
             }
@@ -157,20 +162,22 @@ public class AiProviderRouter {
             );
 
             HttpEntity<Map<String, Object>> entity = new HttpEntity<>(payload, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, entity, Map.class);
+            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(url, entity, (Class<Map<String, Object>>)(Class<?>)Map.class);
 
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
                 Map<String, Object> body = response.getBody();
-                List<?> candidates = (List<?>) body.get("candidates");
-                if (candidates != null && !candidates.isEmpty()) {
-                    Map<String, Object> candidate = (Map<String, Object>) candidates.get(0);
-                    Map<String, Object> contentResponse = (Map<String, Object>) candidate.get("content");
-                    if (contentResponse != null) {
-                        List<?> partsResponse = (List<?>) contentResponse.get("parts");
-                        if (partsResponse != null && !partsResponse.isEmpty()) {
-                            Map<String, Object> firstPart = (Map<String, Object>) partsResponse.get(0);
-                            if (firstPart != null) {
-                                return (String) firstPart.get("text");
+                if (body != null) {
+                    List<?> candidates = (List<?>) body.get("candidates");
+                    if (candidates != null && !candidates.isEmpty()) {
+                        Map<String, Object> candidate = (Map<String, Object>) candidates.get(0);
+                        Map<String, Object> contentResponse = (Map<String, Object>) candidate.get("content");
+                        if (contentResponse != null) {
+                            List<?> partsResponse = (List<?>) contentResponse.get("parts");
+                            if (partsResponse != null && !partsResponse.isEmpty()) {
+                                Map<String, Object> firstPart = (Map<String, Object>) partsResponse.get(0);
+                                if (firstPart != null) {
+                                    return (String) firstPart.get("text");
+                                }
                             }
                         }
                     }

@@ -26,7 +26,7 @@ const Navbar = () => {
     } else if (role === 'SYSTEM_ADMIN') {
       redirectTo = '/login/admin';
     }
-    navigate(replace, redirectTo);
+    navigate(redirectTo, { replace: true });
   };
 
   const getRoleLabel = () => {

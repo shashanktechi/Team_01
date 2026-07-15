@@ -2,13 +2,13 @@ package com.quickcart.config;
 
 import com.quickcart.entity.User;
 import com.quickcart.repository.UserRepository;
-import com.quickcart.config.CurrentUserProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,13 +16,14 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@SuppressWarnings("null")
 public class AuthenticationCheckFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;
     private final CurrentUserProvider currentUserProvider;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+    protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
         // Skip authentication check for auth endpoints, websocket, and swagger (same as SecurityConfig)
