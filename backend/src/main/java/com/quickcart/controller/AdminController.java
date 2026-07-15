@@ -1,12 +1,14 @@
 package com.quickcart.controller;
 
 import com.quickcart.config.CurrentUserProvider;
-import com.quickcart.repository.StoreRepository;
-import com.quickcart.repository.AuditLogRepository;
-import com.quickcart.repository.UserRepository;
-import com.quickcart.entity.Store;
+import com.quickcart.dto.request.StoreVerificationRequest;
 import com.quickcart.entity.AuditLog;
+import com.quickcart.entity.Store;
 import com.quickcart.entity.User;
+import com.quickcart.repository.AuditLogRepository;
+import com.quickcart.repository.StoreRepository;
+import com.quickcart.repository.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -35,15 +37,16 @@ public class AdminController {
 
     @GetMapping("/stores/pending")
     public ResponseEntity<?> getPendingStores() {
-        List<Store> pendingStores = storeRepository.findByVerificationStatus("PENDING");
-        return ResponseEntity.ok(pendingStores);
+        return ResponseEntity.ok(storeRepository.findByVerificationStatus("PENDING"));
     }
 
     @PutMapping("/stores/{id}/verify")
-    public ResponseEntity<?> verifyStore(@PathVariable Long id, @RequestBody @jakarta.validation.Valid com.quickcart.dto.request.StoreVerificationRequest request) {
+    public ResponseEntity<?> verifyStore(@PathVariable Long id,
+                                         @RequestBody @jakarta.validation.Valid StoreVerificationRequest request,
+                                         HttpServletRequest request) {
         Store store = storeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
-        
+
         String statusStr = request.getStatus().name();
         store.setVerificationStatus(statusStr);
         storeRepository.save(store);
@@ -58,7 +61,11 @@ public class AdminController {
                 log.setAction("VERIFY_STORE");
                 log.setTargetStoreId(id);
                 log.setMetadata("{\"status\":\"" + statusStr + "\"}");
-                log.setIpAddress("127.0.0.1"); // simple fallback IP
+                String ipAddress = request.getHeader("X-FORWARDED-FOR");
+                if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+                    ipAddress = request.getRemoteAddr();
+                }
+                log.setIpAddress(ipAddress);
                 auditLogRepository.save(log);
             }
         }
