@@ -1,8 +1,12 @@
 package com.quickcart.controller;
 
 import com.quickcart.dto.request.AuthRequest;
+import com.quickcart.dto.request.ForgotPasswordRequest;
 import com.quickcart.dto.request.RegisterRequest;
+import com.quickcart.dto.request.ResetPasswordRequest;
+import com.quickcart.dto.request.VerifyResetOtpRequest;
 import com.quickcart.dto.response.AuthResponse;
+import com.quickcart.dto.response.ResetTokenResponse;
 import com.quickcart.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -35,5 +39,23 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@RequestBody @jakarta.validation.Valid RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request.getEmail());
+        return ResponseEntity.ok(Map.of("message", "A password reset code has been sent to your email."));
+    }
+
+    @PostMapping("/verify-reset-otp")
+    public ResponseEntity<ResetTokenResponse> verifyResetOtp(@RequestBody VerifyResetOtpRequest request) {
+        String resetToken = authService.verifyResetOtp(request.getEmail(), request.getOtp());
+        return ResponseEntity.ok(new ResetTokenResponse("OTP verified", resetToken));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request.getEmail(), request.getResetToken(), request.getNewPassword());
+        return ResponseEntity.ok(Map.of("message", "Password reset successful. You can now log in."));
     }
 }

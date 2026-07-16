@@ -23,7 +23,21 @@ const Sidebar = () => {
   const { t } = useTranslation();
 
   const getNavItems = () => {
-    switch (role) {
+    let activeRole = role;
+    if (role === 'SYSTEM_ADMIN') {
+      const path = window.location.pathname;
+      if (path.startsWith('/shopkeeper')) {
+        activeRole = 'STORE_ADMIN';
+      } else if (path.startsWith('/delivery')) {
+        activeRole = 'DELIVERY_PARTNER';
+      } else if (path.startsWith('/admin')) {
+        activeRole = 'SYSTEM_ADMIN';
+      } else {
+        activeRole = 'CUSTOMER';
+      }
+    }
+
+    switch (activeRole) {
       case 'CUSTOMER':
         return [
           { to: '/', label: t('nav.home'), icon: Home },

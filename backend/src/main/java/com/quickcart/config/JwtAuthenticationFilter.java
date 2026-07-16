@@ -37,10 +37,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long storeId = jwtTokenProvider.getStoreIdFromJwtToken(jwt);
 
                 CustomUserPrincipal principal = new CustomUserPrincipal(userId, phone, role, storeId);
-                SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
+                java.util.List<SimpleGrantedAuthority> authorities;
+                if ("SYSTEM_ADMIN".equals(role)) {
+                    authorities = java.util.List.of(
+                        new SimpleGrantedAuthority("ROLE_SYSTEM_ADMIN"),
+                        new SimpleGrantedAuthority("ROLE_CUSTOMER"),
+                        new SimpleGrantedAuthority("ROLE_STORE_ADMIN"),
+                        new SimpleGrantedAuthority("ROLE_DELIVERY_PARTNER")
+                    );
+                } else {
+                    authorities = Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+                }
                 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        principal, null, Collections.singletonList(authority));
+                        principal, null, authorities);
                 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 

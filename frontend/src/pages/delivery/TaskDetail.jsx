@@ -70,7 +70,7 @@ const TaskDetail = () => {
   const customerPhone = order.customer?.phone;
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 w-full mx-auto">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">Task: Order #{order.id}</h1>
         <StatusBadge status={order.status} />

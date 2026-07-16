@@ -3,16 +3,17 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../../app/authSlice';
 import { authApi } from '../../api/authApi';
-import { Mail, MessageSquare, Loader2, User, Key, Check } from 'lucide-react';
+import { Mail, Loader2, User, Key, Check, Phone, MessageSquare } from 'lucide-react';
 
 const RegisterCustomer = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [step, setStep] = useState(1); // 1=email, 2=details/otp, 3=success
+  const [step, setStep] = useState(1); // 1=email, 2=otp, 3=details, 4=success
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -34,12 +35,22 @@ const RegisterCustomer = () => {
     }
   };
 
+  const handleVerifyOtp = (e) => {
+    e.preventDefault();
+    setError('');
+    if (!otp.trim()) {
+      setError('OTP is required');
+      return;
+    }
+    setStep(3);
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      if (!email || !otp || !name || !password) {
+      if (!name || !phone || !password) {
         setError('All fields are required');
         setLoading(false);
         return;
@@ -51,10 +62,11 @@ const RegisterCustomer = () => {
       }
       const payload = {
         email: email.trim().toLowerCase(),
-        otp,
         name: name.trim(),
+        phone: phone.trim(),
         password,
-        role: 'CUSTOMER'
+        role: 'CUSTOMER',
+        otp: otp.trim()
       };
       const data = await authApi.register(payload);
       dispatch(setAuth({
@@ -63,7 +75,7 @@ const RegisterCustomer = () => {
         userId: data.userId,
         storeId: data.storeId
       }));
-      setStep(3);
+      setStep(4);
     } catch (e) {
       setError(e.response?.data?.message || 'Registration failed. Please check details.');
     } finally {
@@ -82,7 +94,7 @@ const RegisterCustomer = () => {
         </p>
       </div>
 
-      <form className="space-y-5" onSubmit={step === 2 ? handleRegister : null}>
+      <form className="space-y-5" onSubmit={step === 2 ? handleVerifyOtp : (step === 3 ? handleRegister : null)}>
         {step === 1 && (
           <>
             <div>
@@ -145,6 +157,18 @@ const RegisterCustomer = () => {
               </div>
             </div>
 
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
+            >
+              Verify OTP Code
+            </button>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
             <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                 Full Name
@@ -157,6 +181,23 @@ const RegisterCustomer = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Doe"
+                  className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Phone Number
+              </label>
+              <div className="relative">
+                <Phone size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="tel"
+                  id="register-customer-phone"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="+1 234 567 890"
                   className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 />
               </div>
@@ -190,13 +231,13 @@ const RegisterCustomer = () => {
                   Registering...
                 </>
               ) : (
-                'Verify & Register'
+                'Register'
               )}
             </button>
           </>
         )}
 
-        {step === 3 && (
+        {step === 4 && (
           <div className="text-center space-y-4 py-4">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 mx-auto">
               <Check className="h-8 w-8" />
@@ -216,7 +257,7 @@ const RegisterCustomer = () => {
           </div>
         )}
 
-        {step !== 3 && (
+        {step !== 4 && (
           <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
             Already have an account?{' '}
             <Link to="/login/customer" className="font-extrabold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-350">

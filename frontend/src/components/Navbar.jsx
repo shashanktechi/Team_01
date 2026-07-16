@@ -1,15 +1,14 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { toggleDarkMode } from '../app/uiSlice';
 import { logout } from '../app/authSlice';
 import LanguageSwitcher from './LanguageSwitcher';
-import { Sun, Moon, LogOut, ShoppingCart, User } from 'lucide-react';
+import ThemeToggle from './ThemeToggle';
+import { LogOut, ShoppingCart, User } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { darkMode } = useSelector((state) => state.ui);
   const { role, userId } = useSelector((state) => state.auth);
   const cartItems = useSelector((state) => state.cart.items);
 
@@ -47,9 +46,28 @@ const Navbar = () => {
           </div>
           <span className="font-bold text-lg text-teal dark:text-teal-light">QuickCart</span>
         </Link>
-        <span className="hidden sm:inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-teal/10 dark:bg-teal-light/10 text-teal dark:text-teal-light">
-          {getRoleLabel()}
-        </span>
+        {role === 'SYSTEM_ADMIN' ? (
+          <select
+            value={window.location.pathname.startsWith('/shopkeeper') ? 'STORE_ADMIN' : window.location.pathname.startsWith('/delivery') ? 'DELIVERY_PARTNER' : window.location.pathname.startsWith('/admin') ? 'SYSTEM_ADMIN' : 'CUSTOMER'}
+            onChange={(e) => {
+              const val = e.target.value;
+              if (val === 'SYSTEM_ADMIN') navigate('/admin/dashboard');
+              else if (val === 'STORE_ADMIN') navigate('/shopkeeper/dashboard');
+              else if (val === 'DELIVERY_PARTNER') navigate('/delivery/dashboard');
+              else navigate('/');
+            }}
+            className="text-xs font-extrabold rounded-xl bg-teal/10 dark:bg-teal-light/10 text-teal dark:text-teal-light border-none py-1 px-2.5 focus:outline-none cursor-pointer max-w-[150px] outline-none"
+          >
+            <option value="SYSTEM_ADMIN" className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">Admin View</option>
+            <option value="CUSTOMER" className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">Customer View</option>
+            <option value="STORE_ADMIN" className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">Shopkeeper View</option>
+            <option value="DELIVERY_PARTNER" className="bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">Delivery View</option>
+          </select>
+        ) : (
+          <span className="hidden sm:inline-block px-2.5 py-0.5 text-xs font-semibold rounded-full bg-teal/10 dark:bg-teal-light/10 text-teal dark:text-teal-light">
+            {getRoleLabel()}
+          </span>
+        )}
       </div>
 
       <div className="flex items-center gap-4">
@@ -66,13 +84,7 @@ const Navbar = () => {
 
         <LanguageSwitcher />
 
-        <button
-          onClick={() => dispatch(toggleDarkMode())}
-          className="p-2 rounded-xl text-gray-500 hover:text-teal dark:text-gray-400 dark:hover:text-teal-light bg-gray-100 dark:bg-gray-800 border border-gray-200/50 dark:border-gray-700/50 transition-all duration-200"
-          aria-label="Toggle Dark Mode"
-        >
-          {darkMode ? <Sun size={18} /> : <Moon size={18} />}
-        </button>
+        <ThemeToggle size={18} />
 
         <button
           onClick={handleLogout}

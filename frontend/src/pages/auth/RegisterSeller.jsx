@@ -4,18 +4,19 @@ import { useDispatch } from 'react-redux';
 import { setAuth } from '../../app/authSlice';
 import { authApi } from '../../api/authApi';
 import { useTranslation } from 'react-i18next';
-import { Mail, MessageSquare, Loader2, User, Lock, Eye, EyeOff, MapPin, Check } from 'lucide-react';
+import { Mail, Loader2, User, Lock, Eye, EyeOff, MapPin, Check, Phone, MessageSquare } from 'lucide-react';
 
 const RegisterSeller = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { t } = useTranslation();
 
-  const [step, setStep] = useState(1); // 1=email, 2=otp, 3=store-details, 4=done
+  const [step, setStep] = useState(1); // 1=email, 2=otp, 3=details, 4=done
   const [email, setEmail] = useState('');
   const [otp, setOtp] = useState('');
   const [form, setForm] = useState({
     name: '',
+    phone: '',
     password: '',
     storeName: '',
     storeAddress: '',
@@ -43,7 +44,7 @@ const RegisterSeller = () => {
     }
   };
 
-  const handleVerifyOtp = async (e) => {
+  const handleVerifyOtp = (e) => {
     e.preventDefault();
     setError('');
     if (!otp.trim()) {
@@ -58,13 +59,14 @@ const RegisterSeller = () => {
     setError('');
     setLoading(true);
     try {
-      if (!form.name || !form.password || !form.storeName || !form.storeAddress || !form.storeLat || !form.storeLng) {
+      if (!form.name || !form.phone || !form.password || !form.storeName || !form.storeAddress || !form.storeLat || !form.storeLng) {
         setError('All fields are required');
         setLoading(false);
         return;
       }
       const payload = {
         email: email.trim().toLowerCase(),
+        phone: form.phone.trim(),
         password: form.password,
         name: form.name.trim(),
         role: 'STORE_ADMIN',
@@ -72,7 +74,7 @@ const RegisterSeller = () => {
         storeAddress: form.storeAddress.trim(),
         storeLat: parseFloat(form.storeLat),
         storeLng: parseFloat(form.storeLng),
-        otp: otp
+        otp: otp.trim()
       };
       const data = await authApi.register(payload);
       dispatch(setAuth({
@@ -182,7 +184,7 @@ const RegisterSeller = () => {
         )}
 
         {step === 3 && (
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-1">
+          <div className="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
             <div>
               <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                 Full Name
@@ -195,6 +197,24 @@ const RegisterSeller = () => {
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   placeholder="Your full name"
                   id="register-seller-name"
+                  className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
+                Phone Number
+              </label>
+              <div className="relative">
+                <Phone size={20} className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="tel"
+                  name="phone"
+                  value={form.phone}
+                  onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                  placeholder="+1 234 567 890"
+                  id="register-seller-phone"
                   className="block w-full pl-12 pr-4 py-3.5 text-sm font-medium text-gray-900 bg-white border border-gray-200 rounded-2xl dark:bg-gray-800 dark:border-gray-800 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all"
                 />
               </div>
@@ -225,7 +245,7 @@ const RegisterSeller = () => {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-4">
+            <div className="pt-2 border-t border-gray-100 dark:border-gray-800 space-y-4 mt-4">
               <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Store Info</span>
               <div>
                 <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
@@ -298,7 +318,7 @@ const RegisterSeller = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
+              className="w-full flex justify-center py-3.5 px-4 mt-6 border border-transparent text-sm font-extrabold rounded-2xl text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 disabled:opacity-50 transition shadow-lg shadow-emerald-500/10"
             >
               {loading ? (
                 <>
@@ -333,7 +353,7 @@ const RegisterSeller = () => {
         )}
 
         {step !== 4 && (
-          <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium">
+          <p className="text-center text-sm text-gray-500 dark:text-gray-400 font-medium mt-4">
             Already have an account?{' '}
             <Link to="/login/seller" className="font-extrabold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400 dark:hover:text-emerald-350">
               Sign In
@@ -342,7 +362,7 @@ const RegisterSeller = () => {
         )}
 
         {error && (
-          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 px-4 py-3 rounded-2xl border border-red-100 dark:border-red-900/20 text-center font-medium">
+          <p className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/10 px-4 py-3 rounded-2xl border border-red-100 dark:border-red-900/20 text-center font-medium mt-4">
             {error}
           </p>
         )}

@@ -9,7 +9,7 @@ const ProtectedRoute = ({ allowedRoles }) => {
     return <Navigate to="/login" replace />;
   }
 
-  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(role)) {
+  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(role) && role !== 'SYSTEM_ADMIN') {
     // Redirect to correct dashboard based on actual role
     switch (role) {
       case 'CUSTOMER': return <Navigate to="/" replace />;

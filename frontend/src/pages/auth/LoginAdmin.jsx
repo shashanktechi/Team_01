@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { setAuth } from '../../app/authSlice';
 import { authApi } from '../../api/authApi';
@@ -102,6 +102,11 @@ const LoginAdmin = () => {
             >
               {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
+          </div>
+          <div className="text-right -mt-2">
+            <Link to="/forgot-password" className="text-xs font-bold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400">
+              Forgot password?
+            </Link>
           </div>
         </div>
 

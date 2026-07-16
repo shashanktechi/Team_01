@@ -18,4 +18,12 @@ export const adminApi = {
     const response = await apiClient.get('/admin/stores');
     return response.data;
   },
+  getPendingDeliveryPartners: async () => {
+    const response = await apiClient.get('/admin/delivery-partners/pending');
+    return response.data;
+  },
+  verifyDeliveryPartner: async (id, status) => {
+    const response = await apiClient.put(`/admin/delivery-partners/${id}/verify`, { status });
+    return response.data;
+  },
 };

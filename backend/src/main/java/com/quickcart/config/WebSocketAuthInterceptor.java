@@ -43,9 +43,14 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
             Long userId = jwtTokenProvider.getUserIdFromJwtToken(token);
             Long storeId = jwtTokenProvider.getStoreIdFromJwtToken(token);
             UserPrincipal principal = new UserPrincipal(phone, role, userId, storeId);
+            java.util.List<org.springframework.security.core.GrantedAuthority> authorities;
+            if ("SYSTEM_ADMIN".equals(role)) {
+                authorities = AuthorityUtils.createAuthorityList("ROLE_SYSTEM_ADMIN", "ROLE_CUSTOMER", "ROLE_STORE_ADMIN", "ROLE_DELIVERY_PARTNER");
+            } else {
+                authorities = AuthorityUtils.createAuthorityList("ROLE_" + role);
+            }
             Authentication auth =
-                    new UsernamePasswordAuthenticationToken(principal, null,
-                            AuthorityUtils.createAuthorityList("ROLE_" + role));
+                    new UsernamePasswordAuthenticationToken(principal, null, authorities);
             accessor.setUser(auth);
             accessor.setLeaveMutable(true);
         }
@@ -69,7 +74,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 // Get the authenticated user's ID from principal
                 if (auth.getPrincipal() instanceof UserPrincipal) {
                     UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
-                    if (!principal.getUserId().equals(customerId)) {
+                    if (!"SYSTEM_ADMIN".equals(principal.getRole()) && !principal.getUserId().equals(customerId)) {
                         return null; // Reject: customer ID mismatch
                     }
                 } else {
@@ -81,7 +86,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 Long storeId = Long.valueOf(idStr);
                 if (auth.getPrincipal() instanceof UserPrincipal) {
                     UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
-                    if (!principal.getStoreId().equals(storeId)) {
+                    if (!"SYSTEM_ADMIN".equals(principal.getRole()) && !storeId.equals(principal.getStoreId())) {
                         return null; // Reject: store ID mismatch
                     }
                 } else {
@@ -93,7 +98,7 @@ public class WebSocketAuthInterceptor implements ChannelInterceptor {
                 Long userId = Long.valueOf(idStr);
                 if (auth.getPrincipal() instanceof UserPrincipal) {
                     UserPrincipal principal = (UserPrincipal) auth.getPrincipal();
-                    if (!principal.getUserId().equals(userId)) {
+                    if (!"SYSTEM_ADMIN".equals(principal.getRole()) && !principal.getUserId().equals(userId)) {
                         return null; // Reject: user ID mismatch
                     }
                 } else {

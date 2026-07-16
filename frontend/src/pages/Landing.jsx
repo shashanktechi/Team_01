@@ -82,7 +82,7 @@ const Landing = () => {
     <div className="min-h-screen bg-white dark:bg-gray-950 text-gray-950 dark:text-white transition-colors duration-300 flex flex-col justify-between">
       {/* Universal Floating Header */}
       <header className="sticky top-0 z-50 w-full bg-white/70 dark:bg-gray-950/70 backdrop-blur-md border-b border-gray-100 dark:border-gray-900/50">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="w-full mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 rounded-2xl bg-emerald-600 dark:bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <span className="text-white font-extrabold text-xl">Q</span>
@@ -99,9 +99,9 @@ const Landing = () => {
       </header>
 
       {/* Main Hero section */}
-      <main className="flex-1 max-w-7xl mx-auto w-full px-6 py-12 md:py-16 space-y-16">
+      <main className="flex-1 w-full mx-auto px-6 py-12 md:py-16 space-y-16">
         {/* Intro */}
-        <div className="text-center max-w-3xl mx-auto space-y-6">
+        <div className="text-center w-full mx-auto space-y-6">
           <span className="px-3.5 py-1.5 text-xs font-extrabold uppercase tracking-widest rounded-full bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 border border-emerald-200/30">
             Welcome to QuickCart
           </span>
@@ -190,7 +190,7 @@ const Landing = () => {
       </main>
 
       {/* Footer */}
-      <footer className="w-full text-center py-6 text-xs text-gray-500 dark:text-gray-500 border-t border-gray-100 dark:border-gray-900 max-w-7xl mx-auto">
+      <footer className="w-full text-center py-6 text-xs text-gray-500 dark:text-gray-500 border-t border-gray-100 dark:border-gray-900 w-full mx-auto">
         &copy; {new Date().getFullYear()} QuickCart. All rights reserved.
       </footer>
     </div>

@@ -21,7 +21,7 @@ const Profile = () => {
   if (loading) return <LoadingSpinner />;
 
   return (
-    <div className="space-y-6 max-w-lg mx-auto">
+    <div className="space-y-6 w-full mx-auto">
       <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">My Profile</h1>
 
       {/* Avatar */}

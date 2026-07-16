@@ -48,7 +48,7 @@ const AuthLayout = () => {
         </div>
 
         {/* Feature Teasers */}
-        <div className="relative z-10 my-auto space-y-8 max-w-sm">
+        <div className="relative z-10 my-auto space-y-8 w-full">
           <h2 className="text-3xl font-black text-white leading-tight">
             Freshness Verified, <br />
             Delivered in Swarms.
@@ -105,7 +105,7 @@ const AuthLayout = () => {
         </header>
 
         {/* Center Panel (Full width, padded, vertically centered) */}
-        <main className="flex-1 w-full max-w-xl mx-auto px-6 py-12 md:py-20 flex flex-col justify-center">
+        <main className="flex-1 w-full mx-auto px-6 py-12 md:py-20 flex flex-col justify-center">
           <div className="w-full">
             <Outlet />
           </div>

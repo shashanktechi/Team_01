@@ -65,12 +65,15 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.CONFLICT.value());
 
-        String rootMsg = ex.getRootCause() != null ? ex.getRootCause().getMessage() : ex.getMessage();
+        Throwable rootCause = ex.getRootCause();
+        String rootMsg = rootCause != null ? rootCause.getMessage() : ex.getMessage();
         String userFriendlyMessage = "A database conflict occurred.";
 
         if (rootMsg != null) {
             if (rootMsg.contains("otp_requests_email_key") || rootMsg.contains("otp_requests")) {
                 userFriendlyMessage = "An OTP was already requested for this email. Please wait a moment before trying again.";
+            } else if (rootMsg.contains("password_reset_tokens_email_key") || rootMsg.contains("password_reset_tokens")) {
+                userFriendlyMessage = "A password reset was already requested for this email. Please wait a moment before trying again.";
             } else if (rootMsg.contains("users_email_key") || rootMsg.contains("users.email")) {
                 userFriendlyMessage = "An account with this email address already exists.";
             } else if (rootMsg.contains("users_phone_key")) {

@@ -23,7 +23,7 @@ const StoreProfile = () => {
   const user = profile?.user || {};
 
   return (
-    <div className="space-y-6 max-w-lg mx-auto">
+    <div className="space-y-6 w-full mx-auto">
       <h1 className="text-2xl font-extrabold text-gray-900 dark:text-white">Store Profile</h1>
 
       {/* Store Header */}

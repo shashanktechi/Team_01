@@ -16,6 +16,7 @@ import RegisterSeller from '../pages/auth/RegisterSeller';
 import LoginDelivery from '../pages/auth/LoginDelivery';
 import RegisterDelivery from '../pages/auth/RegisterDelivery';
 import LoginAdmin from '../pages/auth/LoginAdmin';
+import ForgotPassword from '../pages/auth/ForgotPassword';
 
 // Customer pages
 import Home from '../pages/customer/Home';
@@ -71,6 +72,7 @@ const AppRoutes = () => (
         <Route path="/login/delivery" element={<LoginDelivery />} />
         <Route path="/register/delivery" element={<RegisterDelivery />} />
         <Route path="/login/admin" element={<LoginAdmin />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
         {/* Keep the old routes for backward compatibility during transition (optional)
         <Route path="/login" element={<Navigate to="/login/customer" replace />} />
         <Route path="/register" element={<Navigate to="/register/customer" replace />} />

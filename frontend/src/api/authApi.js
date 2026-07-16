@@ -1,11 +1,7 @@
 import apiClient from './apiClient';
 
 export const authApi = {
-  sendOtp: async (target) => {
-    const payload = target.includes('@') ? { email: target } : { phone: target };
-    const response = await apiClient.post('/auth/otp/send', payload);
-    return response.data;
-  },
+
   register: async (registerData) => {
     // registerData contains: phone, email, password, name, role (CUSTOMER, STORE_ADMIN, DELIVERY_PARTNER, SYSTEM_ADMIN)
     // plus storeName, storeAddress, storeLat, storeLng if STORE_ADMIN
@@ -17,4 +13,17 @@ export const authApi = {
     const response = await apiClient.post('/auth/login', loginData);
     return response.data;
   },
+  forgotPassword: async (email) => {
+    const response = await apiClient.post('/auth/forgot-password', { email });
+    return response.data;
+  },
+  verifyResetOtp: async (email, otp) => {
+    const response = await apiClient.post('/auth/verify-reset-otp', { email, otp });
+    return response.data;
+  },
+  resetPassword: async (email, resetToken, newPassword) => {
+    const response = await apiClient.post('/auth/reset-password', { email, resetToken, newPassword });
+    return response.data;
+  },
+
 };

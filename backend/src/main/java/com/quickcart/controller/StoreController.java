@@ -63,7 +63,11 @@ public class StoreController {
         }
         Store store = storeRepository.findById(storeId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Store not found"));
-        if (!"APPROVED".equals(store.getVerificationStatus())) {
+        
+        com.quickcart.config.CustomUserPrincipal principal = currentUserProvider.getCurrentUser();
+        boolean isAdmin = principal != null && "SYSTEM_ADMIN".equals(principal.getRole());
+        
+        if (!isAdmin && !"APPROVED".equals(store.getVerificationStatus())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Store is not approved. Please wait for admin approval.");
         }
         return store;

@@ -103,6 +103,11 @@ const LoginSeller = () => {
               {showPw ? <EyeOff size={18} /> : <Eye size={18} />}
             </button>
           </div>
+          <div className="text-right -mt-2">
+            <Link to="/forgot-password" className="text-xs font-bold text-emerald-600 hover:text-emerald-500 dark:text-emerald-400">
+              Forgot password?
+            </Link>
+          </div>
         </div>
 
         <button

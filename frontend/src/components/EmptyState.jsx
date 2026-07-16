@@ -8,7 +8,7 @@ const EmptyState = ({ title = 'No items found', description = 'Check back later 
         <Icon size={28} />
       </div>
       <h3 className="text-lg font-bold text-gray-800 dark:text-white mb-1.5">{title}</h3>
-      <p className="text-sm text-gray-500 dark:text-gray-400 max-w-sm">{description}</p>
+      <p className="text-sm text-gray-500 dark:text-gray-400 w-full">{description}</p>
     </div>
   );
 };

@@ -6,7 +6,14 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
-  # We use ddl-auto: none and rely on schema.sql for schema initialization
+  # NOTE: ddl-auto is "update", not "none" — Hibernate WILL auto-alter tables to
+  # match entity mappings on top of whatever schema.sql creates. schema.sql is now
+  # written to be fully self-sufficient (all entity-level constraints like unique
+  # columns are declared explicitly in schema.sql itself), so ddl-auto is a backstop,
+  # not a dependency. Before flipping this to "validate" or "none" in production,
+  # audit ALL entities against schema.sql (not just the auth-related ones) — this
+  # was NOT done as part of the OTP/forgot-password fix; only OtpRequest,
+  # PasswordResetToken, and User were verified.
   jpa:
     hibernate:
       ddl-auto: update

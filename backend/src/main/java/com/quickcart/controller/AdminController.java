@@ -80,4 +80,54 @@ public class AdminController {
 
         return ResponseEntity.ok(Map.of("success", true));
     }
+
+    @GetMapping("/delivery-partners/pending")
+    public ResponseEntity<?> getPendingDeliveryPartners() {
+        return ResponseEntity.ok(userRepository.findByRoleAndVerificationStatus("DELIVERY_PARTNER", "PENDING"));
+    }
+
+    @PutMapping("/delivery-partners/{id}/verify")
+    public ResponseEntity<?> verifyDeliveryPartner(@PathVariable Long id,
+                                                   @RequestBody java.util.Map<String, String> request,
+                                                   HttpServletRequest servletRequest) {
+        User partner = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Delivery Partner not found"));
+
+        if (!"DELIVERY_PARTNER".equals(partner.getRole())) {
+            throw new RuntimeException("User is not a delivery partner");
+        }
+
+        String statusStr = request.get("status");
+        if (statusStr == null || (!statusStr.equals("APPROVED") && !statusStr.equals("REJECTED"))) {
+            throw new RuntimeException("Invalid status. Must be APPROVED or REJECTED.");
+        }
+
+        partner.setVerificationStatus(statusStr);
+        if ("APPROVED".equals(statusStr)) {
+            partner.setIsActive(true);
+        } else {
+            partner.setIsActive(false);
+        }
+        userRepository.save(partner);
+
+        // Record to Audit Logs
+        Long adminId = currentUserProvider.getCurrentUserId();
+        if (adminId != null) {
+            User admin = userRepository.findById(adminId).orElse(null);
+            if (admin != null) {
+                AuditLog log = new AuditLog();
+                log.setAdmin(admin);
+                log.setAction("VERIFY_DELIVERY_PARTNER");
+                log.setMetadata("{\"deliveryPartnerId\":" + id + ",\"status\":\"" + statusStr + "\"}");
+                String ipAddress = servletRequest.getHeader("X-FORWARDED-FOR");
+                if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+                    ipAddress = servletRequest.getRemoteAddr();
+                }
+                log.setIpAddress(ipAddress);
+                auditLogRepository.save(log);
+            }
+        }
+
+        return ResponseEntity.ok(Map.of("success", true));
+    }
 }

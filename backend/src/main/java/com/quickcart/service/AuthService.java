@@ -5,24 +5,32 @@ import com.quickcart.dto.request.AuthRequest;
 import com.quickcart.dto.request.RegisterRequest;
 import com.quickcart.dto.response.AuthResponse;
 import com.quickcart.entity.OtpRequest;
+import com.quickcart.entity.PasswordResetToken;
 import com.quickcart.entity.Store;
 import com.quickcart.entity.User;
 import com.quickcart.repository.OtpRequestRepository;
+import com.quickcart.repository.PasswordResetTokenRepository;
 import com.quickcart.repository.StoreRepository;
 import com.quickcart.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.HexFormat;
 import java.util.Optional;
 import java.util.Random;
 
 @Service
 @Transactional
 public class AuthService {
+
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
     @Autowired
     private UserRepository userRepository;
@@ -34,6 +42,9 @@ public class AuthService {
     private OtpRequestRepository otpRequestRepository;
 
     @Autowired
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Autowired
@@ -41,6 +52,8 @@ public class AuthService {
 
     @Autowired
     private EmailService emailService;
+
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     // OTP validity in minutes
     private static final long OTP_VALIDITY_MINUTES = 10;
@@ -50,6 +63,8 @@ public class AuthService {
     private static final int OTP_SEND_WINDOW_MINUTES = 15;
     // Max OTP verification attempts
     private static final int MAX_OTP_ATTEMPTS = 5;
+    // Password reset token validity in minutes
+    private static final long RESET_TOKEN_VALIDITY_MINUTES = 10;
 
     /**
      * Sends an OTP to the given email address.
@@ -60,8 +75,25 @@ public class AuthService {
             throw new RuntimeException("Email is required");
         }
         String emailClean = email.trim().toLowerCase();
+        String otp = generateAndSaveOtp(emailClean);
 
-        // Rate limiting: count how many OTPs have been sent in the last window
+        try {
+            emailService.sendOtpEmail(emailClean, otp);
+            log.info("OTP sent to {}", emailClean);
+        } catch (Exception e) {
+            log.error("Failed to send OTP email to {}: {}", emailClean, e.getMessage());
+            throw new RuntimeException("Failed to send verification code. Please try again later.");
+        }
+    }
+
+    /**
+     * Generates a 6-digit OTP for the given (already-lowercased/trimmed) email,
+     * enforces the send rate limit, and persists it to otp_requests.
+     * Returns the raw (unhashed) OTP so the caller can email it out.
+     * Shared by sendOtp() (register/login) and forgotPassword() (password reset) —
+     * both flows use the same otp_requests table and validity/attempt rules.
+     */
+    private String generateAndSaveOtp(String emailClean) {
         long countSent = otpRequestRepository.countByEmailAndCreatedAtAfter(
                 emailClean,
                 Instant.now().minus(OTP_SEND_WINDOW_MINUTES, ChronoUnit.MINUTES)
@@ -70,19 +102,15 @@ public class AuthService {
             throw new RuntimeException("OTP send limit exceeded. Please try again later.");
         }
 
-        // Generate a 6-digit OTP
         String otp = String.format("%06d", new Random().nextInt(999999));
         String otpHash = passwordEncoder.encode(otp);
 
-        // Set expiration and creation times
         Instant now = Instant.now();
         Instant expiresAt = now.plus(OTP_VALIDITY_MINUTES, ChronoUnit.MINUTES);
 
-        // Delete any existing OTP requests for this email (to invalidate previous OTPs)
         otpRequestRepository.deleteByEmail(emailClean);
         otpRequestRepository.flush();
 
-        // Save new OTP request
         OtpRequest otpRequest = new OtpRequest();
         otpRequest.setEmail(emailClean);
         otpRequest.setOtpHash(otpHash);
@@ -92,23 +120,122 @@ public class AuthService {
         otpRequest.setVerified(false);
         otpRequestRepository.save(otpRequest);
 
-        // Send via email
-        try {
-            emailService.sendOtpEmail(emailClean, otp);
-            System.out.println("OTP sent to " + emailClean);
-        } catch (Exception e) {
-            System.err.println("FAILED to send OTP email: " + e.getMessage());
+        return otp;
+    }
+
+    /**
+     * FORGOT PASSWORD — STEP 1
+     * Sends a password-reset OTP to the given email. Reuses the same
+     * otp_requests table/rate-limit as login & registration OTPs, but with
+     * reset-specific email copy.
+     */
+    public void forgotPassword(String email) {
+        if (email == null || email.trim().isEmpty()) {
+            throw new RuntimeException("Email is required");
         }
-        System.out.println("==========================================");
-        System.out.println("DEVELOPMENT OTP FOR " + emailClean + ": " + otp);
-        System.out.println("==========================================");
+        String emailClean = email.trim().toLowerCase();
+
+        userRepository.findByEmail(emailClean)
+                .orElseThrow(() -> new RuntimeException("No account found with this email"));
+
+        String otp = generateAndSaveOtp(emailClean);
+
+        try {
+            emailService.sendPasswordResetOtpEmail(emailClean, otp);
+            log.info("Password reset OTP sent to {}", emailClean);
+        } catch (Exception e) {
+            log.error("Failed to send password reset OTP email to {}: {}", emailClean, e.getMessage());
+            throw new RuntimeException("Failed to send reset code. Please try again later.");
+        }
+    }
+
+    /**
+     * FORGOT PASSWORD — STEP 2
+     * Verifies the OTP against otp_requests, then issues a short-lived,
+     * single-use reset token (stored hashed) that step 3 must present.
+     */
+    public String verifyResetOtp(String email, String otp) {
+        if (email == null || otp == null) {
+            throw new RuntimeException("Email and OTP are required");
+        }
+        String emailClean = email.trim().toLowerCase();
+
+        OtpRequest otpRequest = otpRequestRepository.findByEmail(emailClean)
+                .orElseThrow(() -> new RuntimeException("No OTP request found. Please request a new code."));
+
+        if (otpRequest.getExpiresAt().isBefore(Instant.now())) {
+            throw new RuntimeException("OTP has expired. Please request a new code.");
+        }
+        if (otpRequest.getAttemptCount() >= MAX_OTP_ATTEMPTS) {
+            throw new RuntimeException("Too many attempts. Please request a new code.");
+        }
+
+        otpRequest.setAttemptCount(otpRequest.getAttemptCount() + 1);
+        otpRequestRepository.save(otpRequest);
+
+        if (!passwordEncoder.matches(otp.trim(), otpRequest.getOtpHash())) {
+            throw new RuntimeException("Incorrect code");
+        }
+
+        otpRequest.setVerified(true);
+        otpRequestRepository.save(otpRequest);
+
+        byte[] tokenBytes = new byte[32];
+        SECURE_RANDOM.nextBytes(tokenBytes);
+        String resetToken = HexFormat.of().formatHex(tokenBytes);
+        String tokenHash = passwordEncoder.encode(resetToken);
+
+        passwordResetTokenRepository.deleteByEmail(emailClean);
+        passwordResetTokenRepository.flush();
+
+        PasswordResetToken tokenEntity = new PasswordResetToken();
+        tokenEntity.setEmail(emailClean);
+        tokenEntity.setTokenHash(tokenHash);
+        tokenEntity.setCreatedAt(Instant.now());
+        tokenEntity.setExpiresAt(Instant.now().plus(RESET_TOKEN_VALIDITY_MINUTES, ChronoUnit.MINUTES));
+        passwordResetTokenRepository.save(tokenEntity);
+
+        return resetToken;
+    }
+
+    /**
+     * FORGOT PASSWORD — STEP 3
+     * Consumes the reset token issued by step 2 and sets the new password.
+     */
+    public void resetPassword(String email, String resetToken, String newPassword) {
+        if (email == null || resetToken == null || newPassword == null || newPassword.isBlank()) {
+            throw new RuntimeException("Email, reset token, and new password are required");
+        }
+        if (newPassword.length() < 8) {
+            throw new RuntimeException("Password must be at least 8 characters long");
+        }
+        String emailClean = email.trim().toLowerCase();
+
+        PasswordResetToken tokenEntity = passwordResetTokenRepository.findByEmail(emailClean)
+                .orElseThrow(() -> new RuntimeException("Invalid or expired reset session. Please start over."));
+
+        if (tokenEntity.getExpiresAt().isBefore(Instant.now())) {
+            passwordResetTokenRepository.deleteByEmail(emailClean);
+            throw new RuntimeException("Reset session expired. Please start over.");
+        }
+        if (!passwordEncoder.matches(resetToken, tokenEntity.getTokenHash())) {
+            throw new RuntimeException("Invalid or expired reset session. Please start over.");
+        }
+
+        User user = userRepository.findByEmail(emailClean)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        passwordResetTokenRepository.deleteByEmail(emailClean);
+        otpRequestRepository.deleteByEmail(emailClean);
     }
 
     public AuthResponse login(AuthRequest request) {
         User user = null;
 
         if (request.getEmail() != null && request.getOtp() != null) {
-            // OTP login path
             String emailClean = request.getEmail().trim().toLowerCase();
             Optional<OtpRequest> otpRequestOpt = otpRequestRepository.findByEmail(emailClean);
             if (otpRequestOpt.isEmpty()) {
@@ -116,56 +243,44 @@ public class AuthService {
             }
             OtpRequest otpRequest = otpRequestOpt.get();
 
-            // Check if OTP has expired
             if (otpRequest.getExpiresAt().isBefore(Instant.now())) {
                 throw new RuntimeException("OTP has expired. Please request a new one.");
             }
 
-            // Check if too many attempts
             if (otpRequest.getAttemptCount() >= MAX_OTP_ATTEMPTS) {
                 throw new RuntimeException("Too many OTP attempts. Please request a new OTP.");
             }
 
-            // Increment attempt count
             otpRequest.setAttemptCount(otpRequest.getAttemptCount() + 1);
             otpRequestRepository.save(otpRequest);
 
-            // Check OTP matches
             if (!passwordEncoder.matches(request.getOtp(), otpRequest.getOtpHash())) {
                 throw new RuntimeException("Invalid OTP");
             }
 
-            // OTP is correct
             otpRequest.setVerified(true);
             otpRequestRepository.save(otpRequest);
 
-            // Retrieve user
             user = userRepository.findByEmail(emailClean)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
-            // Check if account is active
             if (!user.getIsActive()) {
                 throw new RuntimeException("Account is deactivated");
             }
-            // Check if account is approved
             if (!"APPROVED".equals(user.getVerificationStatus())) {
                 throw new RuntimeException("Account is not approved. Please wait for admin approval.");
             }
-            // Mark phone/email as verified
             if (!user.getPhoneVerified()) {
                 user.setPhoneVerified(true);
                 userRepository.save(user);
             }
         } else if (request.getEmail() != null && request.getPassword() != null) {
-            // Email/Password login
             String emailClean = request.getEmail().trim().toLowerCase();
             user = userRepository.findByEmail(emailClean)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-            // Check if account is active
             if (!user.getIsActive()) {
                 throw new RuntimeException("Account is deactivated");
             }
-            // Check if account is approved
             if (!"APPROVED".equals(user.getVerificationStatus())) {
                 throw new RuntimeException("Account is not approved. Please wait for admin approval.");
             }
@@ -178,7 +293,6 @@ public class AuthService {
 
         Long storeId = null;
         if (user.getRole().equals("STORE_ADMIN")) {
-            // For store admins, get their store ID
             Optional<Store> storeOpt = storeRepository.findByOwnerId(user.getId());
             if (storeOpt.isPresent()) {
                 storeId = storeOpt.get().getId();
@@ -208,47 +322,38 @@ public class AuthService {
         }
         String emailClean = request.getEmail().trim().toLowerCase();
 
-        // For all registration roles, we now require email OTP verification
         if (request.getOtp() == null || request.getOtp().isBlank()) {
             throw new RuntimeException("OTP is required for registration");
         }
 
-        // Verify OTP
         Optional<OtpRequest> otpRequestOpt = otpRequestRepository.findByEmail(emailClean);
         if (otpRequestOpt.isEmpty()) {
             throw new RuntimeException("No OTP request found. Please request an OTP first.");
         }
         OtpRequest otpRequest = otpRequestOpt.get();
 
-        // Check if OTP has expired
         if (otpRequest.getExpiresAt().isBefore(Instant.now())) {
             throw new RuntimeException("OTP has expired. Please request a new one.");
         }
 
-        // Check if already verified
         if (otpRequest.isVerified()) {
             throw new RuntimeException("OTP already used. Please request a new one.");
         }
 
-        // Check attempts
         if (otpRequest.getAttemptCount() >= MAX_OTP_ATTEMPTS) {
             throw new RuntimeException("Too many OTP attempts. Please request a new OTP.");
         }
 
-        // Increment attempt count
         otpRequest.setAttemptCount(otpRequest.getAttemptCount() + 1);
         otpRequestRepository.save(otpRequest);
 
-        // Check OTP matches
         if (!passwordEncoder.matches(request.getOtp(), otpRequest.getOtpHash())) {
             throw new RuntimeException("Invalid OTP");
         }
 
-        // OTP is correct
         otpRequest.setVerified(true);
         otpRequestRepository.save(otpRequest);
 
-        // Check if email already registered
         if (userRepository.findByEmail(emailClean).isPresent()) {
             throw new RuntimeException("Email already registered");
         }
@@ -260,11 +365,9 @@ public class AuthService {
         user.setRole(role);
         user.setPhoneVerified(true);
 
-        // Set verification status based on role
         if ("STORE_ADMIN".equals(role) || "DELIVERY_PARTNER".equals(role)) {
-            user.setVerificationStatus("PENDING"); // pending admin approval
+            user.setVerificationStatus("PENDING");
         } else {
-            // CUSTOMER is auto-approved
             user.setVerificationStatus("APPROVED");
         }
 
