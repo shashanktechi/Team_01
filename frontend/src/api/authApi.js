@@ -2,6 +2,10 @@ import apiClient from './apiClient';
 
 export const authApi = {
 
+  sendOtp: async (email) => {
+    const response = await apiClient.post('/auth/otp/send', { email });
+    return response.data;
+  },
   register: async (registerData) => {
     // registerData contains: phone, email, password, name, role (CUSTOMER, STORE_ADMIN, DELIVERY_PARTNER, SYSTEM_ADMIN)
     // plus storeName, storeAddress, storeLat, storeLng if STORE_ADMIN
