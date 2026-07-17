@@ -76,6 +76,7 @@ public class AuthService {
         }
         String emailClean = email.trim().toLowerCase();
         String otp = generateAndSaveOtp(emailClean);
+        log.info("==== GENERATED OTP FOR {}: {} ====", emailClean, otp);
 
         try {
             emailService.sendOtpEmail(emailClean, otp);
