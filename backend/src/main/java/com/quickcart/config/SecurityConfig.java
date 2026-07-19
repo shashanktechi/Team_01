@@ -44,12 +44,11 @@ public class SecurityConfig {
     }
 
     @Bean
-    @SuppressWarnings("null")
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         // Split comma-separated values and trim whitespace
         List<String> origins = Arrays.stream(corsAllowedOrigins.split(","))
-                .map(String::trim)
+                .map(s -> s != null ? s.trim() : "")
                 .filter(s -> !s.isEmpty())
                 .toList();
         configuration.setAllowedOrigins(origins);

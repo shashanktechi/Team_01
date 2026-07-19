@@ -22,7 +22,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/delivery")
 @PreAuthorize("hasRole('DELIVERY_PARTNER')")
-@SuppressWarnings("null")
 public class DeliveryController {
 
     @Autowired

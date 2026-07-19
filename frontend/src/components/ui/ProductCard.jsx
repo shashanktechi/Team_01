@@ -15,7 +15,7 @@ export function ProductCard({ image, name, size, price, onAdd }) {
         <span className="font-label-md text-label-md text-on-surface-variant mt-1">{size}</span>
       </div>
       <div className="flex items-center justify-between mt-auto pt-2">
-        <span className="font-price-sm text-price-sm">{price}</span>
+        <span className="font-price-sm text-price-sm">{typeof price === 'number' ? `$${price.toFixed(2)}` : price}</span>
         <button 
           onClick={onAdd}
           className="w-8 h-8 rounded bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container active:scale-95 transition-all"

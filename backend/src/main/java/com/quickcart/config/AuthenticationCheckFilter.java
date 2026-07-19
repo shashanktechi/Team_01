@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-@SuppressWarnings("null")
 public class AuthenticationCheckFilter extends OncePerRequestFilter {
 
     private final UserRepository userRepository;

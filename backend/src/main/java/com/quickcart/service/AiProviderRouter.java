@@ -11,7 +11,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 
 @Service
-@SuppressWarnings({"unchecked", "null"})
+@SuppressWarnings("unchecked")
 public class AiProviderRouter {
 
     @Value("${ai.groq.api-key:}")

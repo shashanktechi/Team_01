@@ -6,7 +6,7 @@ import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 
 export function RegisterPage() {
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -21,7 +21,7 @@ export function RegisterPage() {
     setLoading(true);
 
     try {
-      await authService.register(formData);
+      await authService.register({ ...formData, role: 'CUSTOMER' });
       navigate('/login');
     } catch (err) {
       setError('Registration failed. Please try again.');
@@ -58,6 +58,15 @@ export function RegisterPage() {
               type="email"
               placeholder="name@example.com"
               value={formData.email}
+              onChange={handleChange}
+              required
+            />
+            <Input
+              label="Phone Number"
+              name="phone"
+              type="tel"
+              placeholder="+1234567890"
+              value={formData.phone}
               onChange={handleChange}
               required
             />

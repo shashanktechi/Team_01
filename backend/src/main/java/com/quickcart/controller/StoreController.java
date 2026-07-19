@@ -25,7 +25,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/store")
 @PreAuthorize("hasRole('STORE_ADMIN')")
-@SuppressWarnings("null")
 public class StoreController {
 
     @Autowired

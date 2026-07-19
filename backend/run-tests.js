@@ -48,14 +48,28 @@ async function run() {
     
     // Check stores mapping to get storeId
     const storesRes = await req('GET', '/admin/stores', adminToken);
-    const stores = JSON.parse(storesRes.data);
-    const store = stores[0];
+    console.log("Stores response:", storesRes.data);
+    let stores = JSON.parse(storesRes.data);
+    let store;
+    if (stores.length === 0) {
+       console.log("No stores found. Creating one via store admin...");
+       const createStoreRes = await req('POST', '/store/profile', storeToken, {
+           name: "Test Store",
+           address: "123 Main St",
+           location: { type: "Point", coordinates: [77.6, 12.9] },
+           whatsappNumber: "+919999999999",
+           isOpen: true
+       });
+       const newStore = JSON.parse(createStoreRes.data);
+       store = newStore;
+    } else {
+       store = stores[0];
+    }
 
     // Approve roles
     await req('PUT', `/admin/users/${storeAdmin.id}/verify?status=APPROVED`, adminToken);
-    await req('PUT', `/admin/users/${delivery.id}/verify?status=APPROVED`, adminToken); // Old endpoints maybe?
+    await req('PUT', `/admin/users/${delivery.id}/verify?status=APPROVED`, adminToken);
     await req('PUT', `/admin/stores/${store.id}/verify`, adminToken, {status: "APPROVED"});
-    await req('PUT', `/admin/delivery-partners/${delivery.id}/verify`, adminToken, {status: "APPROVED"});
 
     // --- TEST 1: ADMIN ---
     console.log("\n--- ADMIN ---");

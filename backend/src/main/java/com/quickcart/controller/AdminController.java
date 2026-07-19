@@ -18,7 +18,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/admin")
 @PreAuthorize("hasRole('SYSTEM_ADMIN')")
-@SuppressWarnings("null")
 public class AdminController {
 
     @Autowired

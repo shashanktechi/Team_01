@@ -25,6 +25,8 @@ spring:
   sql:
     init:
       mode: always
+      data-locations: classpath:seed.sql
+      continue-on-error: true
 
   mail:
     host: smtp.gmail.com

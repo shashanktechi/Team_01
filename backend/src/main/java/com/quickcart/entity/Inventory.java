@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "inventory", uniqueConstraints = {
     @UniqueConstraint(columnNames = {"store_id", "product_id", "batch_code"})
 })
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Inventory {
 
     @Id

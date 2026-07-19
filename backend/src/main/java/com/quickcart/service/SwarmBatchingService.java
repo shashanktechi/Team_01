@@ -30,7 +30,6 @@ public class SwarmBatchingService {
     private NotificationService notificationService;
 
     @Transactional
-    @SuppressWarnings("null")
     public Swarm batchOrdersForDelivery(@org.springframework.lang.NonNull Long deliveryPartnerId, double currentLat, double currentLng) {
         User partner = userRepository.findById(deliveryPartnerId)
                 .orElseThrow(() -> new RuntimeException("Partner not found"));
@@ -55,7 +54,7 @@ public class SwarmBatchingService {
 
         Swarm swarm = new Swarm();
         swarm.setDeliveryPartner(partner);
-        swarm.setOrderIds(pendingOrders.stream().map(Order::getId).collect(Collectors.toList()));
+        swarm.setOrderIds(pendingOrders.stream().map(o -> o != null ? o.getId() : null).collect(Collectors.toList()));
         swarm.setRoutePolyline("encoded_polyline_mock");
         swarm.setEstimatedCompletion(LocalDateTime.now().plusMinutes(45));
         swarm = swarmRepository.save(swarm);

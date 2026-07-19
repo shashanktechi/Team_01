@@ -17,6 +17,9 @@ export const AuthProvider = ({ children }) => {
         } catch (error) {
           console.error('Failed to fetch user:', error);
           localStorage.removeItem('token');
+          localStorage.removeItem('role');
+          localStorage.removeItem('userId');
+          localStorage.removeItem('storeId');
         }
       }
       setLoading(false);
@@ -26,13 +29,16 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const data = await authService.login(credentials);
-    localStorage.setItem('token', data.token);
-    setUser(data.user);
+    await authService.login(credentials);
+    const userData = await authService.getCurrentUser();
+    setUser(userData);
   };
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('role');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('storeId');
     setUser(null);
   };
 

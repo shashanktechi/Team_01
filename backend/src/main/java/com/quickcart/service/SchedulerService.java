@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.HashMap;
 
 @Service
-@SuppressWarnings("null")
 public class SchedulerService {
 
     private static final Logger logger = LoggerFactory.getLogger(SchedulerService.class);
