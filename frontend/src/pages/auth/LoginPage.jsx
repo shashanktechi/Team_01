@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
+import { BrandStamp } from '../../components/ui/BrandStamp';
+import { TagSphere } from '../../components/ui/TagSphere';
 
 export function LoginPage() {
   const [email, setEmail] = useState('');
@@ -29,12 +31,20 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-headline-md text-primary">Quick_Cart</CardTitle>
-          <CardDescription>Enter your credentials to access your account</CardDescription>
-        </CardHeader>
+    <div className="min-h-screen flex bg-background">
+      {/* Left Column: 3D Sphere */}
+      <div className="hidden lg:flex lg:w-1/2 bg-surface border-r border-ink/10 flex-col items-center justify-center p-12 relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
+        <TagSphere />
+      </div>
+
+      {/* Right Column: Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <Card className="w-full max-w-md border-0 shadow-none bg-transparent">
+          <CardHeader className="text-center px-0 flex flex-col items-center">
+            <BrandStamp className="w-16 h-16 mb-4" />
+            <CardDescription className="font-body text-ink-muted">Enter your credentials to access your account</CardDescription>
+          </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
@@ -77,6 +87,7 @@ export function LoginPage() {
           </CardFooter>
         </form>
       </Card>
+      </div>
     </div>
   );
 }

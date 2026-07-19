@@ -175,6 +175,9 @@ public class StoreController {
 
     @PostMapping("/inventory/analyze-shelf")
     public ResponseEntity<?> analyzeShelfPhoto(@RequestBody Map<String, String> body) {
+        // Check store approval for mutating operation
+        getCurrentStoreForMutatingOperations();
+
         String objectKey = body.get("objectKey");
         if (objectKey == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "objectKey is required"));

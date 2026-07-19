@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router';
-import { ArrowLeft, Phone, MessageSquare, MapPin, CheckCircle2, Clock, Package, Loader2 } from 'lucide-react';
+import { ArrowLeft, Phone, MapPin, CheckCircle2, Clock, Package, Loader2 } from 'lucide-react';
 import { api } from '../services/api';
+import { TicketCard } from '../components/ui/TicketCard';
+import { Button } from '../components/ui/Button';
 
 export function TrackOrderPage() {
   const navigate = useNavigate();
@@ -61,16 +63,16 @@ export function TrackOrderPage() {
   const currentIndex = getStatusIndex(order.status);
 
   return (
-    <div className="bg-surface-dim font-body-md text-on-surface antialiased min-h-screen pb-6">
-      <div className="max-w-[480px] mx-auto bg-background min-h-screen flex flex-col shadow-lg">
+    <div className="bg-[#F3EDE1] font-body text-ink antialiased min-h-screen pb-6">
+      <div className="max-w-[480px] mx-auto bg-[#F3EDE1] min-h-screen flex flex-col relative">
         {/* Header */}
-        <header className="bg-primary text-on-primary px-4 py-3 flex items-center gap-3 sticky top-0 z-10">
-          <button onClick={() => navigate('/')} className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors">
+        <header className="bg-chalk text-ink px-4 py-4 flex items-center gap-3 sticky top-0 z-10 border-b border-ink/10 shadow-sm">
+          <button onClick={() => navigate('/')} className="p-2 -ml-2 rounded-full hover:bg-ink/5 transition-colors">
             <ArrowLeft className="h-6 w-6" />
           </button>
           <div>
-            <h1 className="font-headline-md text-headline-md">Track Order</h1>
-            <p className="font-label-md text-label-md opacity-90">Order #{order.id}</p>
+            <h1 className="font-display font-black text-2xl tracking-tight">Track Order</h1>
+            <p className="font-mono text-xs uppercase tracking-wider text-ink-muted mt-1">Order #{order.id}</p>
           </div>
         </header>
 
@@ -83,92 +85,92 @@ export function TrackOrderPage() {
             <div className="w-4 h-1 bg-black/20 rounded-[100%] mt-1 shadow-sm"></div>
           </div>
 
-          <div className="absolute top-4 left-4 right-4 bg-surface rounded-xl shadow-md p-4 flex items-center justify-between border border-surface-variant">
+          <TicketCard className="absolute top-4 left-4 right-4 bg-chalk shadow-sm p-4 flex items-center justify-between border-ink/10 z-10">
             <div className="flex flex-col">
-              <span className="font-headline-sm text-headline-sm text-on-surface">Arriving in {order.estimatedDeliveryTime || 10} mins</span>
-              <span className="font-body-sm text-body-sm text-on-surface-variant">Your order is {order.status.toLowerCase().replace('_', ' ')}!</span>
+              <span className="font-display font-black text-lg text-ink">Arriving in {order.estimatedDeliveryTime || 10} mins</span>
+              <span className="font-mono text-xs uppercase tracking-wider text-ink-muted mt-1">Your order is {order.status.toLowerCase().replace('_', ' ')}!</span>
             </div>
-            <div className="w-12 h-12 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-marigold text-ink rounded-full border border-ink flex items-center justify-center shadow-sm">
               <Clock className="h-6 w-6" />
             </div>
-          </div>
+          </TicketCard>
         </div>
 
-        <div className="flex-1 p-margin-mobile flex flex-col gap-4">
+        <div className="flex-1 p-4 flex flex-col gap-4">
           {/* Delivery Agent Info */}
           {order.deliveryAgent && (
-            <div className="bg-surface rounded-xl shadow-sm border border-surface-variant p-4 flex items-center justify-between">
+            <TicketCard className="bg-chalk shadow-sm border-ink/10 p-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <img src={order.deliveryAgent.profilePhotoUrl || "https://i.pravatar.cc/150?img=11"} alt="Delivery Agent" className="w-12 h-12 rounded-full border-2 border-primary" />
+                <img src={order.deliveryAgent.profilePhotoUrl || "https://i.pravatar.cc/150?img=11"} alt="Delivery Agent" className="w-12 h-12 rounded-full border-2 border-ink" />
                 <div>
-                  <h3 className="font-headline-sm text-headline-sm text-on-surface">{order.deliveryAgent.fullName || 'Agent'}</h3>
-                  <span className="font-body-sm text-body-sm text-on-surface-variant">Delivery Partner</span>
+                  <h3 className="font-display font-black text-lg text-ink">{order.deliveryAgent.fullName || 'Agent'}</h3>
+                  <span className="font-mono text-xs uppercase tracking-wider text-ink-muted">Delivery Partner</span>
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <button className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center hover:bg-primary-container transition-colors">
+                <Button variant="outline" className="w-10 h-10 p-0 rounded-full border-ink text-ink hover:bg-ink hover:text-chalk">
                   <Phone className="h-5 w-5" />
-                </button>
+                </Button>
               </div>
-            </div>
+            </TicketCard>
           )}
 
           {/* Order Status Timeline */}
-          <div className="bg-surface rounded-xl shadow-sm border border-surface-variant p-4">
-            <h3 className="font-headline-sm text-headline-sm text-on-surface mb-4">Order Status</h3>
-            <div className="flex flex-col gap-4 relative">
-              <div className="absolute left-[11px] top-3 bottom-3 w-[2px] bg-surface-container-highest"></div>
+          <TicketCard className="bg-chalk shadow-sm border-ink/10 p-4">
+            <h3 className="font-display font-black text-xl text-ink mb-4 uppercase tracking-tight border-b-2 border-dashed border-ink/20 pb-2">Order Status</h3>
+            <div className="flex flex-col gap-4 relative mt-2">
+              <div className="absolute left-[11px] top-3 bottom-3 w-[2px] bg-ink/10 border-l-2 border-dashed border-ink/20"></div>
               
               <div className="flex gap-4 relative z-10">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${currentIndex >= 0 ? 'bg-primary text-on-primary' : 'bg-surface-container-high border-2 border-surface-container-highest text-transparent'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border border-ink ${currentIndex >= 0 ? 'bg-bazaar-green text-chalk' : 'bg-chalk text-transparent'}`}>
                   {currentIndex >= 0 && <CheckCircle2 className="h-4 w-4" />}
                 </div>
-                <div className="flex flex-col">
-                  <span className={`font-label-md text-label-md ${currentIndex >= 0 ? 'text-on-surface font-bold' : 'text-on-surface opacity-50'}`}>Order Confirmed</span>
+                <div className="flex flex-col mt-0.5">
+                  <span className={`font-mono text-sm uppercase tracking-wider ${currentIndex >= 0 ? 'text-ink font-bold' : 'text-ink-muted'}`}>Order Confirmed</span>
                 </div>
               </div>
 
               <div className="flex gap-4 relative z-10">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${currentIndex >= 1 ? 'bg-primary text-on-primary' : 'bg-surface-container-high border-2 border-surface-container-highest text-transparent'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border border-ink ${currentIndex >= 1 ? 'bg-bazaar-green text-chalk' : 'bg-chalk text-transparent'}`}>
                   {currentIndex >= 1 && <CheckCircle2 className="h-4 w-4" />}
                 </div>
-                <div className="flex flex-col">
-                  <span className={`font-label-md text-label-md ${currentIndex >= 1 ? 'text-on-surface font-bold' : 'text-on-surface opacity-50'}`}>Order Accepted</span>
+                <div className="flex flex-col mt-0.5">
+                  <span className={`font-mono text-sm uppercase tracking-wider ${currentIndex >= 1 ? 'text-ink font-bold' : 'text-ink-muted'}`}>Order Accepted</span>
                 </div>
               </div>
 
               <div className="flex gap-4 relative z-10">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${currentIndex >= 2 ? 'bg-primary text-on-primary' : 'bg-surface-container-high border-2 border-surface-container-highest text-transparent'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border border-ink ${currentIndex >= 2 ? 'bg-bazaar-green text-chalk' : 'bg-chalk text-transparent'}`}>
                   {currentIndex >= 2 && <CheckCircle2 className="h-4 w-4" />}
                 </div>
-                <div className="flex flex-col">
-                  <span className={`font-label-md text-label-md ${currentIndex >= 2 ? 'text-on-surface font-bold' : 'text-on-surface opacity-50'}`}>Out for Delivery</span>
+                <div className="flex flex-col mt-0.5">
+                  <span className={`font-mono text-sm uppercase tracking-wider ${currentIndex >= 2 ? 'text-ink font-bold' : 'text-ink-muted'}`}>Out for Delivery</span>
                 </div>
               </div>
 
               <div className="flex gap-4 relative z-10">
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${currentIndex >= 3 ? 'bg-primary text-on-primary' : 'bg-surface-container-high border-2 border-surface-container-highest text-transparent'}`}>
+                <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border border-ink ${currentIndex >= 3 ? 'bg-bazaar-green text-chalk' : 'bg-chalk text-transparent'}`}>
                   {currentIndex >= 3 && <CheckCircle2 className="h-4 w-4" />}
                 </div>
-                <div className="flex flex-col">
-                  <span className={`font-label-md text-label-md ${currentIndex >= 3 ? 'text-on-surface font-bold' : 'text-on-surface opacity-50'}`}>Delivered</span>
+                <div className="flex flex-col mt-0.5">
+                  <span className={`font-mono text-sm uppercase tracking-wider ${currentIndex >= 3 ? 'text-ink font-bold' : 'text-ink-muted'}`}>Delivered</span>
                 </div>
               </div>
             </div>
-          </div>
+          </TicketCard>
 
           {/* Order Summary */}
-          <div className="bg-surface rounded-xl shadow-sm border border-surface-variant p-4 flex items-center justify-between">
+          <TicketCard className="bg-chalk shadow-sm border-ink/10 p-4 flex items-center justify-between">
              <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-surface-container rounded-lg flex items-center justify-center text-on-surface-variant">
+               <div className="w-10 h-10 bg-[#F3EDE1] rounded-lg border border-ink/10 flex items-center justify-center text-ink">
                  <Package className="h-6 w-6" />
                </div>
                <div>
-                 <span className="font-label-md text-label-md text-on-surface block">{order.items?.length || 0} Items</span>
-                 <span className="font-body-sm text-body-sm text-on-surface-variant block">Total: ${order.totalAmount?.toFixed(2)}</span>
+                 <span className="font-mono text-sm uppercase tracking-wider font-bold text-ink block">{order.items?.length || 0} Items</span>
+                 <span className="font-body text-sm text-ink-muted block mt-1">Total: ${order.totalAmount?.toFixed(2)}</span>
                </div>
              </div>
-          </div>
+          </TicketCard>
         </div>
       </div>
     </div>

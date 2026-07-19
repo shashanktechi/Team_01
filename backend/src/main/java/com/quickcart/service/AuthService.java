@@ -380,13 +380,15 @@ public class AuthService {
         Long storeId = null;
         if ("STORE_ADMIN".equals(role)) {
             if (request.getStoreName() == null || request.getStoreName().trim().isEmpty() ||
+                request.getCity() == null || request.getCity().trim().isEmpty() ||
                 request.getStoreAddress() == null || request.getStoreAddress().trim().isEmpty() ||
                 request.getStoreLat() == null || request.getStoreLng() == null) {
-                throw new RuntimeException("Store details (name, address, lat, lng) are required for STORE_ADMIN registration");
+                throw new RuntimeException("Store details (name, city, address, lat, lng) are required for STORE_ADMIN registration");
             }
             Store store = new Store();
             store.setOwner(user);
             store.setName(request.getStoreName());
+            store.setCity(request.getCity());
             store.setAddress(request.getStoreAddress());
             try {
                 org.locationtech.jts.geom.GeometryFactory geometryFactory = new org.locationtech.jts.geom.GeometryFactory(

@@ -20,5 +20,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     @Query(value = "SELECT * FROM stores s WHERE s.is_open = true AND s.verification_status = 'APPROVED' ORDER BY s.location <-> ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) ASC", nativeQuery = true)
     List<Store> findNearestStores(@Param("lat") double lat, @Param("lng") double lng);
 
+    List<Store> findByCityIgnoreCase(String city);
+
     List<Store> findByVerificationStatus(String verificationStatus);
 }

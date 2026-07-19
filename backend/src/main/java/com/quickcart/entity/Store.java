@@ -28,6 +28,9 @@ public class Store {
     @Column(nullable = false)
     private String name;
 
+    @Column
+    private String city = "Hyderabad";
+
     private String address;
 
     @Column(columnDefinition = "geography(Point,4326)")

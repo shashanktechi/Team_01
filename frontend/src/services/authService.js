@@ -28,17 +28,7 @@ export const authService = {
   },
 
   getCurrentUser: async () => {
-    const role = localStorage.getItem('role');
-    let endpoint = '/customer/profile'; // default for customers
-    if (role === 'STORE_ADMIN') {
-      endpoint = '/store/profile';
-    } else if (role === 'DELIVERY_PARTNER') {
-      endpoint = '/delivery/profile';
-    } else if (role === 'SYSTEM_ADMIN') {
-      // Admins might not have a dedicated profile endpoint in this design, fallback to a mocked profile or skip
-      return { role: 'SYSTEM_ADMIN' };
-    }
-    const response = await api.get(endpoint);
+    const response = await api.get('/auth/me');
     return response.data;
   }
 };

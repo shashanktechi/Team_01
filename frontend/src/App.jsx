@@ -10,29 +10,41 @@ import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { StorePage } from './pages/StorePage';
 import { CartPage } from './pages/CartPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
+import { PendingApprovalPage } from './pages/auth/PendingApprovalPage';
+import { CitySelectorModal } from './components/ui/CitySelectorModal';
+import { LandingPage } from './pages/LandingPage';
+
+import { CityProvider } from './context/CityContext';
 
 function App() {
   return (
     <AuthProvider>
-      <CartProvider>
-        <BrowserRouter>
-          <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<MainLayout />}>
-              <Route index element={<HomePage />} />
+      <CityProvider>
+        <CartProvider>
+          <BrowserRouter>
+            <CitySelectorModal />
+            <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            
+            {/* Public Routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route element={<MainLayout />}>
+              <Route path="/stores" element={<HomePage />} />
+              <Route path="/store/:id" element={<StorePage />} />
             </Route>
-            {/* Pages without MainLayout */}
-            <Route path="/store/:id" element={<StorePage />} />
-            <Route path="/cart" element={<CartPage />} />
-            <Route path="/track" element={<TrackOrderPage />} />
-          </Route>
-          </Routes>
-        </BrowserRouter>
-      </CartProvider>
+
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/pending" element={<PendingApprovalPage />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/track" element={<TrackOrderPage />} />
+            </Route>
+            </Routes>
+          </BrowserRouter>
+        </CartProvider>
+      </CityProvider>
     </AuthProvider>
   );
 }

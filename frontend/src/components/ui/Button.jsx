@@ -10,13 +10,19 @@ export const Button = React.forwardRef(({
   ...props 
 }, ref) => {
   
-  const baseStyles = "inline-flex items-center justify-center rounded-xl font-headline-sm transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none";
+  const baseStyles = "relative inline-flex items-center justify-center font-bold transition-colors duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none rounded";
   
+  // Custom price-tag clip path for primary/danger buttons
+  const tagClipPath = {
+    clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)"
+  };
+
   const variants = {
-    primary: "bg-primary text-on-primary hover:bg-primary-container hover:text-on-primary-container shadow-sm",
-    secondary: "bg-secondary-container text-on-secondary-container hover:bg-secondary-container/80",
-    outline: "border-2 border-outline-variant text-primary hover:bg-surface-container-low",
-    ghost: "text-primary hover:bg-surface-container-low"
+    primary: "bg-primary text-surface hover:brightness-95",
+    secondary: "border-2 border-ink text-ink hover:bg-ink/5",
+    danger: "bg-error text-surface hover:brightness-95",
+    outline: "border border-ink/20 text-ink hover:bg-ink/5",
+    ghost: "text-ink hover:bg-ink/5"
   };
 
   const sizes = {
@@ -26,11 +32,14 @@ export const Button = React.forwardRef(({
     icon: "h-10 w-10"
   };
 
+  const isTagShape = variant === 'primary' || variant === 'danger';
+
   return (
     <button
       ref={ref}
       disabled={disabled || isLoading}
       className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
+      style={isTagShape ? tagClipPath : {}}
       {...props}
     >
       {isLoading ? (

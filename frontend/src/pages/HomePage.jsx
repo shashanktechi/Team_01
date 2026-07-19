@@ -3,17 +3,28 @@ import { CategoryItem } from '../components/ui/CategoryItem';
 import { StoreCard } from '../components/ui/StoreCard';
 import { ProductCard } from '../components/ui/ProductCard';
 import { api } from '../services/api';
+import { useCity } from '../context/CityContext';
 
 export function HomePage() {
   const [categories, setCategories] = useState([]);
   const [stores, setStores] = useState([]);
   const [recentProducts, setRecentProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { selectedCity, isInitialized, setIsCityModalOpen } = useCity();
 
   useEffect(() => {
+    if (!isInitialized) return;
+
+    if (!selectedCity) {
+      setIsCityModalOpen(true);
+      setLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
+      setLoading(true);
       try {
-        const response = await api.get('/customer/stores/nearby?lat=12.9716&lng=77.5946');
+        const response = await api.get(`/public/stores/by-city?city=${encodeURIComponent(selectedCity)}`);
         
         const mappedStores = response.data.map(store => ({
           id: store.id,
@@ -60,12 +71,12 @@ export function HomePage() {
     };
 
     fetchData();
-  }, []);
+  }, [isInitialized, selectedCity, setIsCityModalOpen]);
 
   return (
     <>
       <section className="flex flex-col gap-sm">
-        <h2 className="font-headline-md text-headline-md">Categories</h2>
+        <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-2">Categories</h2>
         <div className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar">
           {categories.map((cat) => (
             <CategoryItem key={cat.id} name={cat.name} image={cat.image} />
@@ -74,7 +85,7 @@ export function HomePage() {
       </section>
 
       <section className="flex flex-col gap-sm">
-        <h2 className="font-headline-md text-headline-md">Nearby Stores</h2>
+        <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-2 mt-4">Nearby Stores</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {stores.map((store) => (
             <StoreCard key={store.id} {...store} />
@@ -83,7 +94,7 @@ export function HomePage() {
       </section>
 
       <section className="flex flex-col gap-sm">
-        <h2 className="font-headline-md text-headline-md">Buy it Again</h2>
+        <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-2 mt-4">Buy it Again</h2>
         <div className="flex overflow-x-auto gap-gutter pb-4 hide-scrollbar">
           {recentProducts.map((product) => (
             <ProductCard 

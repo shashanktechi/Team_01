@@ -1,21 +1,33 @@
 import React from 'react';
 import { ShoppingCart, MapPin, Search, Mic } from 'lucide-react';
+import { useCity } from '../../context/CityContext';
+import { useNavigate } from 'react-router';
+import { BrandMark } from '../ui/BrandMark';
 
 export function TopAppBar() {
+  const { selectedCity, setIsCityModalOpen } = useCity();
+  const navigate = useNavigate();
+
   return (
     <header className="fixed top-0 w-full z-50 shadow-md bg-surface/90 backdrop-blur-md max-w-screen-xl mx-auto">
       <div className="flex flex-col gap-2 px-4 py-3 w-full">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-primary font-bold">
-            <MapPin className="text-primary h-6 w-6" />
-            <div className="flex flex-col">
-              <span className="font-headline-sm text-headline-sm">Quick_Cart</span>
-              <span className="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">
-                Home - 12th Main, Indiranagar
+          <div className="flex items-center gap-3">
+            <BrandMark />
+            <div 
+              className="flex items-center gap-1 cursor-pointer bg-surface-container-low hover:bg-surface-container px-2 py-1 rounded-md transition-colors"
+              onClick={() => setIsCityModalOpen(true)}
+            >
+              <MapPin className="w-3.5 h-3.5 text-primary" />
+              <span className="font-mono font-bold text-xs text-ink-muted">
+                {selectedCity ? selectedCity : 'Select City'}
               </span>
             </div>
           </div>
-          <button className="relative p-2 text-primary hover:bg-surface-container-high transition-colors active:scale-95 duration-200 rounded-full">
+          <button 
+            onClick={() => navigate('/cart')}
+            className="relative p-2 text-primary hover:bg-surface-container-high transition-colors active:scale-95 duration-200 rounded-full"
+          >
             <ShoppingCart className="h-6 w-6" />
             <span className="absolute top-1 right-1 bg-tertiary-container text-on-tertiary-container text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
               3

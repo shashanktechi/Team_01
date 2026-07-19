@@ -1,26 +1,43 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --color-primary: #059669; /* Primary Emerald from designMd */
-  --color-primary-hover: #047857; 
-  --color-secondary: #f59e0b; /* Urgency Amber */
-  --color-error: #e11d48; /* Danger Rose */
-  --color-background: #f5fbf5; 
+  /* Green Theme Colors */
+  --color-bazaar-green: #16A34A; /* Green */
+  --color-kraft: #FFFFFF; /* White */
+  --color-chalk: #FFFFFF; /* Pure White */
+  --color-marigold: #86EFAC; /* Accent Light Green */
+  --color-clay: #EF4444; /* Error Red */
+  --color-ink: #14532D; /* Very Dark Green */
+  --color-ink-muted: #166534; /* Dark Green */
+
+  /* Aliases for generic utility classes */
+  --color-primary: var(--color-bazaar-green);
+  --color-secondary: var(--color-marigold);
+  --color-error: var(--color-clay);
+  --color-background: var(--color-kraft);
   
-  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  /* Typography */
+  --font-display: 'Fraunces', ui-serif, Georgia, serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
 }
 
 @layer base {
-  
   body {
     background-color: var(--color-background);
-    color: #171d19; /* on-surface */
-    font-family: var(--font-sans);
+    color: var(--color-ink);
+    font-family: var(--font-body);
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
+    color: var(--color-ink);
+    letter-spacing: -0.02em;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-marigold) !important;
+    outline-offset: 2px !important;
   }
 }

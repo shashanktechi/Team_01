@@ -21,10 +21,10 @@ public class AdminPasswordResetRunner implements CommandLineRunner {
     @Transactional
     public void run(String... args) throws Exception {
         userRepository.findByEmail("shashankdany8712@gmail.com").ifPresent(admin -> {
-            // Update admin password to 'Password123!' so it can be tested in Postman
-            admin.setPasswordHash(passwordEncoder.encode("Password123!"));
+            // Update admin password
+            admin.setPasswordHash(passwordEncoder.encode("Dany@8712"));
             userRepository.save(admin);
-            System.out.println("=== ADMIN PASSWORD RESET TO 'Password123!' ===");
+            System.out.println("=== ADMIN PASSWORD RESET TO 'Dany@8712' ===");
         });
     }
 }

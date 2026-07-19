@@ -1,9 +1,10 @@
 import React from 'react';
+import { TicketCard } from './TicketCard';
 
 const Card = React.forwardRef(({ className = '', ...props }, ref) => (
-  <div
+  <TicketCard
     ref={ref}
-    className={`bg-surface rounded-2xl shadow-[0px_4px_16px_rgba(0,0,0,0.08)] border border-surface-variant overflow-hidden ${className}`}
+    className={className}
     {...props}
   />
 ));

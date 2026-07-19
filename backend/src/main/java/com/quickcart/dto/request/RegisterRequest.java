@@ -26,6 +26,7 @@ public class RegisterRequest {
     private String role; // CUSTOMER, STORE_ADMIN, DELIVERY_PARTNER, SYSTEM_ADMIN
 
     private String storeName;
+    private String city;
     private String storeAddress;
     private Double storeLat;
     private Double storeLng;

@@ -45,6 +45,23 @@ public class MediaController {
     @Autowired
     private CurrentUserProvider currentUserProvider;
 
+    private String getExtensionAndValidate(String contentType) {
+        if (contentType == null) {
+            return null;
+        }
+        switch (contentType.toLowerCase()) {
+            case "image/jpeg":
+            case "image/jpg":
+                return ".jpg";
+            case "image/png":
+                return ".png";
+            case "image/webp":
+                return ".webp";
+            default:
+                return null;
+        }
+    }
+
     @PostMapping("/profile-photo/upload-url")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<?> getProfilePhotoUploadUrl(@RequestBody @Valid UploadUrlRequest request) {
@@ -52,7 +69,11 @@ public class MediaController {
         if (userId == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized"));
         }
-        String objectKey = "users/" + userId + "/profile.jpg";
+        String ext = getExtensionAndValidate(request.getContentType());
+        if (ext == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid content type. Only JPEG, PNG, and WebP are allowed."));
+        }
+        String objectKey = "users/" + userId + "/profile-" + UUID.randomUUID().toString() + ext;
         String uploadUrl = s3Service.generateUploadUrl(objectKey, request.getContentType());
         String publicUrl = s3Service.getPublicUrl(objectKey);
         return ResponseEntity.ok(Map.of(
@@ -72,8 +93,8 @@ public class MediaController {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        String expectedKey = "users/" + userId + "/profile.jpg";
-        if (!expectedKey.equals(request.getObjectKey())) {
+        String expectedPrefix = "users/" + userId + "/profile-";
+        if (!request.getObjectKey().startsWith(expectedPrefix)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
 
@@ -89,7 +110,11 @@ public class MediaController {
         if (currentStoreId == null || !currentStoreId.equals(storeId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: You do not manage this store"));
         }
-        String objectKey = "stores/" + storeId + "/logo.jpg";
+        String ext = getExtensionAndValidate(request.getContentType());
+        if (ext == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid content type. Only JPEG, PNG, and WebP are allowed."));
+        }
+        String objectKey = "stores/" + storeId + "/logo-" + UUID.randomUUID().toString() + ext;
         String uploadUrl = s3Service.generateUploadUrl(objectKey, request.getContentType());
         String publicUrl = s3Service.getPublicUrl(objectKey);
         return ResponseEntity.ok(Map.of(
@@ -106,8 +131,8 @@ public class MediaController {
         if (currentStoreId == null || !currentStoreId.equals(storeId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: You do not manage this store"));
         }
-        String expectedKey = "stores/" + storeId + "/logo.jpg";
-        if (!expectedKey.equals(request.getObjectKey())) {
+        String expectedPrefix = "stores/" + storeId + "/logo-";
+        if (!request.getObjectKey().startsWith(expectedPrefix)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
         Store store = storeRepository.findById(Objects.requireNonNull(storeId))
@@ -124,7 +149,11 @@ public class MediaController {
         if (currentStoreId == null || !currentStoreId.equals(storeId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: You do not manage this store"));
         }
-        String objectKey = "stores/" + storeId + "/banner.jpg";
+        String ext = getExtensionAndValidate(request.getContentType());
+        if (ext == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid content type. Only JPEG, PNG, and WebP are allowed."));
+        }
+        String objectKey = "stores/" + storeId + "/banner-" + UUID.randomUUID().toString() + ext;
         String uploadUrl = s3Service.generateUploadUrl(objectKey, request.getContentType());
         String publicUrl = s3Service.getPublicUrl(objectKey);
         return ResponseEntity.ok(Map.of(
@@ -141,8 +170,8 @@ public class MediaController {
         if (currentStoreId == null || !currentStoreId.equals(storeId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: You do not manage this store"));
         }
-        String expectedKey = "stores/" + storeId + "/banner.jpg";
-        if (!expectedKey.equals(request.getObjectKey())) {
+        String expectedPrefix = "stores/" + storeId + "/banner-";
+        if (!request.getObjectKey().startsWith(expectedPrefix)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
         Store store = storeRepository.findById(Objects.requireNonNull(storeId))
@@ -159,8 +188,12 @@ public class MediaController {
         if (currentStoreId == null || !currentStoreId.equals(storeId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: You do not manage this store"));
         }
+        String ext = getExtensionAndValidate(request.getContentType());
+        if (ext == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid content type. Only JPEG, PNG, and WebP are allowed."));
+        }
         String uuid = UUID.randomUUID().toString();
-        String objectKey = "stores/" + storeId + "/products/" + productId + "/" + uuid + ".jpg";
+        String objectKey = "stores/" + storeId + "/products/" + productId + "/" + uuid + ext;
         String uploadUrl = s3Service.generateUploadUrl(objectKey, request.getContentType());
         String publicUrl = s3Service.getPublicUrl(objectKey);
         return ResponseEntity.ok(Map.of(
@@ -178,7 +211,7 @@ public class MediaController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: You do not manage this store"));
         }
         String prefix = "stores/" + storeId + "/products/" + productId + "/";
-        if (!request.getObjectKey().startsWith(prefix) || !request.getObjectKey().endsWith(".jpg")) {
+        if (!request.getObjectKey().startsWith(prefix)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("error", "Access denied: objectKey mismatch"));
         }
         Product product = productRepository.findById(Objects.requireNonNull(productId))

@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router';
 import { ArrowLeft, ShoppingCart, Truck, BadgeCheck, Plus, Minus } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { BrandMark } from '../components/ui/BrandMark';
 
 export function StorePage() {
   const navigate = useNavigate();
@@ -54,18 +57,18 @@ export function StorePage() {
   };
 
   return (
-    <div className="bg-background text-on-background min-h-screen pb-24 font-body-lg">
-      <header className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md shadow-md">
+    <div className="bg-[#F3EDE1] text-ink min-h-screen pb-24 font-body">
+      <header className="fixed top-0 w-full z-50 bg-[#F3EDE1]/90 backdrop-blur-md border-b border-ink/10">
         <div className="flex flex-col gap-2 px-4 py-3 w-full max-w-7xl mx-auto">
           <div className="flex justify-between items-center w-full">
-            <button onClick={() => navigate(-1)} className="text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full active:scale-95 duration-200">
+            <button onClick={() => navigate(-1)} className="text-ink hover:bg-ink/5 transition-colors p-2 rounded-full active:scale-95 duration-200">
               <ArrowLeft className="h-6 w-6" />
             </button>
-            <div className="font-display-lg-mobile text-display-lg-mobile text-primary tracking-tight">Quick_Cart</div>
-            <button onClick={() => navigate('/cart')} className="text-on-surface-variant hover:bg-surface-container-high transition-colors p-2 rounded-full active:scale-95 duration-200 relative">
+            <BrandMark />
+            <button onClick={() => navigate('/cart')} className="text-ink hover:bg-ink/5 transition-colors p-2 rounded-full active:scale-95 duration-200 relative">
               <ShoppingCart className="h-6 w-6" />
               {getCartCount() > 0 && (
-                <span className="absolute top-0 right-0 bg-error text-on-error rounded-full w-4 h-4 flex items-center justify-center font-label-md text-label-md">
+                <span className="absolute -top-1 -right-1 bg-marigold text-ink rounded-full w-5 h-5 flex items-center justify-center font-mono font-bold text-[10px] border border-ink/20 shadow-sm">
                   {getCartCount()}
                 </span>
               )}
@@ -95,19 +98,14 @@ export function StorePage() {
           </div>
         </div>
 
-        <nav className="sticky top-[72px] z-40 bg-surface/90 backdrop-blur-md shadow-sm -mx-4 px-4 md:mx-0 md:px-0 py-2 border-b border-surface-variant overflow-x-auto hide-scrollbar">
+        <nav className="sticky top-[72px] z-40 bg-[#F3EDE1]/90 backdrop-blur-md shadow-sm -mx-4 px-4 md:mx-0 md:px-0 py-2 border-b border-ink/10 overflow-x-auto hide-scrollbar">
           <ul className="flex gap-4 min-w-max pb-1">
             {categories.map(cat => (
               <li key={cat}>
-                <button 
-                  onClick={() => setActiveCategory(cat)}
-                  className={`font-label-md text-label-md px-4 py-2 rounded-full shadow-sm active:scale-95 transition-colors ${
-                    activeCategory === cat 
-                      ? 'bg-primary text-on-primary' 
-                      : 'bg-surface-container-low text-on-surface hover:bg-surface-container'
-                  }`}
-                >
-                  {cat}
+                <button onClick={() => setActiveCategory(cat)} className="active:scale-95 transition-transform group">
+                  <Badge variant={activeCategory === cat ? 'marigold' : 'chalk'} className="px-4 py-2 group-hover:-translate-y-0.5 transition-transform">
+                    {cat}
+                  </Badge>
                 </button>
               </li>
             ))}
@@ -115,38 +113,38 @@ export function StorePage() {
         </nav>
 
         <section className="p-margin-mobile md:p-0 md:py-margin-desktop">
-          <h2 className="font-headline-sm text-headline-sm text-on-surface mb-4">{activeCategory}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-6 gap-gutter">
+          <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-4">{activeCategory}</h2>
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             {filteredProducts.map(p => {
               const qty = getProductQuantity(p.id);
               return (
-                <article key={p.id} className="bg-surface-container-lowest rounded-xl shadow-[0px_2px_8px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col hover:-translate-y-1 transition-transform duration-200">
-                  <div className="relative aspect-square bg-surface-container-low p-2">
+                <article key={p.id} className="bg-chalk border border-ink/10 shadow-sm rounded-none flex flex-col hover:-translate-y-1 transition-transform duration-200">
+                  <div className="relative aspect-square bg-[#F3EDE1]/50 p-4 border-b border-ink/10">
                     <img className="w-full h-full object-contain mix-blend-multiply" alt={p.name} src={p.image} />
                   </div>
-                  <div className="p-2 flex flex-col flex-grow justify-between gap-2">
+                  <div className="p-3 flex flex-col flex-grow justify-between gap-3">
                     <div>
-                      <h3 className="font-body-sm text-body-sm text-on-surface line-clamp-2">{p.name}</h3>
-                      <p className="font-label-md text-label-md text-on-surface-variant mt-1">{p.size}</p>
+                      <h3 className="font-body font-bold text-ink line-clamp-2 leading-snug">{p.name}</h3>
+                      <p className="font-mono text-xs text-ink-muted mt-1 uppercase tracking-wider">{p.size}</p>
                     </div>
-                    <div className="flex flex-col gap-2 mt-auto">
+                    <div className="flex flex-col gap-3 mt-auto">
                       <div className="flex items-center gap-1">
-                        <span className="font-price-sm text-price-sm text-on-surface">${p.price?.toFixed(2)}</span>
+                        <span className="font-mono font-bold text-lg text-ink">${p.price?.toFixed(2)}</span>
                       </div>
                       {qty > 0 ? (
-                        <div className="flex items-center justify-between border border-primary rounded-lg overflow-hidden h-8">
-                          <button onClick={() => removeFromCart(p.id)} className="w-8 h-full bg-primary/10 text-primary flex items-center justify-center active:bg-primary/20 transition-colors">
+                        <div className="flex items-center justify-between border-2 border-ink bg-chalk h-10">
+                          <button onClick={() => removeFromCart(p.id)} className="w-10 h-full flex items-center justify-center active:bg-ink/10 transition-colors border-r-2 border-ink text-ink">
                             <Minus className="h-4 w-4" />
                           </button>
-                          <span className="font-label-md text-label-md text-primary font-bold">{qty}</span>
-                          <button onClick={() => addToCart(p)} className="w-8 h-full bg-primary text-on-primary flex items-center justify-center active:bg-primary-container transition-colors">
+                          <span className="font-mono font-bold text-ink">{qty}</span>
+                          <button onClick={() => addToCart(p)} className="w-10 h-full flex items-center justify-center active:bg-ink/10 transition-colors border-l-2 border-ink text-ink">
                             <Plus className="h-4 w-4" />
                           </button>
                         </div>
                       ) : (
-                        <button onClick={() => addToCart(p)} className="w-full h-8 bg-surface-container-low border border-outline-variant text-primary font-label-md text-label-md rounded-lg flex items-center justify-center hover:bg-surface-container active:scale-95 transition-all">
+                        <Button variant="outline" onClick={() => addToCart(p)} className="w-full h-10 font-mono uppercase tracking-wider border-ink text-ink hover:bg-ink hover:text-chalk">
                           ADD
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </div>
@@ -158,14 +156,14 @@ export function StorePage() {
       </main>
 
       {getCartCount() > 0 && (
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-surface shadow-[0_-8px_24px_rgba(0,0,0,0.12)] rounded-t-xl overflow-hidden p-4">
-          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-primary text-on-primary rounded-xl p-3 shadow-lg active:scale-[0.98] transition-transform duration-200 cursor-pointer">
+        <div className="fixed bottom-0 left-0 w-full z-50 bg-[#F3EDE1] border-t border-ink/10 p-4">
+          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-ink text-chalk p-4 border border-ink/20 shadow-[4px_4px_0px_#1F2A24] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_#1F2A24] transition-all cursor-pointer">
             <div className="flex flex-col">
-              <span className="font-label-md text-label-md opacity-90">{getCartCount()} Item(s) | ${getCartTotal().toFixed(2)}</span>
-              <span className="font-headline-sm text-headline-sm">View Cart</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-chalk/70">{getCartCount()} Item(s) | ${getCartTotal().toFixed(2)}</span>
+              <span className="font-display font-black text-xl tracking-tight text-marigold">View Cart</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-label-md text-label-md bg-white/20 px-2 py-1 rounded">Checkout</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-widest bg-marigold text-ink px-3 py-1.5 border border-ink">Checkout</span>
             </div>
           </div>
         </div>
