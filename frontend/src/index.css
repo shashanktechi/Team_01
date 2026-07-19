@@ -1,0 +1,26 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@400;600;700;800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #059669; /* Primary Emerald from designMd */
+  --color-primary-hover: #047857; 
+  --color-secondary: #f59e0b; /* Urgency Amber */
+  --color-error: #e11d48; /* Danger Rose */
+  --color-background: #f5fbf5; 
+  
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Sora', 'Inter', ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  
+  body {
+    background-color: var(--color-background);
+    color: #171d19; /* on-surface */
+    font-family: var(--font-sans);
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+  }
+}

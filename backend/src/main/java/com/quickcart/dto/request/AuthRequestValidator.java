@@ -32,9 +32,11 @@ public class AuthRequestValidator implements ConstraintValidator<ValidAuthReques
             return false;
         }
 
-        if (!hasPassword) {
+        boolean hasOtp = request.getOtp() != null && !request.getOtp().trim().isEmpty();
+
+        if (!hasPassword && !hasOtp) {
             context.disableDefaultConstraintViolation();
-            context.buildConstraintViolationWithTemplate("Password is required for login")
+            context.buildConstraintViolationWithTemplate("Either password or OTP is required for login")
                     .addPropertyNode("password")
                     .addConstraintViolation();
             return false;
