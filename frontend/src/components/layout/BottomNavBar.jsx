@@ -13,7 +13,7 @@ export function BottomNavBar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] max-w-screen-xl mx-auto md:hidden">
+    <nav className="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] md:hidden">
       <div className="flex justify-around items-center px-4 pb-4 pt-2">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;

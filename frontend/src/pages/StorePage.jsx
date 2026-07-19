@@ -57,27 +57,32 @@ export function StorePage() {
   };
 
   return (
-    <div className="bg-[#F3EDE1] text-ink min-h-screen pb-24 font-body">
-      <header className="fixed top-0 w-full z-50 bg-[#F3EDE1]/90 backdrop-blur-md border-b border-ink/10">
-        <div className="flex flex-col gap-2 px-4 py-3 w-full max-w-7xl mx-auto">
-          <div className="flex justify-between items-center w-full">
-            <button onClick={() => navigate(-1)} className="text-ink hover:bg-ink/5 transition-colors p-2 rounded-full active:scale-95 duration-200">
+    <div className="bg-kraft text-ink min-h-screen pb-24 font-body">
+      <header className="fixed top-0 w-full z-50 bg-kraft/90 backdrop-blur-md border-b border-ink/10">
+        <div className="flex flex-col gap-2 px-4 py-3 w-full">
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={() => navigate('/stores')}
+              className="p-1 hover:bg-surface-variant rounded-full transition-colors active:scale-95 text-on-surface-variant"
+            >
               <ArrowLeft className="h-6 w-6" />
             </button>
-            <BrandMark />
-            <button onClick={() => navigate('/cart')} className="text-ink hover:bg-ink/5 transition-colors p-2 rounded-full active:scale-95 duration-200 relative">
-              <ShoppingCart className="h-6 w-6" />
-              {getCartCount() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-marigold text-ink rounded-full w-5 h-5 flex items-center justify-center font-mono font-bold text-[10px] border border-ink/20 shadow-sm">
-                  {getCartCount()}
-                </span>
-              )}
+            <div className="flex-1">
+              <h1 className="font-display font-bold text-lg text-ink leading-tight truncate">{storeDetails?.name || 'Loading...'}</h1>
+              <p className="font-body text-xs text-ink-muted flex items-center gap-1">
+                <span className="flex items-center text-bazaar-green font-medium"><Star className="h-3 w-3 fill-bazaar-green mr-0.5"/> 4.8</span>
+                <span>•</span>
+                <span>10-15 min</span>
+              </p>
+            </div>
+            <button className="p-2 text-ink hover:bg-surface-variant rounded-full transition-colors active:scale-95">
+              <Search className="h-5 w-5" />
             </button>
           </div>
         </div>
       </header>
 
-      <main className="pt-[72px] max-w-7xl mx-auto md:px-margin-desktop">
+      <main className="pt-[72px] w-full md:px-margin-desktop">
         <div className="relative w-full h-48 md:h-64 md:rounded-xl overflow-hidden shadow-sm mt-4 md:mt-0">
           <div className="bg-cover bg-center w-full h-full absolute inset-0" style={{ backgroundImage: `url('${storeDetails?.bannerUrl || 'https://via.placeholder.com/400x150'}')` }}></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 md:p-6">
@@ -98,7 +103,7 @@ export function StorePage() {
           </div>
         </div>
 
-        <nav className="sticky top-[72px] z-40 bg-[#F3EDE1]/90 backdrop-blur-md shadow-sm -mx-4 px-4 md:mx-0 md:px-0 py-2 border-b border-ink/10 overflow-x-auto hide-scrollbar">
+        <nav className="sticky top-[72px] z-40 bg-kraft/90 backdrop-blur-md shadow-sm -mx-4 px-4 md:mx-0 md:px-0 py-2 border-b border-ink/10 overflow-x-auto hide-scrollbar">
           <ul className="flex gap-4 min-w-max pb-1">
             {categories.map(cat => (
               <li key={cat}>
@@ -119,7 +124,7 @@ export function StorePage() {
               const qty = getProductQuantity(p.id);
               return (
                 <article key={p.id} className="bg-chalk border border-ink/10 shadow-sm rounded-none flex flex-col hover:-translate-y-1 transition-transform duration-200">
-                  <div className="relative aspect-square bg-[#F3EDE1]/50 p-4 border-b border-ink/10">
+                  <div className="relative aspect-square bg-kraft/50 p-4 border-b border-ink/10">
                     <img className="w-full h-full object-contain mix-blend-multiply" alt={p.name} src={p.image} />
                   </div>
                   <div className="p-3 flex flex-col flex-grow justify-between gap-3">
@@ -156,8 +161,8 @@ export function StorePage() {
       </main>
 
       {getCartCount() > 0 && (
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-[#F3EDE1] border-t border-ink/10 p-4">
-          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-ink text-chalk p-4 border border-ink/20 shadow-[4px_4px_0px_#1F2A24] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_#1F2A24] transition-all cursor-pointer">
+        <div className="fixed bottom-0 left-0 w-full z-50 bg-kraft border-t border-ink/10 p-4">
+          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-ink text-chalk p-4 border border-ink/20 shadow-[4px_4px_0px_var(--color-ink)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_var(--color-ink)] transition-all cursor-pointer">
             <div className="flex flex-col">
               <span className="font-mono text-xs uppercase tracking-widest text-chalk/70">{getCartCount()} Item(s) | ${getCartTotal().toFixed(2)}</span>
               <span className="font-display font-black text-xl tracking-tight text-marigold">View Cart</span>

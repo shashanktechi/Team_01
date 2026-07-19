@@ -5,14 +5,14 @@ export function Badge({ status, variant, className = '', children }) {
   let textColor = 'text-ink';
   
   if (variant === 'kraft') {
-    bgColor = 'bg-[#F3EDE1]';
-    textColor = 'text-[#1F2A24]';
+    bgColor = 'bg-kraft';
+    textColor = 'text-ink';
   } else if (variant === 'chalk') {
-    bgColor = 'bg-[#FFFDF8]';
-    textColor = 'text-[#1F2A24]';
+    bgColor = 'bg-kraft';
+    textColor = 'text-ink';
   } else if (variant === 'marigold') {
     bgColor = 'bg-[#E8A33D]'; // Marigold
-    textColor = 'text-[#1F2A24]';
+    textColor = 'text-ink';
   } else {
     const normalizedStatus = typeof status === 'string' ? status.toUpperCase() : '';
     if (['APPROVED', 'DELIVERED', 'COMPLETED', 'OPEN'].includes(normalizedStatus)) {

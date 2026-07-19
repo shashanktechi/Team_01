@@ -54,4 +54,7 @@ public class User {
 
     @Column(name = "phone_verified")
     private Boolean phoneVerified = false;
+
+    @Column(length = 100)
+    private String city;
 }

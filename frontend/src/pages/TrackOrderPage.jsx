@@ -63,8 +63,8 @@ export function TrackOrderPage() {
   const currentIndex = getStatusIndex(order.status);
 
   return (
-    <div className="bg-[#F3EDE1] font-body text-ink antialiased min-h-screen pb-6">
-      <div className="max-w-[480px] mx-auto bg-[#F3EDE1] min-h-screen flex flex-col relative">
+    <div className="bg-kraft font-body text-ink antialiased min-h-screen pb-6">
+      <div className="max-w-[480px] mx-auto bg-kraft min-h-screen flex flex-col relative">
         {/* Header */}
         <header className="bg-chalk text-ink px-4 py-4 flex items-center gap-3 sticky top-0 z-10 border-b border-ink/10 shadow-sm">
           <button onClick={() => navigate('/')} className="p-2 -ml-2 rounded-full hover:bg-ink/5 transition-colors">
@@ -162,7 +162,7 @@ export function TrackOrderPage() {
           {/* Order Summary */}
           <TicketCard className="bg-chalk shadow-sm border-ink/10 p-4 flex items-center justify-between">
              <div className="flex items-center gap-3">
-               <div className="w-10 h-10 bg-[#F3EDE1] rounded-lg border border-ink/10 flex items-center justify-center text-ink">
+               <div className="w-10 h-10 bg-kraft rounded-lg border border-ink/10 flex items-center justify-center text-ink">
                  <Package className="h-6 w-6" />
                </div>
                <div>

@@ -3,6 +3,7 @@ package com.quickcart.config;
 import com.quickcart.entity.User;
 import com.quickcart.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -19,52 +20,49 @@ public class DataSeeder implements CommandLineRunner {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Value("${app.admin.email:admin@quickcart.com}")
+    private String adminEmail;
+
+    @Value("${app.admin.password:Admin@123}")
+    private String adminPassword;
+
+    @Value("${app.demo.email:demo@quickcart.com}")
+    private String demoEmail;
+
+    @Value("${app.demo.password:Demo@123}")
+    private String demoPassword;
+
     @Override
     @Transactional
     public void run(String... args) throws Exception {
-        String adminEmail = "shashankdany8712@gmail.com";
-        Optional<User> adminOpt = userRepository.findByEmail(adminEmail);
-        
-        if (adminOpt.isPresent()) {
-            User admin = adminOpt.get();
-            admin.setPasswordHash(passwordEncoder.encode("Dany@8712"));
-            admin.setRole("SYSTEM_ADMIN");
-            admin.setIsActive(true);
-            admin.setVerificationStatus("APPROVED");
-            userRepository.save(admin);
-        } else {
-            User admin = new User();
-            admin.setEmail(adminEmail);
-            admin.setPhone("+919876543213");
-            admin.setFullName("Admin");
-            admin.setPasswordHash(passwordEncoder.encode("Dany@8712"));
-            admin.setRole("SYSTEM_ADMIN");
-            admin.setIsActive(true);
-            admin.setVerificationStatus("APPROVED");
+        seedUser(adminEmail, adminPassword, "Admin", "+919876543213", "+919999999991");
+        seedUser(demoEmail, demoPassword, "Demo Admin", "+919876543214", "+919999999992");
+    }
 
-            userRepository.save(admin);
-        }
-
-        // Seed the requested demo admin
-        String demoEmail = "todo70392@gmail.com";
-        Optional<User> demoOpt = userRepository.findByEmail(demoEmail);
-        if (demoOpt.isPresent()) {
-            User demo = demoOpt.get();
-            demo.setPasswordHash(passwordEncoder.encode("todo@987"));
-            demo.setRole("SYSTEM_ADMIN");
-            demo.setIsActive(true);
-            demo.setVerificationStatus("APPROVED");
-            userRepository.save(demo);
+    private void seedUser(String email, String password, String fullName, String primaryPhone, String fallbackPhone) {
+        Optional<User> opt = userRepository.findByEmail(email);
+        if (opt.isPresent()) {
+            User user = opt.get();
+            user.setPasswordHash(passwordEncoder.encode(password));
+            user.setRole("SYSTEM_ADMIN");
+            user.setIsActive(true);
+            user.setVerificationStatus("APPROVED");
+            userRepository.save(user);
         } else {
-            User demo = new User();
-            demo.setEmail(demoEmail);
-            demo.setPhone("+919876543214");
-            demo.setFullName("Demo Admin");
-            demo.setPasswordHash(passwordEncoder.encode("todo@987"));
-            demo.setRole("SYSTEM_ADMIN");
-            demo.setIsActive(true);
-            demo.setVerificationStatus("APPROVED");
-            userRepository.save(demo);
+            User user = new User();
+            user.setEmail(email);
+            // Try primary phone, if it exists (by another user), use fallback
+            if (userRepository.findByPhone(primaryPhone).isPresent()) {
+                user.setPhone(fallbackPhone);
+            } else {
+                user.setPhone(primaryPhone);
+            }
+            user.setFullName(fullName);
+            user.setPasswordHash(passwordEncoder.encode(password));
+            user.setRole("SYSTEM_ADMIN");
+            user.setIsActive(true);
+            user.setVerificationStatus("APPROVED");
+            userRepository.save(user);
         }
     }
 }

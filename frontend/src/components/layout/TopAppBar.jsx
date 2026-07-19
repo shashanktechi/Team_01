@@ -9,8 +9,8 @@ export function TopAppBar() {
   const navigate = useNavigate();
 
   return (
-    <header className="fixed top-0 w-full z-50 shadow-md bg-surface/90 backdrop-blur-md max-w-screen-xl mx-auto">
-      <div className="flex flex-col gap-2 px-4 py-3 w-full">
+    <header className="fixed top-0 w-full z-50 shadow-md bg-surface/90 backdrop-blur-md">
+      <div className="flex flex-col gap-2 px-4 sm:px-6 lg:px-8 py-3 w-full">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <BrandMark />

@@ -16,7 +16,7 @@ export const ImageUploader = ({
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
+     
     // Validate type roughly on client side
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {

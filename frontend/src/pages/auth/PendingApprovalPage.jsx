@@ -47,9 +47,13 @@ export const PendingApprovalPage = () => {
 
   return (
     <div className="flex min-h-screen w-full flex-col items-center bg-background px-4 py-8 relative">
-      <div className="absolute top-0 left-0 p-6 w-full flex justify-center md:justify-start">
+      {/* Top Left Logo */}
+      <button 
+        onClick={() => navigate('/')} 
+        className="absolute top-4 left-4 lg:top-8 lg:left-8 z-50 hover:opacity-80 transition-opacity focus:outline-none"
+      >
         <BrandMark />
-      </div>
+      </button>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mt-16 md:mt-0">
         <TicketCard className="w-full text-center p-8 bg-chalk shadow-sm border border-ink/10">

@@ -55,8 +55,14 @@ export const CitySelectorModal = () => {
               </button>
             ))
           ) : (
-            <div className="col-span-full py-8 text-center text-gray-500">
-              No cities found matching "{search}"
+            <div className="col-span-full py-8 flex flex-col items-center justify-center text-center">
+              <p className="text-gray-500 mb-4">No popular cities match "{search}"</p>
+              <button
+                onClick={() => changeCity(search.trim())}
+                className="bg-primary text-surface px-6 py-2 rounded-xl font-bold font-mono uppercase tracking-wider text-sm hover:opacity-90 transition-opacity"
+              >
+                Use "{search}" as my location
+              </button>
             </div>
           )}
         </div>

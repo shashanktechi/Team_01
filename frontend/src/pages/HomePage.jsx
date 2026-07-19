@@ -75,7 +75,7 @@ export function HomePage() {
 
   return (
     <>
-      <section className="flex flex-col gap-sm">
+      <section className="flex flex-col gap-4">
         <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-2">Categories</h2>
         <div className="flex overflow-x-auto gap-4 pb-2 hide-scrollbar">
           {categories.map((cat) => (
@@ -84,18 +84,28 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="flex flex-col gap-sm">
+      <section className="flex flex-col gap-4">
         <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-2 mt-4">Nearby Stores</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {stores.map((store) => (
-            <StoreCard key={store.id} {...store} />
-          ))}
-        </div>
+        {stores.length === 0 && !loading ? (
+          <div className="bg-chalk border border-ink/10 shadow-sm rounded-xl p-8 text-center flex flex-col items-center justify-center">
+            <div className="w-16 h-16 bg-kraft rounded-full flex items-center justify-center mb-4">
+              <span className="text-3xl">🏪</span>
+            </div>
+            <h3 className="font-display font-bold text-xl text-ink mb-2">No stores available</h3>
+            <p className="font-body text-ink-muted">There are no stores available in {selectedCity} yet. Check back soon!</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {stores.map((store) => (
+              <StoreCard key={store.id} {...store} />
+            ))}
+          </div>
+        )}
       </section>
 
-      <section className="flex flex-col gap-sm">
+      <section className="flex flex-col gap-4">
         <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-2 mt-4">Buy it Again</h2>
-        <div className="flex overflow-x-auto gap-gutter pb-4 hide-scrollbar">
+        <div className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar">
           {recentProducts.map((product) => (
             <ProductCard 
               key={product.id} 

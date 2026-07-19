@@ -1,0 +1,106 @@
+import React, { useEffect, useState } from 'react';
+import { useNavigate, Routes, Route, NavLink, Navigate, useLocation } from 'react-router';
+import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
+import { BrandMark } from '../../components/ui/BrandMark';
+import { TicketCard } from '../../components/ui/TicketCard';
+import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { MapPin, Navigation, Package, LogOut, Loader2 } from 'lucide-react';
+
+import { DeliveryTasks } from './DeliveryTasks';
+
+export function DeliveryDashboard() {
+  const location = useLocation();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+  const [tasks, setTasks] = useState({ swarms: [], orders: [] });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const tasksRes = await api.get('/delivery/tasks');
+        setTasks(tasksRes.data);
+      } catch (err) {
+        console.error("Failed to load tasks", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchTasks();
+  }, []);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-kraft min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-bazaar-green" />
+      </div>
+    );
+  }
+
+  const hasActiveTasks = tasks.swarms.length > 0 || tasks.orders.length > 0;
+
+  return (
+    <div className="bg-kraft font-body text-ink min-h-screen pb-12">
+      <header className="fixed top-0 w-full z-50 bg-kraft/90 backdrop-blur-md border-b border-ink/10 shadow-sm">
+        <div className="flex items-center justify-between px-6 py-4 w-full">
+          <BrandMark />
+          <div className="flex items-center gap-4">
+            <span className="font-mono text-xs font-bold uppercase tracking-wider hidden sm:block">
+              {user?.fullName || 'Delivery Partner'}
+            </span>
+            <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      <main className="pt-24 w-full px-4 sm:px-6 flex flex-col gap-6">
+        {/* Profile Card */}
+        <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6 flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
+            <img src={user?.profilePhotoUrl || "https://i.pravatar.cc/150?img=11"} alt="Profile" className="w-16 h-16 rounded-full border-2 border-ink shadow-sm" />
+            <div>
+              <h2 className="font-display font-black text-2xl text-ink leading-tight">{user?.fullName || 'Partner'}</h2>
+              <p className="font-mono text-xs text-ink-muted uppercase tracking-wider mt-1">Trust Score: {user?.trustScore || 100}</p>
+            </div>
+          </div>
+          <Badge variant="marigold" className="hidden sm:inline-flex">Online</Badge>
+        </TicketCard>
+
+        {/* Tabs Nav */}
+        <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-ink/10 pb-4">
+          <NavLink 
+            to="tasks"
+            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive || location.pathname.endsWith('/delivery-dashboard') ? 'bg-bazaar-green text-chalk' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
+          >
+            <Navigation className="w-4 h-4" /> Active Tasks
+          </NavLink>
+          <NavLink 
+            to="batch"
+            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive ? 'bg-marigold text-ink' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
+          >
+            <Package className="w-4 h-4" /> Batch Finding
+          </NavLink>
+        </div>
+
+        {/* Nested Routes */}
+        <div className="mt-4">
+          <Routes>
+            <Route index element={<Navigate to="tasks" replace />} />
+            <Route path="tasks" element={<DeliveryTasks tasks={tasks} />} />
+            <Route path="batch" element={<div className="p-8 text-center bg-chalk rounded-xl border border-ink/10 shadow-sm"><Package className="w-12 h-12 mx-auto text-ink/20 mb-4"/><p className="font-mono text-ink-muted">Batch finding coming soon</p></div>} />
+          </Routes>
+        </div>
+      </main>
+    </div>
+  );
+}

@@ -46,8 +46,8 @@ export function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="bg-[#F3EDE1] font-body text-ink antialiased min-h-screen">
-        <div className="max-w-[480px] mx-auto bg-[#F3EDE1] h-full min-h-screen flex flex-col relative items-center justify-center p-8">
+      <div className="bg-kraft font-body text-ink antialiased min-h-screen">
+        <div className="max-w-[480px] mx-auto bg-kraft h-full min-h-screen flex flex-col relative items-center justify-center p-8">
           <TicketCard className="w-full p-8 text-center bg-chalk shadow-sm border-ink/10">
             <h2 className="font-display font-black text-2xl text-ink mb-6">Your cart is empty</h2>
             <Button onClick={() => navigate('/')} className="w-full text-lg h-12">
@@ -60,9 +60,9 @@ export function CartPage() {
   }
 
   return (
-    <div className="bg-[#F3EDE1] font-body text-ink antialiased min-h-screen">
-      <div className="max-w-[480px] mx-auto bg-[#F3EDE1] h-full min-h-screen flex flex-col relative">
-        <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-ink/10 sticky top-0 bg-[#F3EDE1]/90 backdrop-blur-md z-10">
+    <div className="bg-kraft font-body text-ink antialiased min-h-screen">
+      <div className="max-w-[480px] mx-auto bg-kraft h-full min-h-screen flex flex-col relative">
+        <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-ink/10 sticky top-0 bg-kraft/90 backdrop-blur-md z-10">
           <h2 className="font-display font-black text-2xl text-ink tracking-tight">My Cart ({cartItems.length})</h2>
           <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-ink/5 transition-colors">
             <X className="h-6 w-6 text-ink" />
@@ -103,7 +103,7 @@ export function CartPage() {
           <div className="mt-4 px-4 flex flex-col gap-4">
             {cartItems.map(item => (
               <TicketCard key={item.product.id} className="flex items-start gap-4 p-3 bg-chalk shadow-sm border-ink/10">
-                <div className="w-16 h-16 bg-[#F3EDE1] border border-ink/10 flex items-center justify-center mix-blend-multiply shrink-0 p-1">
+                <div className="w-16 h-16 bg-kraft border border-ink/10 flex items-center justify-center mix-blend-multiply shrink-0 p-1">
                   <img className="w-full h-full object-contain" alt={item.product.name} src={item.product.image} />
                 </div>
                 <div className="flex-1">
@@ -174,7 +174,7 @@ export function CartPage() {
         </div>
 
         {/* Sticky Bottom Bar */}
-        <div className="absolute bottom-0 w-full bg-[#F3EDE1] border-t border-ink/10 p-4 z-20">
+        <div className="absolute bottom-0 w-full bg-kraft border-t border-ink/10 p-4 z-20">
           <Button 
             onClick={handleCheckout} 
             disabled={loading}

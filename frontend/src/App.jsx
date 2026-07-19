@@ -3,6 +3,7 @@ import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { MainLayout } from './components/layout/MainLayout';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { RoleProtectedRoute } from './components/layout/RoleProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import { LoginPage } from './pages/auth/LoginPage';
 import { RegisterPage } from './pages/auth/RegisterPage';
@@ -13,6 +14,9 @@ import { TrackOrderPage } from './pages/TrackOrderPage';
 import { PendingApprovalPage } from './pages/auth/PendingApprovalPage';
 import { CitySelectorModal } from './components/ui/CitySelectorModal';
 import { LandingPage } from './pages/LandingPage';
+import { SystemAdminDashboard } from './pages/dashboards/SystemAdminDashboard';
+import { StoreAdminDashboard } from './pages/dashboards/StoreAdminDashboard';
+import { DeliveryDashboard } from './pages/dashboards/DeliveryDashboard';
 
 import { CityProvider } from './context/CityContext';
 
@@ -40,6 +44,15 @@ function App() {
               <Route path="/pending" element={<PendingApprovalPage />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/track" element={<TrackOrderPage />} />
+              <Route element={<RoleProtectedRoute role="SYSTEM_ADMIN" />}>
+                <Route path="/admin-dashboard/*" element={<SystemAdminDashboard />} />
+              </Route>
+              <Route element={<RoleProtectedRoute role="STORE_ADMIN" />}>
+                <Route path="/store-dashboard/*" element={<StoreAdminDashboard />} />
+              </Route>
+              <Route element={<RoleProtectedRoute role="DELIVERY_PARTNER" />}>
+                <Route path="/delivery-dashboard/*" element={<DeliveryDashboard />} />
+              </Route>
             </Route>
             </Routes>
           </BrowserRouter>

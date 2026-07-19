@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5433/quickcart?sslmode=disable
-    username: admin123
-    password: Sunny2005
+    username: ${TEST_DB_USER:postgres}
+    password: ${TEST_DB_PASSWORD:postgres}
     driver-class-name: org.postgresql.Driver
     # Testcontainers will manage the PostgreSQL container with PostGIS and pgvector extensions
   jpa:
