@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Button } from '../../components/ui/Button';
-import { TicketCard } from '../../components/ui/TicketCard';
+import { Card } from '../../components/ui/Card';
 import { BrandMark } from '../../components/ui/BrandMark';
 import { api } from '../../services/api';
 import { useNavigate } from 'react-router';
@@ -56,9 +56,9 @@ export const PendingApprovalPage = () => {
       </button>
 
       <div className="flex-1 flex flex-col items-center justify-center w-full max-w-md mt-16 md:mt-0">
-        <TicketCard className="w-full text-center p-8 bg-chalk shadow-sm border border-ink/10">
+        <Card className="w-full text-center p-8 bg-surface shadow-sm border border-border">
           <div className="flex flex-col items-center">
-            <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-ink ${isRejected ? 'bg-clay text-chalk' : 'bg-marigold text-ink'}`}>
+            <div className={`mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full border-2 border-ink ${isRejected ? 'bg-danger text-white' : 'bg-warning text-ink'}`}>
               {isRejected ? (
                 <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
@@ -90,12 +90,12 @@ export const PendingApprovalPage = () => {
                   {isChecking ? 'Checking...' : 'Check Status Again'}
                 </Button>
               )}
-              <Button variant="outline" onClick={logout} className="w-full h-12 text-lg border-ink text-ink hover:bg-ink hover:text-chalk">
+              <Button variant="outline" onClick={logout} className="w-full h-12 text-lg border-ink text-ink hover:bg-ink hover:text-white">
                 Log Out
               </Button>
             </div>
           </div>
-        </TicketCard>
+        </Card>
       </div>
     </div>
   );

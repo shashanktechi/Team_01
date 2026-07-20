@@ -37,4 +37,7 @@ public class Product {
 
     @Column(name = "typical_shelf_life_hours")
     private Integer typicalShelfLifeHours;
+
+    @Column(name = "sku", length = 50)
+    private String sku;
 }

@@ -11,3 +11,4 @@ public class ShelfAnalysisResult {
     private String productGuess;
     private Integer quantityGuess;
 }
+//

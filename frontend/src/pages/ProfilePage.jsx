@@ -14,10 +14,10 @@ export function ProfilePage() {
   };
 
   return (
-    <div className="bg-kraft font-body text-ink antialiased min-h-screen">
-      <div className="max-w-[480px] mx-auto bg-kraft h-full min-h-screen flex flex-col relative pb-24">
+    <div className="bg-background font-body text-ink antialiased min-h-screen">
+      <div className="max-w-[480px] mx-auto bg-background h-full min-h-screen flex flex-col relative pb-24">
         {/* Header */}
-        <header className="bg-primary text-on-primary px-4 py-6 rounded-b-3xl shadow-sm relative z-10 overflow-hidden">
+        <header className="bg-primary text-white px-4 py-6 rounded-b-3xl shadow-sm relative z-10 overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>
           <div className="flex items-center gap-4 relative z-10">
             <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/30 text-white">
@@ -36,9 +36,9 @@ export function ProfilePage() {
 
         <div className="flex-1 px-4 mt-6 flex flex-col gap-5">
           {/* QuickCart Coins / Loyalty */}
-          <div className="bg-chalk rounded-2xl p-4 shadow-sm border border-ink/5 flex items-center justify-between">
+          <div className="bg-surface rounded-2xl p-4 shadow-sm border border-ink/5 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-marigold/20 text-marigold rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-warning/20 text-warning rounded-full flex items-center justify-center">
                 <Star className="w-6 h-6 fill-current" />
               </div>
               <div>
@@ -58,18 +58,18 @@ export function ProfilePage() {
             </div>
             <div className="relative z-10">
               <div className="flex items-center gap-2 mb-1">
-                <Gift className="w-5 h-5 text-bazaar-green" />
-                <h3 className="font-display font-bold text-lg text-bazaar-green">Refer & Earn ₹50</h3>
+                <Gift className="w-5 h-5 text-primary" />
+                <h3 className="font-display font-bold text-lg text-primary">Refer & Earn ₹50</h3>
               </div>
               <p className="font-body text-sm text-ink/80 max-w-[200px]">Invite friends to QuickCart and get flat ₹50 off on your next order.</p>
-              <Button variant="outline" className="mt-3 border-bazaar-green text-bazaar-green hover:bg-bazaar-green hover:text-white h-9 px-4 text-xs font-bold">
+              <Button variant="outline" className="mt-3 border-bazaar-green text-primary hover:bg-primary hover:text-white h-9 px-4 text-xs font-bold">
                 Share Link
               </Button>
             </div>
           </div>
 
           {/* Menu Items */}
-          <div className="bg-chalk rounded-2xl shadow-sm border border-ink/5 overflow-hidden">
+          <div className="bg-surface rounded-2xl shadow-sm border border-ink/5 overflow-hidden">
             {[
               { icon: MapPin, label: 'Saved Addresses', desc: 'Home, Office', path: '#' },
               { icon: CreditCard, label: 'Payment Methods', desc: 'Cards, UPI', path: '#' },

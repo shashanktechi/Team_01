@@ -3,15 +3,27 @@ import { Outlet } from 'react-router';
 import { TopAppBar } from './TopAppBar';
 import { BottomNavBar } from './BottomNavBar';
 import { ConflictModal } from '../ui/ConflictModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useAuth } from '../../context/AuthContext';
+import { useNavigate } from 'react-router';
 
 export function MainLayout() {
   // Since we don't have a global App-level conflict state right now, 
   // the HomePage and StorePage will handle their own ConflictModals,
   // but if we needed it globally, we'd add it here.
+  const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading && user && user.role !== 'CUSTOMER') {
+      if (user.role === 'SYSTEM_ADMIN') navigate('/admin-dashboard', { replace: true });
+      else if (user.role === 'STORE_ADMIN') navigate('/store-dashboard', { replace: true });
+      else if (user.role === 'DELIVERY_PARTNER') navigate('/delivery-dashboard', { replace: true });
+    }
+  }, [user, loading, navigate]);
   
   return (
-    <div className="bg-kraft text-ink font-body min-h-[100dvh] w-full">
+    <div className="bg-background text-ink font-body min-h-[100dvh] w-full">
       <TopAppBar />
       <main className="pt-[130px] pb-[80px] md:pb-8 w-full max-w-7xl mx-auto flex flex-col">
         <Outlet />

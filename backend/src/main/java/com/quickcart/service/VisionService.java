@@ -17,24 +17,24 @@ import java.util.*;
 public class VisionService {
 
     @Autowired
-    private S3Service s3Service;
+    private CloudinaryService cloudinaryService;
 
     @Value("${ai.gemini.api-key:}")
     private String geminiApiKey;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public List<ShelfAnalysisResult> analyzeShelfPhoto(String objectKey) {
+    public List<ShelfAnalysisResult> analyzeShelfPhoto(String imageUrl) {
         byte[] imageBytes;
         try {
-            imageBytes = s3Service.downloadObject(objectKey);
+            imageBytes = cloudinaryService.downloadImageBytes(imageUrl);
         } catch (Exception e) {
-            System.err.println("S3 download failed: " + e.getMessage() + ". Using simulated image bytes.");
+            System.err.println("Cloudinary image download failed: " + e.getMessage() + ". Using simulated image bytes.");
             imageBytes = new byte[0];
         }
 
         if (geminiApiKey == null || geminiApiKey.trim().isEmpty() || geminiApiKey.contains("your_")) {
-            return getSimulatedShelfAnalysis(objectKey);
+            return getSimulatedShelfAnalysis(imageUrl);
         }
 
         try {
@@ -83,19 +83,19 @@ public class VisionService {
                     }
                 }
             }
-            return getSimulatedShelfAnalysis(objectKey);
+            return getSimulatedShelfAnalysis(imageUrl);
         } catch (Exception e) {
             System.err.println("Gemini Vision API call failed: " + e.getMessage() + ". Falling back to simulated results.");
-            return getSimulatedShelfAnalysis(objectKey);
+            return getSimulatedShelfAnalysis(imageUrl);
         }
     }
 
-    public ProofOfDeliveryVerificationResult verifyProofOfDelivery(String objectKey) {
+    public ProofOfDeliveryVerificationResult verifyProofOfDelivery(String imageUrl) {
         byte[] imageBytes;
         try {
-            imageBytes = s3Service.downloadObject(objectKey);
+            imageBytes = cloudinaryService.downloadImageBytes(imageUrl);
         } catch (Exception e) {
-            System.err.println("S3 download failed: " + e.getMessage() + ". Using simulated image bytes.");
+            System.err.println("Cloudinary image download failed: " + e.getMessage() + ". Using simulated image bytes.");
             imageBytes = new byte[0];
         }
 
@@ -160,7 +160,7 @@ public class VisionService {
         }
     }
 
-    private List<ShelfAnalysisResult> getSimulatedShelfAnalysis(String objectKey) {
+    private List<ShelfAnalysisResult> getSimulatedShelfAnalysis(String imageUrl) {
         return List.of(
                 new ShelfAnalysisResult("Umbrella", 12),
                 new ShelfAnalysisResult("Instant Noodles", 45),

@@ -3,7 +3,7 @@ import { api } from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Loader2, Save } from 'lucide-react';
-import { TicketCard } from '../../components/ui/TicketCard';
+import { Card } from '../../components/ui/Card';
 import { ImageUploader } from '../../components/ui/ImageUploader';
 
 export function StoreAdminProfile({ storeId }) {
@@ -14,7 +14,9 @@ export function StoreAdminProfile({ storeId }) {
     whatsappNumber: '',
     isOpen: false,
     logoUrl: '',
-    bannerUrl: ''
+    bannerUrl: '',
+    userFullName: '',
+    userPhone: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -23,17 +25,20 @@ export function StoreAdminProfile({ storeId }) {
     try {
       setLoading(true);
       const res = await api.get('/store/profile');
-      if (res.data.store) {
-        setProfile({
-          name: res.data.store.name || '',
-          address: res.data.store.address || '',
-          city: res.data.store.city || '',
-          whatsappNumber: res.data.store.whatsappNumber || '',
-          isOpen: res.data.store.isOpen || false,
-          logoUrl: res.data.store.logoUrl || '',
-          bannerUrl: res.data.store.bannerUrl || ''
-        });
-      }
+      const storeData = res.data.store || {};
+      const userData = res.data.user || {};
+      
+      setProfile({
+        name: storeData.name || '',
+        address: storeData.address || '',
+        city: storeData.city || '',
+        whatsappNumber: storeData.whatsappNumber || '',
+        isOpen: storeData.isOpen || false,
+        logoUrl: storeData.logoUrl || '',
+        bannerUrl: storeData.bannerUrl || '',
+        userFullName: userData.fullName || '',
+        userPhone: userData.phone || ''
+      });
     } catch (err) {
       console.error('Failed to fetch profile', err);
     } finally {
@@ -54,7 +59,9 @@ export function StoreAdminProfile({ storeId }) {
         address: profile.address,
         city: profile.city,
         whatsappNumber: profile.whatsappNumber,
-        isOpen: profile.isOpen
+        isOpen: profile.isOpen,
+        userFullName: profile.userFullName,
+        userPhone: profile.userPhone
       });
       alert('Profile updated successfully');
     } catch (err) {
@@ -73,8 +80,17 @@ export function StoreAdminProfile({ storeId }) {
       setProfile(prev => ({ ...prev, bannerUrl: url }));
   };
 
-  if (loading || !storeId) {
-    return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-bazaar-green" /></div>;
+  if (loading) {
+    return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  }
+
+  if (!storeId) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 text-center">
+        <h2 className="font-display font-black text-2xl text-ink mb-2">Store Pending Setup</h2>
+        <p className="text-ink-muted max-w-md">Your store profile has not been initialized yet or is pending approval. Please contact an administrator to approve your store.</p>
+      </div>
+    );
   }
 
   return (
@@ -85,8 +101,8 @@ export function StoreAdminProfile({ storeId }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6">
-          <h3 className="font-display font-bold text-xl mb-4 text-ink border-b border-ink/10 pb-2">General Info</h3>
+        <Card className="bg-surface shadow-sm border-border p-6">
+          <h3 className="font-display font-bold text-xl mb-4 text-ink border-b border-border pb-2">General Info</h3>
           <form onSubmit={handleSave} className="flex flex-col gap-4">
             <div>
               <label className="block text-sm font-bold mb-1">Store Name</label>
@@ -104,13 +120,24 @@ export function StoreAdminProfile({ storeId }) {
               <label className="block text-sm font-bold mb-1">WhatsApp Number</label>
               <Input required value={profile.whatsappNumber} onChange={e => setProfile({...profile, whatsappNumber: e.target.value})} />
             </div>
-            <div className="flex items-center gap-2 mt-2">
+
+            <h3 className="font-display font-bold text-xl mt-6 mb-2 text-ink border-b border-border pb-2">Your Personal Profile</h3>
+            <div>
+              <label className="block text-sm font-bold mb-1">Full Name</label>
+              <Input required value={profile.userFullName} onChange={e => setProfile({...profile, userFullName: e.target.value})} />
+            </div>
+            <div>
+              <label className="block text-sm font-bold mb-1">Phone Number</label>
+              <Input required value={profile.userPhone} onChange={e => setProfile({...profile, userPhone: e.target.value})} />
+            </div>
+
+            <div className="flex items-center gap-2 mt-4">
               <input 
                 type="checkbox" 
                 id="isOpenToggle"
                 checked={profile.isOpen}
                 onChange={e => setProfile({...profile, isOpen: e.target.checked})}
-                className="w-4 h-4 text-bazaar-green rounded focus:ring-bazaar-green"
+                className="w-4 h-4 text-primary rounded focus:ring-bazaar-green"
               />
               <label htmlFor="isOpenToggle" className="text-sm font-bold">Store is Currently Open for Orders</label>
             </div>
@@ -121,11 +148,11 @@ export function StoreAdminProfile({ storeId }) {
               </Button>
             </div>
           </form>
-        </TicketCard>
+        </Card>
 
         <div className="flex flex-col gap-6">
-            <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6">
-              <h3 className="font-display font-bold text-xl mb-4 text-ink border-b border-ink/10 pb-2">Store Logo</h3>
+            <Card className="bg-surface shadow-sm border-border p-6">
+              <h3 className="font-display font-bold text-xl mb-4 text-ink border-b border-border pb-2">Store Logo</h3>
               <p className="text-sm text-ink-muted mb-4">Upload a square image to represent your store across the platform.</p>
               <ImageUploader 
                   currentImageUrl={profile.logoUrl}
@@ -134,10 +161,10 @@ export function StoreAdminProfile({ storeId }) {
                   onUploadSuccess={handleLogoSuccess}
                   label="Update Logo"
               />
-            </TicketCard>
+            </Card>
 
-            <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6">
-              <h3 className="font-display font-bold text-xl mb-4 text-ink border-b border-ink/10 pb-2">Store Banner</h3>
+            <Card className="bg-surface shadow-sm border-border p-6">
+              <h3 className="font-display font-bold text-xl mb-4 text-ink border-b border-border pb-2">Store Banner</h3>
               <p className="text-sm text-ink-muted mb-4">Upload a wide banner image that appears at the top of your store page.</p>
               <ImageUploader 
                   currentImageUrl={profile.bannerUrl}
@@ -146,7 +173,7 @@ export function StoreAdminProfile({ storeId }) {
                   onUploadSuccess={handleBannerSuccess}
                   label="Update Banner"
               />
-            </TicketCard>
+            </Card>
         </div>
       </div>
     </div>

@@ -34,4 +34,12 @@ public class PublicController {
         List<Inventory> inventoryList = inventoryService.getInventoryByStore(storeId);
         return ResponseEntity.ok(inventoryList);
     }
+
+    @GetMapping("/stores/{storeId}")
+    public ResponseEntity<?> getStoreById(@PathVariable Long storeId) {
+        return storeRepository.findById(storeId)
+                .filter(store -> "APPROVED".equals(store.getVerificationStatus()))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

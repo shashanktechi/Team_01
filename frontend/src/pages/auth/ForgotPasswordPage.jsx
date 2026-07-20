@@ -61,7 +61,7 @@ export function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-kraft p-4 lg:p-0 overflow-hidden relative">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 lg:p-0 overflow-hidden relative">
       {/* Top Left Logo */}
       <button 
         onClick={() => navigate('/')} 
@@ -70,10 +70,10 @@ export function ForgotPasswordPage() {
         <BrandMark />
       </button>
 
-      <div className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row bg-kraft rounded-2xl shadow-xl border border-ink/10 overflow-hidden h-[700px]">
+      <div className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row bg-background rounded-2xl shadow-xl border border-border overflow-hidden h-[700px]">
         
         {/* Left Col - Illustration */}
-        <div className="hidden lg:flex w-1/2 bg-surface p-12 flex-col justify-between border-r border-ink/10 relative">
+        <div className="hidden lg:flex w-1/2 bg-surface p-12 flex-col justify-between border-r border-border relative">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
           <div>
             <h1 className="font-display font-black text-5xl text-ink leading-tight tracking-tight mt-8 relative z-10">
@@ -84,16 +84,16 @@ export function ForgotPasswordPage() {
             </p>
           </div>
           <div className="relative z-10">
-            <BrandStamp className="w-48 md:w-56 h-auto text-bazaar-green opacity-50" />
+            <BrandStamp className="w-48 md:w-56 h-auto text-primary opacity-50" />
           </div>
         </div>
 
         {/* Right Col - Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 relative bg-kraft">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 relative bg-background">
           <div className="w-full max-w-sm">
             
             {error && (
-              <div className="mb-6 p-4 bg-clay/10 border border-clay/20 text-clay rounded-lg text-sm font-body">
+              <div className="mb-6 p-4 bg-danger/10 border border-clay/20 text-danger rounded-lg text-sm font-body">
                 {error}
               </div>
             )}
@@ -115,7 +115,7 @@ export function ForgotPasswordPage() {
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                        className="pl-10 h-12 border-border focus:border-bazaar-green"
                         placeholder="you@example.com"
                       />
                     </div>
@@ -151,7 +151,7 @@ export function ForgotPasswordPage() {
                         required
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
-                        className="pl-10 h-12 border-ink/20 focus:border-marigold font-mono tracking-widest text-lg"
+                        className="pl-10 h-12 border-border focus:border-marigold font-mono tracking-widest text-lg"
                         placeholder="000000"
                         maxLength={6}
                       />
@@ -182,7 +182,7 @@ export function ForgotPasswordPage() {
                         required
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                        className="pl-10 h-12 border-border focus:border-bazaar-green"
                         placeholder="••••••••"
                       />
                     </div>

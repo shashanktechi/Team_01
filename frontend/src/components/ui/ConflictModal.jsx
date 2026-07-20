@@ -7,7 +7,7 @@ export function ConflictModal({ isOpen, conflictStoreName, targetStoreName, onCo
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/40 backdrop-blur-sm p-4">
-      <div className="bg-chalk rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-200">
+      <div className="bg-surface rounded-2xl shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-200">
         <div className="w-12 h-12 rounded-full bg-error/10 flex items-center justify-center mb-4 text-error">
           <AlertTriangle className="w-6 h-6" />
         </div>

@@ -21,7 +21,7 @@ export const Button = React.forwardRef(({
     primary: "bg-primary text-surface hover:brightness-95",
     secondary: "border-2 border-ink text-ink hover:bg-ink/5",
     danger: "bg-error text-surface hover:brightness-95",
-    outline: "border border-ink/20 text-ink hover:bg-ink/5",
+    outline: "border border-border text-ink hover:bg-ink/5",
     ghost: "text-ink hover:bg-ink/5"
   };
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Zap, Star, MapPin } from 'lucide-react';
-import { TicketCard } from './TicketCard';
+import { Card } from './Card';
 import { useNavigate } from 'react-router';
 
 export function StoreCard({ id, bannerImage, logoImage, name, rating, categories, status, deliveryTime, distance, rawStore }) {
@@ -9,11 +9,11 @@ export function StoreCard({ id, bannerImage, logoImage, name, rating, categories
 
   return (
     <div onClick={() => navigate(`/store/${id}`, { state: { storeDetails: rawStore || { id, name, bannerUrl: bannerImage, logoUrl: logoImage, freshnessScore: rating } } })} className="cursor-pointer">
-      <TicketCard className={`overflow-hidden flex flex-col relative group hover:-translate-y-1 transition-transform duration-300 ${!isOpen ? 'opacity-70 grayscale-[30%]' : ''}`}>
-        <div className="h-32 w-full relative bg-kraft/20">
+      <Card className={`overflow-hidden flex flex-col relative group hover:-translate-y-1 transition-transform duration-300 ${!isOpen ? 'opacity-70 grayscale-[30%]' : ''}`}>
+        <div className="h-32 w-full relative bg-background/20">
           <img className="w-full h-full object-cover" alt={`${name} banner`} src={bannerImage} />
           {isOpen ? (
-            <div className="absolute top-2 left-2 bg-bazaar-green text-white font-mono text-xs font-bold px-2 py-1 rounded-sm flex items-center gap-1 shadow-sm">
+            <div className="absolute top-2 left-2 bg-primary text-white font-mono text-xs font-bold px-2 py-1 rounded-sm flex items-center gap-1 shadow-sm">
               <Zap className="h-3.5 w-3.5" fill="currentColor" /> {deliveryTime}
             </div>
           ) : (
@@ -27,24 +27,24 @@ export function StoreCard({ id, bannerImage, logoImage, name, rating, categories
             </div>
           )}
         </div>
-        <div className="p-4 pt-6 relative bg-chalk">
+        <div className="p-4 pt-6 relative bg-surface">
           {/* Overlapping Logo */}
-          <div className="absolute -top-6 left-4 w-12 h-12 rounded border border-ink/10 bg-surface overflow-hidden shadow-sm flex items-center justify-center p-1">
+          <div className="absolute -top-6 left-4 w-12 h-12 rounded border border-border bg-surface overflow-hidden shadow-sm flex items-center justify-center p-1">
             <img className="w-full h-full object-contain" alt={`${name} logo`} src={logoImage} />
           </div>
           
           <div className="flex justify-between items-start mb-1">
             <h3 className="font-body font-bold text-base text-ink line-clamp-1">{name}</h3>
-            <div className="flex items-center gap-1 bg-marigold/10 border border-marigold/30 px-1.5 py-0.5 rounded text-xs font-bold text-ink">
+            <div className="flex items-center gap-1 bg-warning/10 border border-marigold/30 px-1.5 py-0.5 rounded text-xs font-bold text-ink">
               <span>{rating}</span>
-              <Star className="text-marigold h-3 w-3" fill="currentColor" />
+              <Star className="text-warning h-3 w-3" fill="currentColor" />
             </div>
           </div>
           
           <p className="font-body text-xs text-ink-muted line-clamp-1">{categories}</p>
           
         </div>
-      </TicketCard>
+      </Card>
     </div>
   );
 }

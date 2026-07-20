@@ -17,7 +17,7 @@ export function BottomNavBar() {
   ];
 
   return (
-    <nav className="fixed bottom-0 w-full z-50 bg-chalk shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-ink/10 md:hidden">
+    <nav className="fixed bottom-0 w-full z-50 bg-surface shadow-[0_-4px_12px_rgba(0,0,0,0.08)] border-t border-border md:hidden">
       <div className="flex justify-around items-end px-2 pb-safe pt-2 min-h-[60px]">
         {navItems.map((item) => {
           const isActive = location.pathname === item.path;
@@ -27,7 +27,7 @@ export function BottomNavBar() {
               key={item.name}
               to={item.path}
               className={`relative flex flex-col items-center justify-center transition-all duration-200 active:scale-90 px-2 py-1 w-16 ${
-                isActive ? 'text-bazaar-green' : 'text-ink-muted hover:text-ink'
+                isActive ? 'text-primary' : 'text-ink-muted hover:text-ink'
               }`}
             >
               <div className="relative">

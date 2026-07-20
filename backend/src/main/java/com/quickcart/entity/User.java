@@ -64,6 +64,12 @@ public class User {
     @Column(name = "vehicle_type", length = 50)
     private String vehicleType;
 
+    @Column(name = "vehicle_name", length = 50)
+    private String vehicleName;
+
+    @Column(name = "vehicle_model", length = 50)
+    private String vehicleModel;
+
     @Column(name = "vehicle_number", length = 50)
     private String vehicleNumber;
 

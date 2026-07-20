@@ -3,7 +3,7 @@ import { api } from '../../services/api';
 
 export const ImageUploader = ({
   currentImageUrl,
-  uploadEndpoint,
+  uploadEndpoint, // Deprecated, kept for backward compatibility
   confirmEndpoint,
   onUploadSuccess,
   label = "Upload Image",
@@ -12,12 +12,12 @@ export const ImageUploader = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const fileInputRef = useRef(null);
+  const inputId = useRef(`image-upload-${Math.random().toString(36).substring(2, 9)}`).current;
 
   const handleFileChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
      
-    // Validate type roughly on client side
     const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!validTypes.includes(file.type)) {
       setError("Please select a valid image (JPEG, PNG, WebP).");
@@ -28,23 +28,15 @@ export const ImageUploader = ({
     setError(null);
 
     try {
-      // 1. Get presigned URL
-      const { data: { uploadUrl, objectKey } } = await api.post(uploadEndpoint, {
-        contentType: file.type
-      });
+      const formData = new FormData();
+      formData.append('file', file);
 
-      // 2. Upload directly to S3
-      await fetch(uploadUrl, {
-        method: 'PUT',
+      // We now upload directly to the confirmEndpoint which has been updated
+      // in the backend to accept multipart/form-data.
+      const { data } = await api.patch(confirmEndpoint, formData, {
         headers: {
-          'Content-Type': file.type
-        },
-        body: file
-      });
-
-      // 3. Confirm with backend
-      const { data } = await api.patch(confirmEndpoint, {
-        objectKey
+          'Content-Type': 'multipart/form-data'
+        }
       });
 
       if (data.success && data.url) {
@@ -55,7 +47,6 @@ export const ImageUploader = ({
       setError(err.response?.data?.error || err.message || "Failed to upload image");
     } finally {
       setLoading(false);
-      // Reset input so the same file can be uploaded again if needed
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }
@@ -78,11 +69,11 @@ export const ImageUploader = ({
           onChange={handleFileChange}
           className="hidden"
           ref={fileInputRef}
-          id="image-upload"
+          id={inputId}
           disabled={loading}
         />
         <label
-          htmlFor="image-upload"
+          htmlFor={inputId}
           className={`cursor-pointer inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           {loading ? 'Uploading...' : label}

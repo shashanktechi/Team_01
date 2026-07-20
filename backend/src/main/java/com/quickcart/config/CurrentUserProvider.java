@@ -38,6 +38,14 @@ public class CurrentUserProvider {
                 }
             }
         }
+        if (storeId == null && "STORE_ADMIN".equals(principal.getRole())) {
+            if (storeRepository != null) {
+                java.util.Optional<com.quickcart.entity.Store> storeOpt = storeRepository.findByOwnerId(principal.getUserId());
+                if (storeOpt.isPresent()) {
+                    return storeOpt.get().getId();
+                }
+            }
+        }
         return storeId;
     }
 }

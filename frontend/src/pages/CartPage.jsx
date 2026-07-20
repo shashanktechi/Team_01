@@ -5,7 +5,7 @@ import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
-import { TicketCard } from '../components/ui/TicketCard';
+import { Card } from '../components/ui/Card';
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -56,8 +56,8 @@ export function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="bg-kraft font-body text-ink antialiased min-h-screen">
-        <div className="max-w-3xl mx-auto bg-chalk h-full min-h-screen flex flex-col relative items-center justify-center p-8">
+      <div className="bg-background font-body text-ink antialiased min-h-screen">
+        <div className="max-w-3xl mx-auto bg-surface h-full min-h-screen flex flex-col relative items-center justify-center p-8">
           <div className="text-6xl mb-6 opacity-80">🛒</div>
           <h2 className="font-display font-black text-2xl text-ink mb-2">Your cart is empty</h2>
           <p className="font-body text-ink-muted mb-8 text-center max-w-sm">
@@ -72,9 +72,9 @@ export function CartPage() {
   }
 
   return (
-    <div className="bg-kraft font-body text-ink antialiased min-h-screen">
-      <div className="max-w-3xl mx-auto bg-kraft h-full min-h-screen flex flex-col relative">
-        <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-ink/10 sticky top-0 bg-kraft/90 backdrop-blur-md z-10">
+    <div className="bg-background font-body text-ink antialiased min-h-screen">
+      <div className="max-w-3xl mx-auto bg-background h-full min-h-screen flex flex-col relative">
+        <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-border sticky top-0 bg-background/90 backdrop-blur-md z-10">
           <div className="flex flex-col">
             <h2 className="font-display font-black text-2xl text-ink tracking-tight">Checkout</h2>
             {currentStoreName && (
@@ -88,7 +88,7 @@ export function CartPage() {
 
         <div className="flex-1 overflow-y-auto pb-32">
           {error && (
-            <div className="mx-4 mt-4 bg-error-container text-on-error-container p-3 rounded-lg text-sm flex items-start gap-2">
+            <div className="mx-4 mt-4 bg-danger/10 text-danger p-3 rounded-lg text-sm flex items-start gap-2">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <span>{error}</span>
             </div>
@@ -98,8 +98,8 @@ export function CartPage() {
           <div className="px-4 mt-4 flex flex-col gap-3">
             <div className="flex items-center justify-between bg-surface rounded-xl p-4 shadow-sm border border-ink/5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-bazaar-green/10 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-bazaar-green" />
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-primary" />
                 </div>
                 <div>
                   <span className="font-display font-bold text-sm block text-ink">Delivery in 12 mins</span>
@@ -113,7 +113,7 @@ export function CartPage() {
                 <Home className="h-4 w-4" /> Delivery Address
               </label>
               <textarea 
-                className="w-full bg-kraft border border-ink/10 rounded-lg p-3 font-body text-sm outline-none focus:border-primary resize-none"
+                className="w-full bg-background border border-border rounded-lg p-3 font-body text-sm outline-none focus:border-primary resize-none"
                 placeholder="Enter your full delivery address"
                 rows={2}
                 value={deliveryAddress}
@@ -128,7 +128,7 @@ export function CartPage() {
             <div className="bg-surface rounded-xl shadow-sm border border-ink/5 overflow-hidden">
               {cartItems.map((item, idx) => (
                 <div key={item.product.id} className={`flex items-start gap-3 p-4 ${idx !== cartItems.length - 1 ? 'border-b border-ink/5' : ''}`}>
-                  <div className="w-16 h-16 bg-kraft border border-ink/10 rounded-lg flex items-center justify-center mix-blend-multiply shrink-0 p-1">
+                  <div className="w-16 h-16 bg-background border border-border rounded-lg flex items-center justify-center mix-blend-multiply shrink-0 p-1">
                     <img className="w-full h-full object-contain" alt={item.product.name} src={item.product.image} />
                   </div>
                   <div className="flex-1 flex flex-col justify-between h-16">
@@ -165,7 +165,7 @@ export function CartPage() {
                     key={amount}
                     onClick={() => setTipAmount(tipAmount === amount ? 0 : amount)}
                     className={`flex-1 py-2 rounded-lg font-mono text-xs font-bold border transition-colors ${
-                      tipAmount === amount ? 'bg-primary text-white border-primary' : 'bg-surface border-ink/20 text-ink hover:bg-ink/5'
+                      tipAmount === amount ? 'bg-primary text-white border-primary' : 'bg-surface border-border text-ink hover:bg-ink/5'
                     }`}
                   >
                     ₹{amount}
@@ -194,7 +194,7 @@ export function CartPage() {
                     {deliveryFee === 0 ? (
                       <>
                         <span className="font-mono text-sm line-through opacity-50">₹40.00</span>
-                        <span className="font-mono text-[10px] font-bold text-bazaar-green bg-bazaar-green/10 px-1.5 py-0.5 rounded-sm">FREE</span>
+                        <span className="font-mono text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded-sm">FREE</span>
                       </>
                     ) : (
                       <span className="font-mono text-sm">₹{deliveryFee.toFixed(2)}</span>
@@ -221,15 +221,15 @@ export function CartPage() {
               </div>
 
               {remainingForFreeDelivery > 0 && (
-                <div className="mt-4 bg-bazaar-green/10 rounded-lg p-3 flex items-center gap-2 border border-bazaar-green/20">
-                  <Sparkles className="h-4 w-4 text-bazaar-green" />
-                  <span className="font-body text-xs font-medium text-bazaar-green">
+                <div className="mt-4 bg-primary/10 rounded-lg p-3 flex items-center gap-2 border border-bazaar-green/20">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <span className="font-body text-xs font-medium text-primary">
                     Add ₹{remainingForFreeDelivery.toFixed(2)} more to get FREE delivery!
                   </span>
                 </div>
               )}
 
-              <div className="border-t border-ink/10 mt-4 pt-4 flex justify-between items-center">
+              <div className="border-t border-border mt-4 pt-4 flex justify-between items-center">
                 <span className="font-display font-black text-xl text-ink">Grand Total</span>
                 <span className="font-mono font-bold text-xl">₹{grandTotal.toFixed(2)}</span>
               </div>
@@ -238,11 +238,11 @@ export function CartPage() {
         </div>
 
         {/* Sticky Bottom Bar */}
-        <div className="absolute bottom-0 w-full bg-chalk border-t border-ink/10 p-4 pb-safe z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <div className="absolute bottom-0 w-full bg-surface border-t border-border p-4 pb-safe z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
           <Button 
             onClick={handleCheckout} 
             disabled={loading}
-            className="w-full h-14 flex justify-between items-center px-6 rounded-xl text-lg font-bold bg-primary text-on-primary hover:opacity-90 active:scale-[0.98] transition-all"
+            className="w-full h-14 flex justify-between items-center px-6 rounded-xl text-lg font-bold bg-primary text-white hover:opacity-90 active:scale-[0.98] transition-all"
           >
             <div className="flex flex-col text-left">
               <span className="font-mono text-lg leading-tight">₹{grandTotal.toFixed(2)}</span>

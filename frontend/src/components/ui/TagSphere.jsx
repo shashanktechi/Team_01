@@ -302,7 +302,7 @@ export function TagSphere() {
               </div>
             </Badge>
             {price && (
-              <div className="mt-0.5 font-mono text-[8px] sm:text-[9px] font-bold text-ink-muted rotate-[-3deg] bg-chalk px-1 border border-ink/10 shadow-sm pointer-events-auto">
+              <div className="mt-0.5 font-mono text-[8px] sm:text-[9px] font-bold text-ink-muted rotate-[-3deg] bg-surface px-1 border border-border shadow-sm pointer-events-auto">
                 {price}
               </div>
             )}

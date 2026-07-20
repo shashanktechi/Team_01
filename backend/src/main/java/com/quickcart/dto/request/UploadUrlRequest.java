@@ -10,3 +10,4 @@ public class UploadUrlRequest {
     @Pattern(regexp = "^image/(jpeg|png|webp)$", message = "Content type must be image/jpeg, image/png, or image/webp")
     private String contentType;
 }
+//

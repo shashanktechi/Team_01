@@ -46,8 +46,10 @@ function App() {
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/pending" element={<PendingApprovalPage />} />
-              <Route path="/cart" element={<CartPage />} />
-              <Route path="/track" element={<TrackOrderPage />} />
+              <Route element={<RoleProtectedRoute role="CUSTOMER" />}>
+                <Route path="/cart" element={<CartPage />} />
+                <Route path="/track" element={<TrackOrderPage />} />
+              </Route>
               <Route element={<RoleProtectedRoute role="SYSTEM_ADMIN" />}>
                 <Route path="/admin-dashboard/*" element={<SystemAdminDashboard />} />
               </Route>

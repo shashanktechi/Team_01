@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { Loader2, User, Phone, ShieldCheck } from 'lucide-react';
-import { TicketCard } from '../../components/ui/TicketCard';
+import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
 import { ImageUploader } from '../../components/ui/ImageUploader';
 
@@ -30,7 +30,7 @@ export function DeliveryProfile() {
   };
 
   if (loading || !profile) {
-    return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-bazaar-green" /></div>;
+    return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
 
   const statusColor = profile.verificationStatus === 'APPROVED' ? 'bazaar-green' : 
@@ -44,8 +44,8 @@ export function DeliveryProfile() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6 flex flex-col gap-6">
-          <h3 className="font-display font-bold text-xl text-ink border-b border-ink/10 pb-2">Personal Information</h3>
+        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-6">
+          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2">Personal Information</h3>
           
           <div className="flex items-center justify-between">
              <div className="flex items-center gap-3">
@@ -68,10 +68,10 @@ export function DeliveryProfile() {
              </div>
              <Badge variant={statusColor}>{profile.verificationStatus || 'PENDING'}</Badge>
           </div>
-        </TicketCard>
+        </Card>
 
-        <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6 flex flex-col gap-4">
-          <h3 className="font-display font-bold text-xl text-ink border-b border-ink/10 pb-2">Vehicle Documents</h3>
+        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-4">
+          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2">Vehicle Documents</h3>
           <p className="text-sm text-ink-muted">Upload a clear photo of your vehicle registration or driving license to maintain your active status.</p>
           
           <ImageUploader 
@@ -81,7 +81,7 @@ export function DeliveryProfile() {
             onUploadSuccess={handleDocumentSuccess}
             label="Upload Document"
           />
-        </TicketCard>
+        </Card>
       </div>
     </div>
   );

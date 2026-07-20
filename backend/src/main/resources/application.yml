@@ -59,7 +59,7 @@ server:
 
 cors:
   allowed:
-    origins: "http://localhost:3000,http://localhost:5173"
+    origins: "http://localhost:3000,http://localhost:5173,http://localhost:5174"
 
 springdoc:
   api-docs:
@@ -67,12 +67,10 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html
 
-aws:
-  access-key-id: ${AWS_ACCESS_KEY_ID:}
-  secret-access-key: ${AWS_SECRET_ACCESS_KEY:}
-  s3:
-    bucket: ${S3_BUCKET_NAME:quickcart1}
-    region: ${AWS_REGION:us-east-1}
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME:bd5fzceu}
+  api-key: ${CLOUDINARY_API_KEY:}
+  api-secret: ${CLOUDINARY_API_SECRET:}
 
 ai:
   groq:

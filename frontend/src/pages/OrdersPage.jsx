@@ -24,10 +24,10 @@ export function OrdersPage() {
   }, []);
 
   return (
-    <div className="bg-kraft font-body text-ink antialiased min-h-screen">
-      <div className="max-w-[480px] mx-auto bg-kraft h-full min-h-screen flex flex-col relative pb-24">
+    <div className="bg-background font-body text-ink antialiased min-h-screen">
+      <div className="max-w-[480px] mx-auto bg-background h-full min-h-screen flex flex-col relative pb-24">
         {/* Header */}
-        <header className="bg-chalk text-ink px-4 py-4 flex items-center gap-3 sticky top-0 z-10 border-b border-ink/10 shadow-sm">
+        <header className="bg-surface text-ink px-4 py-4 flex items-center gap-3 sticky top-0 z-10 border-b border-border shadow-sm">
           <button onClick={() => navigate('/stores')} className="p-2 -ml-2 rounded-full hover:bg-ink/5 transition-colors">
             <ArrowLeft className="h-6 w-6" />
           </button>
@@ -49,10 +49,10 @@ export function OrdersPage() {
           ) : (
             <div className="flex flex-col gap-4">
               {orders.map(order => (
-                <div key={order.id} className="bg-chalk rounded-2xl shadow-sm border border-ink/5 p-4 relative overflow-hidden">
+                <div key={order.id} className="bg-surface rounded-2xl shadow-sm border border-ink/5 p-4 relative overflow-hidden">
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-marigold/10 text-marigold rounded-xl flex items-center justify-center">
+                      <div className="w-10 h-10 bg-warning/10 text-warning rounded-xl flex items-center justify-center">
                         <Package className="h-5 w-5" />
                       </div>
                       <div>
@@ -81,7 +81,7 @@ export function OrdersPage() {
                     {order.status === 'DELIVERED' ? (
                       <Button variant="outline" className="h-8 text-xs px-4" onClick={() => alert('Review Modal Coming Soon')}>Rate</Button>
                     ) : (
-                      <div className="flex items-center gap-1 text-bazaar-green font-mono text-xs font-bold bg-bazaar-green/10 px-2 py-1 rounded-sm">
+                      <div className="flex items-center gap-1 text-primary font-mono text-xs font-bold bg-primary/10 px-2 py-1 rounded-sm">
                         <Clock className="h-3 w-3" /> In Progress
                       </div>
                     )}

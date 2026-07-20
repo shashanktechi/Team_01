@@ -68,21 +68,21 @@ export function StorePage() {
   };
 
   return (
-    <div className="bg-kraft text-ink min-h-screen pb-24 font-body">
+    <div className="bg-background text-ink min-h-screen pb-24 font-body">
       <ConflictModal {...conflictState} />
-      <header className="fixed top-0 w-full z-50 bg-kraft/90 backdrop-blur-md border-b border-ink/10">
+      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-border">
         <div className="flex flex-col gap-2 px-4 py-3 w-full">
           <div className="flex items-center gap-3">
             <button 
               onClick={() => navigate('/stores')}
-              className="p-1 hover:bg-surface-variant rounded-full transition-colors active:scale-95 text-on-surface-variant"
+              className="p-1 hover:bg-surface-variant rounded-full transition-colors active:scale-95 text-ink-muted"
             >
               <ArrowLeft className="h-6 w-6" />
             </button>
             <div className="flex-1">
               <h1 className="font-display font-bold text-lg text-ink leading-tight truncate">{storeDetails?.name || 'Loading...'}</h1>
               <p className="font-body text-xs text-ink-muted flex items-center gap-1">
-                <span className="flex items-center text-bazaar-green font-medium"><Star className="h-3 w-3 fill-bazaar-green mr-0.5"/> 4.8</span>
+                <span className="flex items-center text-primary font-medium"><Star className="h-3 w-3 fill-bazaar-green mr-0.5"/> 4.8</span>
                 <span>•</span>
                 <span>10-15 min</span>
               </p>
@@ -94,7 +94,7 @@ export function StorePage() {
         </div>
       </header>
 
-      <main className="pt-[72px] w-full md:px-margin-desktop">
+      <main className="pt-[72px] w-full md:px-6">
         <div className="relative w-full h-48 md:h-64 md:rounded-xl overflow-hidden shadow-sm mt-4 md:mt-0">
           <div className="bg-cover bg-center w-full h-full absolute inset-0" style={{ backgroundImage: `url('${storeDetails?.bannerUrl || '/placeholder-store-banner.svg'}')` }}></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 md:p-6">
@@ -103,19 +103,19 @@ export function StorePage() {
                 <img className="w-10 h-10 object-contain" alt="Store logo" src={storeDetails?.logoUrl || '/placeholder-store-logo.svg'} />
               </div>
               <div>
-                <h1 className="font-headline-md text-headline-md text-white">{storeDetails?.name || 'Loading Store...'}</h1>
-                <p className="font-body-sm text-body-sm text-white/80 flex items-center gap-1">
+                <h1 className="font-display font-bold text-2xl text-white">{storeDetails?.name || 'Loading Store...'}</h1>
+                <p className="font-body text-sm text-white/80 flex items-center gap-1">
                   <Truck className="h-3.5 w-3.5" /> Delivery in 10 mins
                 </p>
               </div>
             </div>
-            <div className="absolute top-4 right-4 bg-primary-container text-on-primary-container font-label-md text-label-md px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
+            <div className="absolute top-4 right-4 bg-warning/20 text-ink font-mono uppercase tracking-wider text-xs px-2 py-1 rounded-full flex items-center gap-1 shadow-md">
               <BadgeCheck className="h-3.5 w-3.5" /> Freshness: {storeDetails?.freshnessScore || 98}%
             </div>
           </div>
         </div>
 
-        <nav className="sticky top-[72px] z-40 bg-kraft/90 backdrop-blur-md shadow-sm -mx-4 px-4 md:mx-0 md:px-0 py-2 border-b border-ink/10 overflow-x-auto hide-scrollbar">
+        <nav className="sticky top-[72px] z-40 bg-background/90 backdrop-blur-md shadow-sm -mx-4 px-4 md:mx-0 md:px-0 py-2 border-b border-border overflow-x-auto hide-scrollbar">
           <ul className="flex gap-4 min-w-max pb-1">
             {categories.map(cat => (
               <li key={cat}>
@@ -129,7 +129,7 @@ export function StorePage() {
           </ul>
         </nav>
 
-        <section className="p-margin-mobile md:p-0 md:py-margin-desktop">
+        <section className="p-4 md:p-0 md:py-6">
           <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-4">{activeCategory}</h2>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
             {filteredProducts.map(p => (
@@ -153,14 +153,14 @@ export function StorePage() {
       </main>
 
       {getCartCount() > 0 && (
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-kraft border-t border-ink/10 p-4">
-          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-ink text-chalk p-4 border border-ink/20 shadow-[4px_4px_0px_var(--color-ink)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_var(--color-ink)] transition-all cursor-pointer">
+        <div className="fixed bottom-0 left-0 w-full z-50 bg-background border-t border-border p-4">
+          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-ink text-white p-4 border border-border shadow-[4px_4px_0px_var(--color-ink)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_var(--color-ink)] transition-all cursor-pointer">
             <div className="flex flex-col">
-              <span className="font-mono text-xs uppercase tracking-widest text-chalk/70">{getCartCount()} Item(s) | ${getCartTotal().toFixed(2)}</span>
-              <span className="font-display font-black text-xl tracking-tight text-marigold">View Cart</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-white/70">{getCartCount()} Item(s) | ${getCartTotal().toFixed(2)}</span>
+              <span className="font-display font-black text-xl tracking-tight text-warning">View Cart</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-widest bg-marigold text-ink px-3 py-1.5 border border-ink">Checkout</span>
+              <span className="font-mono text-xs font-bold uppercase tracking-widest bg-warning text-ink px-3 py-1.5 border border-ink">Checkout</span>
             </div>
           </div>
         </div>

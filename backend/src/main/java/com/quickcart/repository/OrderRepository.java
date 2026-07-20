@@ -29,4 +29,17 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByStoreIdAndStatus(Long storeId, String status);
 
     List<Order> findByCustomerId(Long customerId);
+
+    @Query("SELECT COUNT(o) FROM Order o WHERE o.status NOT IN ('DELIVERED', 'CANCELLED', 'REFUNDED')")
+    long countActiveOrders();
+
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = 'DELIVERED'")
+    java.math.BigDecimal sumGrossTransactionValue();
+
+    @Query(value = "SELECT DATE(o.created_at) as date, SUM(o.total_amount) as totalAmount " +
+                   "FROM orders o " +
+                   "WHERE o.status = 'DELIVERED' AND o.created_at >= CURRENT_DATE - CAST(:days || ' days' AS INTERVAL) " +
+                   "GROUP BY DATE(o.created_at) " +
+                   "ORDER BY DATE(o.created_at) ASC", nativeQuery = true)
+    List<java.util.Map<String, Object>> findRevenueTrend(@Param("days") int days);
 }

@@ -376,7 +376,9 @@ public class AuthService {
         user.setPhoneVerified(true);
 
         if ("DELIVERY_PARTNER".equals(role)) {
-            user.setVehicleType(request.getVehicleType());
+            user.setVehicleType("Bike"); // only use bike
+            user.setVehicleName(request.getVehicleName());
+            user.setVehicleModel(request.getVehicleModel());
             user.setVehicleNumber(request.getVehicleNumber());
         }
 

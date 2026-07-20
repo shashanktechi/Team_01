@@ -56,4 +56,14 @@ public class Order {
 
     @Column(name = "proof_of_delivery_url")
     private String proofOfDeliveryUrl;
+
+    @Column(name = "created_at", updatable = false)
+    private java.time.Instant createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = java.time.Instant.now();
+        }
+    }
 }

@@ -8,3 +8,4 @@ public class ConfirmMediaRequest {
     @NotBlank(message = "objectKey is required")
     private String objectKey;
 }
+//

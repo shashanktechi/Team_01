@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Heart, Plus, Minus } from 'lucide-react';
-import { TicketCard } from './TicketCard';
+import { Card } from './Card';
 import { Button } from './Button';
 import { useCart } from '../../context/CartContext';
 
@@ -29,13 +29,13 @@ export function ProductCard({
   };
 
   return (
-    <TicketCard 
-      className="p-3 min-w-[150px] max-w-[160px] shrink-0 group hover:-translate-y-1 transition-transform duration-300 relative bg-chalk border border-ink/10 shadow-sm rounded-xl overflow-hidden"
+    <Card 
+      className="p-3 min-w-[150px] max-w-[160px] shrink-0 group hover:-translate-y-1 transition-transform duration-300 relative bg-surface border border-border shadow-sm rounded-xl overflow-hidden"
     >
       {/* Out of stock overlay */}
       {isOutOfStock && (
         <div className="absolute inset-0 bg-ink/10 backdrop-blur-[1px] z-20 flex items-center justify-center">
-          <span className="bg-ink text-chalk font-mono text-xs font-bold px-3 py-1 uppercase tracking-wider shadow-md -rotate-12">
+          <span className="bg-ink text-white font-mono text-xs font-bold px-3 py-1 uppercase tracking-wider shadow-md -rotate-12">
             Sold Out
           </span>
         </div>
@@ -48,9 +48,9 @@ export function ProductCard({
         </div>
       )}
 
-      <div className="aspect-square w-full bg-kraft/20 overflow-hidden relative rounded-lg border border-ink/5 mb-2 flex items-center justify-center">
+      <div className="aspect-square w-full bg-background/20 overflow-hidden relative rounded-lg border border-ink/5 mb-2 flex items-center justify-center">
         <img className="w-full h-full object-contain mix-blend-multiply p-2" alt={name} src={image} />
-        <button className="absolute top-1 right-1 p-1.5 bg-surface/80 rounded-full border border-ink/10 text-ink-muted hover:text-error transition-colors z-10">
+        <button className="absolute top-1 right-1 p-1.5 bg-surface/80 rounded-full border border-border text-ink-muted hover:text-error transition-colors z-10">
           <Heart className="h-4 w-4" />
         </button>
       </div>
@@ -101,6 +101,6 @@ export function ProductCard({
           </Button>
         )}
       </div>
-    </TicketCard>
+    </Card>
   );
 }

@@ -27,7 +27,8 @@ export function LoginPage() {
       await login(payload);
       navigate('/');
     } catch (err) {
-      setError('Invalid email or password. Please try again.');
+      const errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'Invalid email or password. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -44,7 +45,7 @@ export function LoginPage() {
       </button>
 
       {/* Left Column: 3D Sphere */}
-      <div className="hidden lg:flex lg:w-1/2 bg-surface border-r border-ink/10 flex-col items-center justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-1/2 bg-surface border-r border-border flex-col items-center justify-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
         <TagSphere />
       </div>
@@ -59,7 +60,7 @@ export function LoginPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="p-3 text-sm text-error bg-error-container rounded-md">
+              <div className="p-3 text-sm text-error bg-danger/10 rounded-md">
                 {error}
               </div>
             )}
@@ -80,7 +81,7 @@ export function LoginPage() {
               required
             />
             <div className="flex justify-end">
-              <Link to="/forgot-password" className="text-sm text-primary hover:underline font-label-md">
+              <Link to="/forgot-password" className="text-xs font-mono uppercase tracking-wider text-primary hover:underline">
                 Forgot Password?
               </Link>
             </div>
@@ -89,9 +90,9 @@ export function LoginPage() {
             <Button type="submit" className="w-full" isLoading={loading}>
               Sign In
             </Button>
-            <div className="text-center text-sm text-on-surface-variant">
+            <div className="text-center text-sm text-ink-muted">
               Don't have an account?{' '}
-              <Link to="/register" className="text-primary hover:underline font-label-md">
+              <Link to="/register" className="text-xs font-mono uppercase tracking-wider text-primary hover:underline">
                 Sign up
               </Link>
             </div>

@@ -10,13 +10,13 @@ export const Input = React.forwardRef(({ label, error, className = '', ...props 
       )}
       <input
         ref={ref}
-        className={`w-full bg-surface border border-ink/20 rounded px-4 py-2 font-body text-ink transition-colors outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
+        className={`w-full bg-surface border border-border rounded px-4 py-2 font-body text-ink transition-colors outline-none disabled:opacity-50 disabled:cursor-not-allowed ${
           error ? 'border-error' : 'hover:border-ink/40'
         } ${className}`}
         {...props}
       />
       {error && (
-        <span className="font-body-sm text-body-sm text-error">{error}</span>
+        <span className="font-body text-sm text-error">{error}</span>
       )}
     </div>
   );

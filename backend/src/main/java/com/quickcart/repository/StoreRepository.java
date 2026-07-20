@@ -23,4 +23,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     List<Store> findByCityIgnoreCase(String city);
 
     List<Store> findByVerificationStatus(String verificationStatus);
+
+    long countByVerificationStatus(String verificationStatus);
 }

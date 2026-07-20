@@ -27,6 +27,9 @@ public class AdminController {
     private UserRepository userRepository;
 
     @Autowired
+    private com.quickcart.repository.OrderRepository orderRepository;
+
+    @Autowired
     private AuditLogRepository auditLogRepository;
 
     @Autowired
@@ -40,6 +43,23 @@ public class AdminController {
     @GetMapping("/stores")
     public ResponseEntity<?> getAllStores() {
         return ResponseEntity.ok(storeRepository.findAll());
+    }
+
+    @GetMapping("/stats")
+    public ResponseEntity<?> getAdminStats() {
+        long activeOrders = orderRepository.countActiveOrders();
+        long approvedStoreCount = storeRepository.countByVerificationStatus("APPROVED");
+        java.math.BigDecimal grossTransactionValue = orderRepository.sumGrossTransactionValue();
+        return ResponseEntity.ok(Map.of(
+            "activeOrders", activeOrders,
+            "approvedStoreCount", approvedStoreCount,
+            "grossTransactionValue", grossTransactionValue
+        ));
+    }
+
+    @GetMapping("/stats/revenue-trend")
+    public ResponseEntity<?> getRevenueTrend(@RequestParam(defaultValue = "7") int days) {
+        return ResponseEntity.ok(orderRepository.findRevenueTrend(days));
     }
 
     @PatchMapping("/users/{id}/status")
@@ -68,6 +88,18 @@ public class AdminController {
         String statusStr = request.getStatus().name();
         store.setVerificationStatus(statusStr);
         storeRepository.save(store);
+
+        // Also update the store owner's verification status so they can log in
+        User owner = store.getOwner();
+        if (owner != null) {
+            owner.setVerificationStatus(statusStr);
+            if ("APPROVED".equals(statusStr)) {
+                owner.setIsActive(true);
+            } else if ("REJECTED".equals(statusStr)) {
+                owner.setIsActive(false);
+            }
+            userRepository.save(owner);
+        }
 
         // Record to Audit Logs
         Long adminId = currentUserProvider.getCurrentUserId();

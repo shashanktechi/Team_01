@@ -40,7 +40,7 @@ export function TrackOrderPage() {
 
   if (loading) {
     return (
-      <div className="bg-chalk min-h-screen flex items-center justify-center">
+      <div className="bg-surface min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
       </div>
     );
@@ -48,7 +48,7 @@ export function TrackOrderPage() {
 
   if (error || !order) {
     return (
-      <div className="bg-chalk min-h-screen flex flex-col items-center justify-center p-4">
+      <div className="bg-surface min-h-screen flex flex-col items-center justify-center p-4">
         <h2 className="text-xl font-bold mb-4">{error || 'Order not found'}</h2>
         <Button onClick={() => navigate('/')}>Go Home</Button>
       </div>
@@ -64,8 +64,8 @@ export function TrackOrderPage() {
   const estimatedMins = order.estimatedDeliveryTime || 12;
 
   return (
-    <div className="bg-chalk font-body text-ink antialiased min-h-screen pb-6">
-      <div className="max-w-md mx-auto bg-chalk min-h-screen flex flex-col relative">
+    <div className="bg-surface font-body text-ink antialiased min-h-screen pb-6">
+      <div className="max-w-md mx-auto bg-surface min-h-screen flex flex-col relative">
         {/* Header (Overlaid on map) */}
         <button onClick={() => navigate('/')} className="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md text-ink hover:bg-white active:scale-95 transition-all">
           <ArrowLeft className="h-5 w-5" />
@@ -91,7 +91,7 @@ export function TrackOrderPage() {
         </div>
 
         {/* Content Sheet */}
-        <div className="flex-1 bg-chalk -mt-6 rounded-t-3xl relative z-10 p-5 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
+        <div className="flex-1 bg-surface -mt-6 rounded-t-3xl relative z-10 p-5 shadow-[0_-4px_15px_rgba(0,0,0,0.05)]">
           <div className="w-12 h-1.5 bg-ink/10 rounded-full mx-auto mb-6"></div>
 
           {/* ETA Card */}
@@ -105,7 +105,7 @@ export function TrackOrderPage() {
                  order.status === 'OUT_FOR_DELIVERY' ? 'Partner is on the way!' : 'Order delivered!'}
               </span>
             </div>
-            <div className="w-16 h-16 bg-bazaar-green/10 text-bazaar-green rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center">
               <Clock className="h-8 w-8" />
             </div>
           </div>
@@ -150,7 +150,7 @@ export function TrackOrderPage() {
                 const isCurrent = currentIndex === idx;
                 return (
                   <div key={idx} className="flex gap-5 relative z-10">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-2 mt-0.5 transition-colors ${isActive ? 'bg-primary border-primary text-white' : 'bg-chalk border-ink/20 text-transparent'}`}>
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-2 mt-0.5 transition-colors ${isActive ? 'bg-primary border-primary text-white' : 'bg-surface border-border text-transparent'}`}>
                       {isActive && <CheckCircle2 className="h-4 w-4" />}
                     </div>
                     <div className="flex flex-col">
@@ -166,7 +166,7 @@ export function TrackOrderPage() {
           {/* Order Summary Summary */}
           <div className="bg-surface rounded-2xl p-4 flex items-center justify-between shadow-sm border border-ink/5 cursor-pointer hover:bg-ink/5 transition-colors" onClick={() => navigate('/orders')}>
              <div className="flex items-center gap-4">
-               <div className="w-12 h-12 bg-marigold/20 text-marigold rounded-xl flex items-center justify-center">
+               <div className="w-12 h-12 bg-warning/20 text-warning rounded-xl flex items-center justify-center">
                  <Package className="h-6 w-6" />
                </div>
                <div>

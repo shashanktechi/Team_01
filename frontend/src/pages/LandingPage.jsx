@@ -6,7 +6,7 @@ import { BrandMark } from '../components/ui/BrandMark';
 import { useCity } from '../context/CityContext';
 import { useAuth } from '../context/AuthContext';
 import { TagSphere } from '../components/ui/TagSphere';
-import { TicketCard } from '../components/ui/TicketCard';
+import { Card } from '../components/ui/Card';
 import { MapPin, Navigation, CheckCircle, Users } from 'lucide-react';
 
 export function LandingPage() {
@@ -42,7 +42,7 @@ export function LandingPage() {
   return (
     <div className="min-h-screen bg-background font-body text-ink antialiased flex flex-col w-full">
       {/* Top Navigation */}
-      <nav className="sticky top-0 w-full bg-background/90 backdrop-blur-md border-b border-ink/10 z-50">
+      <nav className="sticky top-0 w-full bg-background/90 backdrop-blur-md border-b border-border z-50">
         <div className="w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <button onClick={() => navigate('/')} className="hover:opacity-80 transition-opacity focus:outline-none">
             <BrandMark />
@@ -54,9 +54,9 @@ export function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="flex flex-col lg:flex-row min-h-[calc(100vh-64px)] border-b border-ink/10 w-full">
+      <section className="flex flex-col lg:flex-row min-h-[calc(100vh-64px)] border-b border-border w-full">
         {/* Left Column: 3D Sphere */}
-        <div className="w-full lg:w-1/2 bg-surface border-b lg:border-b-0 lg:border-r border-ink/10 flex items-center justify-center relative py-12 lg:py-0 overflow-hidden">
+        <div className="w-full lg:w-1/2 bg-surface border-b lg:border-b-0 lg:border-r border-border flex items-center justify-center relative py-12 lg:py-0 overflow-hidden">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
           <TagSphere />
         </div>
@@ -94,42 +94,42 @@ export function LandingPage() {
         </div>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
-          <TicketCard className="bg-surface border-ink/10 p-6 hover:-translate-y-1 transition-transform duration-200">
-            <div className="w-12 h-12 bg-bazaar-green/10 rounded-full flex items-center justify-center mb-4">
-              <MapPin className="text-bazaar-green w-6 h-6" />
+          <Card className="bg-surface border-border p-6 hover:-translate-y-1 transition-transform duration-200">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <MapPin className="text-primary w-6 h-6" />
             </div>
             <h3 className="font-display font-bold text-xl mb-2">Hyperlocal Delivery</h3>
             <p className="text-ink-muted text-sm font-body">Fast delivery from stores right in your neighborhood. We serve any town, not just metros.</p>
-          </TicketCard>
+          </Card>
 
-          <TicketCard className="bg-surface border-ink/10 p-6 hover:-translate-y-1 transition-transform duration-200">
-            <div className="w-12 h-12 bg-marigold/30 rounded-full flex items-center justify-center mb-4">
+          <Card className="bg-surface border-border p-6 hover:-translate-y-1 transition-transform duration-200">
+            <div className="w-12 h-12 bg-warning/30 rounded-full flex items-center justify-center mb-4">
               <Navigation className="text-ink w-6 h-6" />
             </div>
             <h3 className="font-display font-bold text-xl mb-2">Real-time Tracking</h3>
             <p className="text-ink-muted text-sm font-body">Watch your order travel from the store to your door with live status updates.</p>
-          </TicketCard>
+          </Card>
 
-          <TicketCard className="bg-surface border-ink/10 p-6 hover:-translate-y-1 transition-transform duration-200">
-            <div className="w-12 h-12 bg-bazaar-green/10 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle className="text-bazaar-green w-6 h-6" />
+          <Card className="bg-surface border-border p-6 hover:-translate-y-1 transition-transform duration-200">
+            <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
+              <CheckCircle className="text-primary w-6 h-6" />
             </div>
             <h3 className="font-display font-bold text-xl mb-2">Verified Stores</h3>
             <p className="text-ink-muted text-sm font-body">Every store is verified by our team before they can sell, guaranteeing quality and freshness.</p>
-          </TicketCard>
+          </Card>
 
-          <TicketCard className="bg-surface border-ink/10 p-6 hover:-translate-y-1 transition-transform duration-200">
-            <div className="w-12 h-12 bg-marigold/30 rounded-full flex items-center justify-center mb-4">
+          <Card className="bg-surface border-border p-6 hover:-translate-y-1 transition-transform duration-200">
+            <div className="w-12 h-12 bg-warning/30 rounded-full flex items-center justify-center mb-4">
               <Users className="text-ink w-6 h-6" />
             </div>
             <h3 className="font-display font-bold text-xl mb-2">For Everyone</h3>
             <p className="text-ink-muted text-sm font-body">Customers get groceries fast. Store owners reach more buyers. Delivery partners earn on their schedule.</p>
-          </TicketCard>
+          </Card>
         </div>
       </section>
 
       {/* Final CTA Section */}
-      <section className="py-16 md:py-24 bg-surface border-t border-ink/10 mt-auto w-full">
+      <section className="py-16 md:py-24 bg-surface border-t border-border mt-auto w-full">
         <div className="w-full mx-auto px-4 text-center">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-display font-black text-ink mb-6 tracking-tight">Ready to get your groceries delivered?</h2>
           <p className="text-lg md:text-xl text-ink-muted mb-10 max-w-2xl mx-auto font-body">Join Quick Cart today and experience the fastest, freshest delivery in your town.</p>

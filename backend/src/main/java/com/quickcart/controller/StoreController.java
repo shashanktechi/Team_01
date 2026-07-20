@@ -81,10 +81,15 @@ public class StoreController {
         }
         com.quickcart.entity.User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        com.quickcart.entity.Store store = null;
+        
+        Store store = null;
         if (storeId != null) {
             store = storeRepository.findById(storeId).orElse(null);
         }
+        if (store == null && "STORE_ADMIN".equals(user.getRole())) {
+            store = storeRepository.findByOwnerId(userId).orElse(null);
+        }
+
         return ResponseEntity.ok(Map.of(
                 "user", Map.of(
                         "id", user.getId(),
@@ -96,12 +101,12 @@ public class StoreController {
                 ),
                 "store", store != null ? Map.of(
                         "id", store.getId(),
-                        "name", store.getName(),
+                        "name", store.getName() != null ? store.getName() : "",
                         "address", store.getAddress() != null ? store.getAddress() : "",
                         "whatsappNumber", store.getWhatsappNumber() != null ? store.getWhatsappNumber() : "",
-                        "verificationStatus", store.getVerificationStatus(),
-                        "freshnessScore", store.getFreshnessScore(),
-                        "isOpen", store.getIsOpen(),
+                        "verificationStatus", store.getVerificationStatus() != null ? store.getVerificationStatus() : "",
+                        "freshnessScore", store.getFreshnessScore() != null ? store.getFreshnessScore() : 0.0,
+                        "isOpen", store.getIsOpen() != null ? store.getIsOpen() : false,
                         "logoUrl", store.getLogoUrl() != null ? store.getLogoUrl() : "",
                         "bannerUrl", store.getBannerUrl() != null ? store.getBannerUrl() : ""
                 ) : Map.of()
@@ -117,8 +122,22 @@ public class StoreController {
         if (request.containsKey("whatsappNumber")) store.setWhatsappNumber((String) request.get("whatsappNumber"));
         if (request.containsKey("isOpen")) store.setIsOpen((Boolean) request.get("isOpen"));
         
-        com.quickcart.repository.StoreRepository storeRepositoryLocal = storeRepository;
-        storeRepositoryLocal.save(store);
+        storeRepository.save(store);
+
+        Long userId = currentUserProvider.getCurrentUserId();
+        if (userId != null) {
+            com.quickcart.entity.User user = userRepository.findById(userId).orElse(null);
+            if (user != null) {
+                if (request.containsKey("userFullName") && request.get("userFullName") != null) {
+                    user.setFullName((String) request.get("userFullName"));
+                }
+                if (request.containsKey("userPhone") && request.get("userPhone") != null) {
+                    user.setPhone((String) request.get("userPhone"));
+                }
+                userRepository.save(user);
+            }
+        }
+
         return ResponseEntity.ok(Map.of("success", true));
     }
 

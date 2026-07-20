@@ -3,7 +3,7 @@ import { useNavigate, Routes, Route, NavLink, Navigate, useLocation } from 'reac
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { BrandMark } from '../../components/ui/BrandMark';
-import { TicketCard } from '../../components/ui/TicketCard';
+import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { MapPin, Navigation, Package, LogOut, Loader2 } from 'lucide-react';
@@ -41,8 +41,8 @@ export function DeliveryDashboard() {
 
   if (loading) {
     return (
-      <div className="bg-kraft min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-bazaar-green" />
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -50,8 +50,8 @@ export function DeliveryDashboard() {
   const hasActiveTasks = tasks.swarms.length > 0 || tasks.orders.length > 0;
 
   return (
-    <div className="bg-kraft font-body text-ink min-h-screen pb-12">
-      <header className="fixed top-0 w-full z-50 bg-kraft/90 backdrop-blur-md border-b border-ink/10 shadow-sm">
+    <div className="bg-background font-body text-ink min-h-screen pb-12">
+      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 w-full">
           <BrandMark />
           <div className="flex items-center gap-4">
@@ -68,7 +68,7 @@ export function DeliveryDashboard() {
 
       <main className="pt-24 w-full px-4 sm:px-6 flex flex-col gap-6">
         {/* Profile Card */}
-        <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6 flex items-center justify-between mb-8">
+        <Card className="bg-surface shadow-sm border-border p-6 flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
             <img src={user?.profilePhotoUrl || "https://i.pravatar.cc/150?img=11"} alt="Profile" className="w-16 h-16 rounded-full border-2 border-ink shadow-sm" />
             <div>
@@ -77,25 +77,25 @@ export function DeliveryDashboard() {
             </div>
           </div>
           <Badge variant="marigold" className="hidden sm:inline-flex">Online</Badge>
-        </TicketCard>
+        </Card>
 
         {/* Tabs Nav */}
-        <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-ink/10 pb-4">
+        <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-border pb-4">
           <NavLink 
-            to="tasks"
-            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive || location.pathname.endsWith('/delivery-dashboard') ? 'bg-bazaar-green text-chalk' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
+            to="/delivery-dashboard/tasks"
+            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive || location.pathname.endsWith('/delivery-dashboard') ? 'bg-primary text-white' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
           >
             <Navigation className="w-4 h-4" /> Active Tasks
           </NavLink>
           <NavLink 
-            to="batch"
-            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive ? 'bg-marigold text-ink' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
+            to="/delivery-dashboard/batch"
+            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive ? 'bg-warning text-ink' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
           >
             <Package className="w-4 h-4" /> Batch Finding
           </NavLink>
           <NavLink 
-            to="profile"
-            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive ? 'bg-ink text-chalk' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
+            to="/delivery-dashboard/profile"
+            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive ? 'bg-ink text-white' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
           >
             <User className="w-4 h-4" /> Profile
           </NavLink>

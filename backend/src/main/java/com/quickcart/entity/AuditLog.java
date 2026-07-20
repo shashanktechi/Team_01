@@ -30,10 +30,10 @@ public class AuditLog {
     @Column(name = "target_store_id")
     private Long targetStoreId;
 
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "metadata", columnDefinition = "TEXT")
     private String metadata;
 
-    @Column(name = "ip_address", columnDefinition = "inet")
+    @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
     @Column(name = "created_at", insertable = false, updatable = false)

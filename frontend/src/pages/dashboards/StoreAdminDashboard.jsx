@@ -16,6 +16,7 @@ export function StoreAdminDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [store, setStore] = useState(null);
+  const [storeUser, setStoreUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -23,6 +24,7 @@ export function StoreAdminDashboard() {
     try {
       const profileRes = await api.get('/store/profile');
       setStore(profileRes.data.store);
+      setStoreUser(profileRes.data.user);
       
       const ordersRes = await api.get('/store/orders/incoming');
       setOrders(ordersRes.data);
@@ -44,29 +46,45 @@ export function StoreAdminDashboard() {
 
   const getTabClass = (path) => {
     const isActive = location.pathname.includes(path) || (path === 'overview' && location.pathname.endsWith('/store-dashboard'));
-    if (path === 'overview' && isActive) return 'bg-bazaar-green text-chalk';
-    if (path === 'orders' && isActive) return 'bg-marigold text-ink';
-    if (path === 'inventory' && isActive) return 'bg-clay text-chalk';
-    if (path === 'profile' && isActive) return 'bg-ink text-chalk';
+    if (path === 'overview' && isActive) return 'bg-primary text-white';
+    if (path === 'orders' && isActive) return 'bg-warning text-ink';
+    if (path === 'inventory' && isActive) return 'bg-danger text-white';
+    if (path === 'profile' && isActive) return 'bg-ink text-white';
     return 'bg-transparent text-ink-muted hover:bg-ink/5';
   };
 
   if (loading) {
     return (
-      <div className="bg-kraft min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-bazaar-green" />
+      <div className="bg-background min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
 
   return (
-    <div className="bg-kraft font-body text-ink min-h-screen pb-12">
-      <header className="fixed top-0 w-full z-50 bg-kraft/90 backdrop-blur-md border-b border-ink/10 shadow-sm">
+    <div className="bg-background font-body text-ink min-h-screen pb-12">
+      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
         <div className="flex items-center justify-between px-6 py-4 w-full">
-          <BrandMark />
+          <div className="flex items-center gap-6">
+            <BrandMark />
+            {storeUser && (
+              <div className="hidden sm:flex items-center gap-3 pl-6 border-l border-border">
+                {storeUser.profilePhotoUrl ? (
+                  <img src={storeUser.profilePhotoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border border-border" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-sm">
+                    {storeUser.fullName ? storeUser.fullName.charAt(0).toUpperCase() : 'U'}
+                  </div>
+                )}
+                <span className="font-mono text-xs font-bold uppercase tracking-wider text-ink-muted">
+                  {storeUser.fullName || 'Admin'}
+                </span>
+              </div>
+            )}
+          </div>
           <div className="flex items-center gap-4">
             <span className="font-mono text-xs font-bold uppercase tracking-wider hidden sm:block">
-              {store?.name || 'Store Admin'}
+              {store?.name || 'Store Pending'}
             </span>
             <Button variant="outline" onClick={handleLogout} className="flex items-center gap-2">
               <LogOut className="h-4 w-4" />
@@ -82,27 +100,27 @@ export function StoreAdminDashboard() {
         </div>
 
         {/* Tabs Nav */}
-        <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-ink/10 pb-4">
+        <div className="flex overflow-x-auto hide-scrollbar gap-2 mb-8 border-b border-border pb-4">
           <NavLink 
-            to="overview"
+            to="/store-dashboard/overview"
             className={`flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${getTabClass('overview')}`}
           >
             <Store className="w-4 h-4" /> Overview
           </NavLink>
           <NavLink 
-            to="orders"
+            to="/store-dashboard/orders"
             className={`flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${getTabClass('orders')}`}
           >
             <ListOrdered className="w-4 h-4" /> Orders
           </NavLink>
           <NavLink 
-            to="inventory"
+            to="/store-dashboard/inventory"
             className={`flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${getTabClass('inventory')}`}
           >
             <Package className="w-4 h-4" /> Inventory
           </NavLink>
           <NavLink 
-            to="profile"
+            to="/store-dashboard/profile"
             className={`flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${getTabClass('profile')}`}
           >
             <User className="w-4 h-4" /> Profile

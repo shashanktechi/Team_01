@@ -1,10 +1,9 @@
 import React from 'react';
-import { TicketCard } from './TicketCard';
 
 const Card = React.forwardRef(({ className = '', ...props }, ref) => (
-  <TicketCard
+  <div
     ref={ref}
-    className={className}
+    className={`bg-surface rounded-xl border border-border shadow-sm ${className}`}
     {...props}
   />
 ));
@@ -22,7 +21,7 @@ CardHeader.displayName = "CardHeader";
 const CardTitle = React.forwardRef(({ className = '', ...props }, ref) => (
   <h3
     ref={ref}
-    className={`font-headline-md text-headline-md text-on-surface tracking-tight ${className}`}
+    className={`font-display font-bold text-2xl text-ink tracking-tight ${className}`}
     {...props}
   />
 ));
@@ -31,7 +30,7 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef(({ className = '', ...props }, ref) => (
   <p
     ref={ref}
-    className={`font-body-sm text-body-sm text-on-surface-variant ${className}`}
+    className={`font-body text-sm text-ink-muted ${className}`}
     {...props}
   />
 ));

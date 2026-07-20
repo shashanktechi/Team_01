@@ -11,7 +11,7 @@ import { Mail, Phone, User, Lock, Store, MapPin, Building2, Loader2, KeyRound } 
 export function RegisterPage() {
   const [formData, setFormData] = useState({ 
     name: '', username: '', email: '', phone: '', password: '', role: 'CUSTOMER',
-    storeName: '', city: '', storeAddress: '', otp: '', vehicleType: 'Bike', vehicleNumber: ''
+    storeName: '', city: '', storeAddress: '', otp: '', vehicleType: 'Bike', vehicleNumber: '', vehicleName: '', vehicleModel: ''
   });
   const [step, setStep] = useState(1); // 1: details, 2: otp
   const [error, setError] = useState('');
@@ -74,7 +74,7 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-kraft p-4 lg:p-0 overflow-hidden relative">
+    <div className="min-h-screen flex items-center justify-center bg-background p-4 lg:p-0 overflow-hidden relative">
       {/* Top Left Logo */}
       <button 
         onClick={() => navigate('/')} 
@@ -83,10 +83,10 @@ export function RegisterPage() {
         <BrandMark />
       </button>
 
-      <div className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row bg-kraft rounded-2xl shadow-xl border border-ink/10 overflow-hidden min-h-[700px]">
+      <div className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row bg-background rounded-2xl shadow-xl border border-border overflow-hidden min-h-[700px]">
         
         {/* Left Col - Illustration */}
-        <div className="hidden lg:flex w-1/2 bg-surface p-12 flex-col justify-between border-r border-ink/10 relative">
+        <div className="hidden lg:flex w-1/2 bg-surface p-12 flex-col justify-between border-r border-border relative">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
           <div>
             <h1 className="font-display font-black text-5xl text-ink leading-tight tracking-tight mt-8 relative z-10">
@@ -97,16 +97,16 @@ export function RegisterPage() {
             </p>
           </div>
           <div className="relative z-10">
-            <BrandStamp className="w-48 md:w-56 h-auto text-bazaar-green opacity-50" />
+            <BrandStamp className="w-48 md:w-56 h-auto text-primary opacity-50" />
           </div>
         </div>
 
         {/* Right Col - Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 relative bg-kraft overflow-y-auto">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 relative bg-background overflow-y-auto">
           <div className="w-full max-w-sm">
             
             {error && (
-              <div className="mb-6 p-4 bg-clay/10 border border-clay/20 text-clay rounded-lg text-sm font-body">
+              <div className="mb-6 p-4 bg-danger/10 border border-clay/20 text-danger rounded-lg text-sm font-body">
                 {error}
               </div>
             )}
@@ -126,7 +126,7 @@ export function RegisterPage() {
                         name="role" 
                         value={formData.role} 
                         onChange={handleChange}
-                        className="w-full h-12 bg-transparent border border-ink/20 rounded-lg px-4 font-body focus:border-bazaar-green focus:ring-1 focus:ring-bazaar-green outline-none transition-colors appearance-none"
+                        className="w-full h-12 bg-transparent border border-border rounded-lg px-4 font-body focus:border-bazaar-green focus:ring-1 focus:ring-bazaar-green outline-none transition-colors appearance-none"
                       >
                         <option value="CUSTOMER">Customer</option>
                         <option value="STORE_ADMIN">Store Owner</option>
@@ -146,7 +146,7 @@ export function RegisterPage() {
                       value={formData.name}
                       onChange={handleChange}
                       required
-                      className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                      className="pl-10 h-12 border-border focus:border-bazaar-green"
                     />
                   </div>
 
@@ -159,7 +159,7 @@ export function RegisterPage() {
                       onChange={handleChange}
                       required
                       minLength={3}
-                      className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                      className="pl-10 h-12 border-border focus:border-bazaar-green"
                     />
                   </div>
 
@@ -172,7 +172,7 @@ export function RegisterPage() {
                       value={formData.email}
                       onChange={handleChange}
                       required
-                      className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                      className="pl-10 h-12 border-border focus:border-bazaar-green"
                     />
                   </div>
 
@@ -185,7 +185,7 @@ export function RegisterPage() {
                       value={formData.phone}
                       onChange={handleChange}
                       required
-                      className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                      className="pl-10 h-12 border-border focus:border-bazaar-green"
                     />
                   </div>
 
@@ -199,12 +199,12 @@ export function RegisterPage() {
                       onChange={handleChange}
                       required
                       minLength={8}
-                      className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                      className="pl-10 h-12 border-border focus:border-bazaar-green"
                     />
                   </div>
 
                   {(formData.role === 'STORE_ADMIN' || formData.role === 'DELIVERY_PARTNER') && (
-                    <div className="pt-4 border-t border-dashed border-ink/20 space-y-4">
+                    <div className="pt-4 border-t border-dashed border-border space-y-4">
                       <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-ink-muted">Additional Details</h3>
                       
                       {formData.role === 'STORE_ADMIN' && (
@@ -216,7 +216,7 @@ export function RegisterPage() {
                             value={formData.storeName}
                             onChange={handleChange}
                             required
-                            className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                            className="pl-10 h-12 border-border focus:border-bazaar-green"
                           />
                         </div>
                       )}
@@ -225,37 +225,36 @@ export function RegisterPage() {
                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40 z-10" />
                         <Input
                           name="city"
-                          placeholder="Mandal / Village / Town"
+                          placeholder="Mandal / Village / Town (Enter your city)"
                           value={formData.city}
                           onChange={handleChange}
                           required
-                          className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
-                          list="local-areas"
+                          className="pl-10 h-12 border-border focus:border-bazaar-green"
                         />
-                        <datalist id="local-areas">
-                          <option value="Mandal A" />
-                          <option value="Village B" />
-                          <option value="Town C" />
-                        </datalist>
                       </div>
 
                       {formData.role === 'DELIVERY_PARTNER' && (
                         <>
                           <div className="relative">
-                            <select 
-                              name="vehicleType" 
-                              value={formData.vehicleType} 
+                            <Input
+                              name="vehicleName"
+                              placeholder="Bike Name (e.g. Honda, Bajaj)"
+                              value={formData.vehicleName}
                               onChange={handleChange}
-                              className="w-full h-12 bg-transparent border border-ink/20 rounded-lg pl-10 pr-4 font-body focus:border-bazaar-green focus:ring-1 focus:ring-bazaar-green outline-none transition-colors appearance-none"
-                            >
-                              <option value="Bike">Bike</option>
-                              <option value="Auto">Auto Rickshaw</option>
-                              <option value="Mini-truck">Mini-truck</option>
-                            </select>
-                            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40 pointer-events-none" />
-                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ink/40">
-                              ▼
-                            </div>
+                              required
+                              className="pl-4 h-12 border-border focus:border-bazaar-green"
+                            />
+                          </div>
+
+                          <div className="relative">
+                            <Input
+                              name="vehicleModel"
+                              placeholder="Bike Model (e.g. Splendor, Activa)"
+                              value={formData.vehicleModel}
+                              onChange={handleChange}
+                              required
+                              className="pl-4 h-12 border-border focus:border-bazaar-green"
+                            />
                           </div>
                           
                           <div className="relative">
@@ -265,7 +264,7 @@ export function RegisterPage() {
                               value={formData.vehicleNumber}
                               onChange={handleChange}
                               required
-                              className="pl-4 h-12 border-ink/20 focus:border-bazaar-green"
+                              className="pl-4 h-12 border-border focus:border-bazaar-green"
                             />
                           </div>
                         </>
@@ -280,7 +279,7 @@ export function RegisterPage() {
                             value={formData.storeAddress}
                             onChange={handleChange}
                             required
-                            className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                            className="pl-10 h-12 border-border focus:border-bazaar-green"
                           />
                         </div>
                       )}
@@ -294,7 +293,7 @@ export function RegisterPage() {
 
                 <div className="text-center">
                   <span className="text-sm font-body text-ink-muted">Already have an account? </span>
-                  <Link to="/login" className="font-mono text-xs font-bold uppercase tracking-wider text-ink hover:text-bazaar-green transition-colors">
+                  <Link to="/login" className="font-mono text-xs font-bold uppercase tracking-wider text-ink hover:text-primary transition-colors">
                     Sign In
                   </Link>
                 </div>
@@ -317,7 +316,7 @@ export function RegisterPage() {
                         required
                         value={formData.otp}
                         onChange={handleChange}
-                        className="pl-10 h-12 border-ink/20 focus:border-marigold font-mono tracking-widest text-lg"
+                        className="pl-10 h-12 border-border focus:border-marigold font-mono tracking-widest text-lg"
                         placeholder="000000"
                         maxLength={6}
                       />

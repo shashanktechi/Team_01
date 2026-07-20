@@ -12,3 +12,4 @@ public class ProofOfDeliveryVerificationResult {
     private String reason;
     private boolean requiresAdminReview;
 }
+//
