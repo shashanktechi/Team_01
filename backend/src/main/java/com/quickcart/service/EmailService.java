@@ -68,6 +68,32 @@ public class EmailService {
         }
     }
 
+    public void sendVerificationRejectionEmail(String toEmail, String reason, String subject, String title, String bodyText) {
+        log.info("Sending verification rejection email from={} to={} with reason={}", fromAddress, toEmail, reason);
+        try {
+            jakarta.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
+            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(mimeMessage, "utf-8");
+            
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject(subject);
+            
+            String htmlMsg = getHtmlTemplate(
+                title, 
+                bodyText, 
+                reason != null && !reason.trim().isEmpty() ? reason : "Please review your submitted documents and re-upload.", 
+                "If you have any questions, please contact our support team."
+            );
+            helper.setText(htmlMsg, true);
+
+            mailSender.send(mimeMessage);
+            log.info("Successfully sent verification rejection email to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send verification rejection email to {} using fromAddress={}: {}", toEmail, fromAddress, e.getMessage(), e);
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
     private String getHtmlTemplate(String title, String message, String otp, String footer) {
         return "<!DOCTYPE html>"
                 + "<html>"
@@ -80,7 +106,7 @@ public class EmailService {
                 + "  .content { padding: 32px 24px; text-align: center; }"
                 + "  .message { font-size: 16px; margin-bottom: 24px; line-height: 1.5; }"
                 + "  .otp-box { background-color: #F3EDE1; display: inline-block; padding: 16px 32px; border-radius: 8px; border: 2px dashed #0F5132; margin-bottom: 24px; }"
-                + "  .otp { font-family: 'JetBrains Mono', monospace; font-size: 32px; font-weight: bold; color: #0F5132; letter-spacing: 4px; margin: 0; }"
+                + "  .otp { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: bold; color: #0F5132; margin: 0; }"
                 + "  .footer { font-size: 13px; color: rgba(31, 42, 36, 0.6); margin-top: 32px; border-top: 1px solid rgba(31, 42, 36, 0.1); padding-top: 16px; }"
                 + "</style>"
                 + "</head>"

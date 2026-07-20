@@ -81,16 +81,20 @@ public class GlobalExceptionHandler {
             }
         }
         body.put("message", userFriendlyMessage);
+        body.put("error", userFriendlyMessage);
 
         return new ResponseEntity<>(body, HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntimeExceptions(RuntimeException ex) {
+        logger.error("Runtime exception occurred: ", ex);
+
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
         body.put("message", ex.getMessage());
+        body.put("error", ex.getMessage());
 
         HttpStatus status = HttpStatus.BAD_REQUEST;
         if (ex.getMessage() != null && ex.getMessage().contains("not found")) {

@@ -32,7 +32,9 @@ public class Product {
 
     // pgvector column mapping
     @Column(columnDefinition = "vector(384)")
-    private com.pgvector.PGvector embedding;
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.OTHER)
+    @Convert(converter = com.quickcart.util.VectorConverter.class)
+    private float[] embedding;
 
     @Column(name = "typical_shelf_life_hours")
     private Integer typicalShelfLifeHours;

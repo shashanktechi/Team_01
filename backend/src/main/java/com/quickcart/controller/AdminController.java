@@ -34,6 +34,9 @@ public class AdminController {
     @Autowired
     private CurrentUserProvider currentUserProvider;
 
+    @Autowired
+    private com.quickcart.service.EmailService emailService;
+
     @GetMapping("/users")
     public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userRepository.findAll());
@@ -82,11 +85,15 @@ public class AdminController {
 
     @PutMapping("/stores/{id}/verify")
     public ResponseEntity<?> verifyStore(@PathVariable Long id,
-                                         @RequestParam String status,
+                                         @RequestBody Map<String, String> body,
                                          HttpServletRequest servletRequest) {
         Store store = storeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Store not found"));
 
+        String status = body.get("status");
+        if (status == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Status is required"));
+        }
         String statusStr = status.trim().toUpperCase();
         if (!statusStr.equals("APPROVED") && !statusStr.equals("REJECTED") && !statusStr.equals("PENDING")) {
             return ResponseEntity.badRequest().body(Map.of("error", "Invalid status. Must be APPROVED, REJECTED, or PENDING."));
@@ -102,6 +109,18 @@ public class AdminController {
                 owner.setIsActive(true);
             } else if ("REJECTED".equals(statusStr)) {
                 owner.setIsActive(false);
+                String reason = body.get("reason");
+                try {
+                    emailService.sendVerificationRejectionEmail(
+                        owner.getEmail(),
+                        reason,
+                        "Your Quick Cart Store Verification Needs Attention",
+                        "Store Verification Rejected",
+                        "We regret to inform you that your store registration for '" + store.getName() + "' has been rejected for the following reason:"
+                    );
+                } catch (Exception e) {
+                    // Log but don't fail transaction
+                }
             }
             userRepository.save(owner);
         }
@@ -135,7 +154,7 @@ public class AdminController {
 
     @PutMapping("/delivery-partners/{id}/verify")
     public ResponseEntity<?> verifyDeliveryPartner(@PathVariable Long id,
-                                                   @RequestParam String status,
+                                                   @RequestBody Map<String, String> body,
                                                    HttpServletRequest servletRequest) {
         User partner = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Delivery Partner not found"));
@@ -144,8 +163,12 @@ public class AdminController {
             throw new RuntimeException("User is not a delivery partner");
         }
 
+        String status = body.get("status");
+        if (status == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Status is required"));
+        }
         String statusStr = status.trim().toUpperCase();
-        if (statusStr == null || (!statusStr.equals("APPROVED") && !statusStr.equals("REJECTED"))) {
+        if (!statusStr.equals("APPROVED") && !statusStr.equals("REJECTED")) {
             throw new RuntimeException("Invalid status. Must be APPROVED or REJECTED.");
         }
 
@@ -154,6 +177,20 @@ public class AdminController {
             partner.setIsActive(true);
         } else {
             partner.setIsActive(false);
+            if ("REJECTED".equals(statusStr)) {
+                String reason = body.get("reason");
+                try {
+                    emailService.sendVerificationRejectionEmail(
+                        partner.getEmail(),
+                        reason,
+                        "Your Quick Cart Delivery Partner Verification Needs Attention",
+                        "Delivery Partner Verification Rejected",
+                        "We regret to inform you that your delivery partner application has been rejected for the following reason:"
+                    );
+                } catch (Exception e) {
+                    // Log but don't fail transaction
+                }
+            }
         }
         userRepository.save(partner);
 
