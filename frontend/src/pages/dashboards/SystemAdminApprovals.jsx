@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { api } from '../../services/api';
 import { TicketCard } from '../../components/ui/TicketCard';
 import { Badge } from '../../components/ui/Badge';
 import { Button } from '../../components/ui/Button';
@@ -8,16 +9,57 @@ export function SystemAdminApprovals() {
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Mock data for approvals
-    setTimeout(() => {
-      setApprovals([
-        { id: 1, name: 'Dave Delivery', type: 'DELIVERY_PARTNER', date: 'Oct 24, 2026', city: 'Seattle' },
-        { id: 2, name: 'Eve Store Owner', type: 'STORE_ADMIN', date: 'Oct 24, 2026', city: 'Portland' },
+  const fetchApprovals = async () => {
+    try {
+      const [storesRes, deliveryRes] = await Promise.all([
+        api.get('/admin/stores/pending'),
+        api.get('/admin/delivery-partners/pending')
       ]);
+
+      const formattedStores = storesRes.data.map(store => ({
+        id: store.id,
+        name: store.name,
+        type: 'STORE_ADMIN',
+        date: 'Recent',
+        city: store.city,
+        raw: store
+      }));
+
+      const formattedDelivery = deliveryRes.data.map(user => ({
+        id: user.id,
+        name: user.fullName,
+        type: 'DELIVERY_PARTNER',
+        date: 'Recent',
+        city: user.city || 'N/A',
+        raw: user
+      }));
+
+      setApprovals([...formattedStores, ...formattedDelivery]);
+    } catch (err) {
+      console.error('Error fetching approvals:', err);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
+  };
+
+  useEffect(() => {
+    fetchApprovals();
   }, []);
+
+  const handleAction = async (approvalId, type, action) => {
+    try {
+      const status = action === 'approve' ? 'APPROVED' : 'REJECTED';
+      if (type === 'STORE_ADMIN') {
+        await api.put(`/admin/stores/${approvalId}/verify`, { status });
+      } else {
+        await api.put(`/admin/delivery-partners/${approvalId}/verify`, { status });
+      }
+      setApprovals(approvals.filter(a => !(a.id === approvalId && a.type === type)));
+    } catch (err) {
+      console.error('Action failed:', err);
+      alert('Action failed');
+    }
+  };
 
   if (loading) {
     return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-bazaar-green" /></div>;
@@ -41,16 +83,21 @@ export function SystemAdminApprovals() {
       ) : (
         <div className="grid grid-cols-1 gap-4">
           {approvals.map(a => (
-            <TicketCard key={a.id} className="bg-chalk shadow-sm border-ink/10 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <TicketCard key={`${a.type}-${a.id}`} className="bg-chalk shadow-sm border-ink/10 p-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <h3 className="font-display font-bold text-lg text-ink leading-tight">{a.name}</h3>
                 <p className="font-body text-sm text-ink-muted mt-1">Applied: {a.date} • {a.city}</p>
+                {a.type === 'DELIVERY_PARTNER' && (
+                  <p className="font-body text-sm text-ink-muted mt-1">
+                    Vehicle: {a.raw.vehicleType || 'N/A'} - {a.raw.vehicleNumber || 'N/A'}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-3 w-full md:w-auto">
                 <Badge variant="marigold" className="uppercase">{a.type.replace('_', ' ')}</Badge>
                 <div className="flex gap-2">
-                  <Button variant="outline">Reject</Button>
-                  <Button>Approve</Button>
+                  <Button variant="outline" onClick={() => handleAction(a.id, a.type, 'reject')}>Reject</Button>
+                  <Button onClick={() => handleAction(a.id, a.type, 'approve')}>Approve</Button>
                 </div>
               </div>
             </TicketCard>

@@ -19,6 +19,10 @@ public class RegisterRequest {
     @Size(min = 8, message = "Password must be at least 8 characters long")
     private String password;
 
+    @NotBlank(message = "Username is required")
+    @Size(min = 3, message = "Username must be at least 3 characters long")
+    private String username;
+
     @NotBlank(message = "Full name is required")
     private String name;
 
@@ -31,4 +35,6 @@ public class RegisterRequest {
     private Double storeLat;
     private Double storeLng;
     private String otp;
+    private String vehicleType;
+    private String vehicleNumber;
 }

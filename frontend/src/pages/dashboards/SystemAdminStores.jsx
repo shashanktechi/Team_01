@@ -9,14 +9,17 @@ export function SystemAdminStores() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data for stores
-    setTimeout(() => {
-      setStores([
-        { id: 1, name: 'Downtown Fresh', owner: 'Alice Smith', freshnessScore: 98, isOpen: true },
-        { id: 2, name: 'Uptown Grocers', owner: 'Charlie Brown', freshnessScore: 85, isOpen: false },
-      ]);
-      setLoading(false);
-    }, 500);
+    const fetchStores = async () => {
+      try {
+        const response = await api.get('/admin/stores');
+        setStores(response.data);
+      } catch (err) {
+        console.error('Error fetching stores:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStores();
   }, []);
 
   if (loading) {
@@ -42,7 +45,7 @@ export function SystemAdminStores() {
               </div>
               <div>
                 <h3 className="font-display font-bold text-xl text-ink leading-tight">{store.name}</h3>
-                <p className="font-body text-sm text-ink-muted">Owner: {store.owner}</p>
+                <p className="font-body text-sm text-ink-muted">Owner: {store.owner?.fullName || 'N/A'}</p>
               </div>
             </div>
             <div className="flex items-center justify-between border-t border-dashed border-ink/20 pt-4 mt-2">

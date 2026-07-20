@@ -1,52 +1,75 @@
 import React, { useEffect, useRef, useCallback } from 'react';
 import { Badge } from './Badge';
 
+// Expanded premium daily essentials list (Fruits, Vegetables, Snacks/Bakery, Household Needs)
 const items = [
-  // Vegetables
-  { icon: '🍅', type: 'veg', id: 'tomato', text: 'Tomato' }, { icon: '🧅', type: 'veg', id: 'onion', text: 'Onion' },
-  { icon: '🥔', type: 'veg', id: 'potato', text: 'Potato' }, { icon: '🥕', type: 'veg', id: 'carrot', text: 'Carrot' },
-  { icon: '🍆', type: 'veg', id: 'brinjal', text: 'Brinjal' }, { icon: '🥬', type: 'veg', id: 'spinach', text: 'Spinach' },
-  { icon: '🌶️', type: 'veg', id: 'chili', text: 'Chili' }, { icon: '🥦', type: 'veg', id: 'cauliflower', text: 'Cauliflower' },
-  { icon: '🥒', type: 'veg', id: 'cucumber', text: 'Cucumber' }, { icon: '🎃', type: 'veg', id: 'pumpkin', text: 'Pumpkin' },
-  { icon: '🧄', type: 'veg', id: 'garlic', text: 'Garlic' }, { icon: '🫚', type: 'veg', id: 'ginger', text: 'Ginger' },
-  { icon: '🌽', type: 'veg', id: 'corn', text: 'Corn' }, { icon: '🍄', type: 'veg', id: 'mushroom', text: 'Mushroom' },
-  { icon: '🥬', type: 'veg', id: 'cabbage', text: 'Cabbage' }, { icon: '🍠', type: 'veg', id: 'sweetpotato', text: 'Sweet Potato' },
-  { icon: '🌿', type: 'veg', id: 'celery', text: 'Celery' },
+  // Fresh Fruits
+  { icon: '🍎', type: 'fruit', id: 'apple', text: 'Apple' },
+  { icon: '🍏', type: 'fruit', id: 'greenapple', text: 'Green Apple' },
+  { icon: '🍌', type: 'fruit', id: 'banana', text: 'Banana' },
+  { icon: '🍉', type: 'fruit', id: 'watermelon', text: 'Watermelon' },
+  { icon: '🍇', type: 'fruit', id: 'grapes', text: 'Grapes' },
+  { icon: '🍓', type: 'fruit', id: 'strawberry', text: 'Strawberry' },
+  { icon: '🥭', type: 'fruit', id: 'mango', text: 'Mango' },
+  { icon: ' Pineapple', icon: '🍍', type: 'fruit', id: 'pineapple', text: 'Pineapple' },
+  { icon: '🍒', type: 'fruit', id: 'cherry', text: 'Cherry' },
+  { icon: '🫐', type: 'fruit', id: 'blueberry', text: 'Blueberry' },
+  { icon: '🍊', type: 'fruit', id: 'orange', text: 'Orange' },
+  { icon: '🥑', type: 'fruit', id: 'avocado', text: 'Avocado' },
+  { icon: '🥝', type: 'fruit', id: 'kiwi', text: 'Kiwi' },
+  { icon: '🍑', type: 'fruit', id: 'peach', text: 'Peach' },
+  { icon: '🍋', type: 'fruit', id: 'lemon', text: 'Lemon' },
+  { icon: '🥥', type: 'fruit', id: 'coconut', text: 'Coconut' },
 
-  // Fruits
-  { icon: '🍌', type: 'veg', id: 'banana', text: 'Banana' }, { icon: '🍎', type: 'veg', id: 'apple', text: 'Apple' },
-  { icon: '🍉', type: 'veg', id: 'watermelon', text: 'Watermelon' }, { icon: '🍇', type: 'veg', id: 'grapes', text: 'Grapes' },
-  { icon: '🍓', type: 'veg', id: 'strawberry', text: 'Strawberry' }, { icon: '🥭', type: 'veg', id: 'mango', text: 'Mango' },
-  { icon: '🍍', type: 'veg', id: 'pineapple', text: 'Pineapple' }, { icon: '🥥', type: 'veg', id: 'coconut', text: 'Coconut' },
-  { icon: '🥝', type: 'veg', id: 'kiwi', text: 'Kiwi' }, { icon: '🍋', type: 'veg', id: 'lemon', text: 'Lemon' },
-  { icon: '🥑', type: 'veg', id: 'avocado', text: 'Avocado' }, { icon: '🍈', type: 'veg', id: 'melon', text: 'Melon' },
-  { icon: '🍒', type: 'veg', id: 'cherry', text: 'Cherry' }, { icon: '🍑', type: 'veg', id: 'peach', text: 'Peach' },
-  { icon: '🍐', type: 'veg', id: 'pear', text: 'Pear' }, { icon: '🫐', type: 'veg', id: 'blueberry', text: 'Blueberry' },
-  { icon: '🍏', type: 'veg', id: 'greenapple', text: 'Green Apple' }, { icon: '🍊', type: 'veg', id: 'orange', text: 'Orange' },
+  // Fresh Vegetables
+  { icon: '🍅', type: 'veg', id: 'tomato', text: 'Tomato' },
+  { icon: '🧅', type: 'veg', id: 'onion', text: 'Onion' },
+  { icon: '🥔', type: 'veg', id: 'potato', text: 'Potato' },
+  { icon: '🥕', type: 'veg', id: 'carrot', text: 'Carrot' },
+  { icon: '🍆', type: 'veg', id: 'brinjal', text: 'Brinjal' },
+  { icon: '🥬', type: 'veg', id: 'spinach', text: 'Spinach' },
+  { icon: '🌶️', type: 'veg', id: 'chili', text: 'Chili' },
+  { icon: '🥦', type: 'veg', id: 'broccoli', text: 'Broccoli' },
+  { icon: '🥒', type: 'veg', id: 'cucumber', text: 'Cucumber' },
+  { icon: '🧄', type: 'veg', id: 'garlic', text: 'Garlic' },
+  { icon: '🫚', type: 'veg', id: 'ginger', text: 'Ginger' },
+  { icon: '🌽', type: 'veg', id: 'corn', text: 'Corn' },
+  { icon: '🍄', type: 'veg', id: 'mushroom', text: 'Mushroom' },
+  { icon: '🫑', type: 'veg', id: 'capsicum', text: 'Capsicum' },
 
-  // Brands & Snacks
-  { icon: '🥨', text: 'Haldiram\'s', type: 'snack', id: 'haldirams' },
+  // Bakery, Snacks & Brands
   { icon: '🍪', text: 'Oreo', type: 'snack', id: 'oreo' },
-  { icon: '🍘', text: 'Lays', type: 'snack', id: 'lays' },
-  { icon: '🧂', text: 'Kurkure', type: 'snack', id: 'kurkure' },
-  { icon: '🍵', text: 'Tata Tea', type: 'snack', id: 'tea' },
-  { icon: '🍬', text: 'Cadbury', type: 'snack', id: 'cadbury' },
+  { icon: '🥨', text: 'Pretzel', type: 'snack', id: 'pretzel' },
+  { icon: '🍟', text: 'Lays Chips', type: 'snack', id: 'lays' },
+  { icon: '🍿', text: 'Act II Popcorn', type: 'snack', id: 'act2' },
+  { icon: '🍫', text: 'Cadbury', type: 'snack', id: 'cadbury' },
+  { icon: '🍬', text: 'Candyfloss', type: 'snack', id: 'candy' },
+  { icon: '🍞', text: 'Daily Bread', type: 'snack', id: 'bread' },
+  { icon: '🥚', text: 'Farm Eggs', type: 'snack', id: 'eggs' },
+  { icon: '🧀', text: 'Amul Cheese', type: 'snack', id: 'cheese' },
+  { icon: '🥛', text: 'Mother Dairy', type: 'snack', id: 'milk' },
   { icon: '🥤', text: 'Coca-Cola', type: 'snack', id: 'soda' },
+  { icon: '☕', text: 'Nescafe', type: 'snack', id: 'nescafe' },
+  { icon: '🍵', text: 'Tata Tea', type: 'snack', id: 'tea' },
   { icon: '🥣', text: 'Kellogg\'s', type: 'snack', id: 'cereal' },
   { icon: '🥫', text: 'Maggi', type: 'snack', id: 'maggi' },
   { icon: '🧃', text: 'Real Juice', type: 'snack', id: 'juice' },
-  { icon: '🍫', text: 'Amul', type: 'snack', id: 'amul' },
-  { icon: '🍦', text: 'Kwality', type: 'snack', id: 'kwality' },
-  { icon: '☕', text: 'Nescafe', type: 'snack', id: 'nescafe' },
-  { icon: '🥛', text: 'Mother Dairy', type: 'snack', id: 'motherdairy' },
-  { icon: '🍿', text: 'Act II', type: 'snack', id: 'act2' },
-  { icon: '🥜', text: 'Haldiram Nuts', type: 'snack', id: 'haldiram_nuts' },
-  { icon: '🍯', text: 'Dabur', type: 'snack', id: 'dabur' },
-  { icon: '🍫', text: 'Snickers', type: 'snack', id: 'snickers' },
-  { icon: '🍪', text: 'Parle-G', type: 'snack', id: 'parleg' },
-  { icon: '🥤', text: 'Pepsi', type: 'snack', id: 'pepsi' },
-  { icon: '🧃', text: 'Tropicana', type: 'snack', id: 'tropicana' },
-  { icon: '🍮', text: 'Dairy Milk', type: 'snack', id: 'dairymilk' },
+
+  // Household & Daily Needs (HomeNeedy)
+  { icon: '🧼', text: 'Vim Soap', type: 'household', id: 'soap' },
+  { icon: '🧻', text: 'Tissue Roll', type: 'household', id: 'tissue' },
+  { icon: '🧴', text: 'Dettol Lotion', type: 'household', id: 'lotion' },
+  { icon: '🪥', text: 'Toothbrush', type: 'household', id: 'brush' },
+  { icon: '🪮', text: 'Hair Comb', type: 'household', id: 'comb' },
+  { icon: '🧺', text: 'Laundry Basket', type: 'household', id: 'laundry' },
+  { icon: '🧹', text: 'Broom Clean', type: 'household', id: 'broom' },
+  { icon: '🧽', text: 'Scrub Sponge', type: 'household', id: 'sponge' },
+  { icon: '🕯️', text: 'Candle Light', type: 'household', id: 'candle' },
+  { icon: '🔋', text: 'Duracell', type: 'household', id: 'battery' },
+  { icon: '🍽️', text: 'Tableware', type: 'household', id: 'plates' },
+  { icon: '🧂', text: 'Catch Salt', type: 'household', id: 'salt' },
+  { icon: '🍯', text: 'Dabur Honey', type: 'household', id: 'honey' },
+  { icon: '🌻', text: 'Fortune Oil', type: 'household', id: 'oil' },
 ];
 
 const N = items.length;
@@ -66,9 +89,11 @@ const spherePoints = items.map((item, i) => {
   };
 });
 
+// Dynamic Price tags for daily essential tracking
 const prices = {
   tomato: '₹40/kg', potato: '₹30/kg', cucumber: '₹20/kg',
-  tea: '₹120', mango: '₹80/kg', amul: '₹20',
+  tea: '₹120', mango: '₹80/kg', milk: '₹33/pkt', 
+  bread: '₹45', eggs: '₹75/dz', soap: '₹35', oil: '₹145/L'
 };
 
 export function TagSphere() {
@@ -92,7 +117,6 @@ export function TagSphere() {
     containerH: 0,
   });
 
-  // Build item refs array
   const setItemRef = useCallback((el, i) => {
     itemRefs.current[i] = el;
   }, []);
@@ -178,7 +202,6 @@ export function TagSphere() {
     if (!container) return;
 
     if (s.isDragging) {
-      // Drag: use delta from last pointer position
       const dx = e.clientX - s.lastPointerX;
       const dy = e.clientY - s.lastPointerY;
       s.targetVelY = dx * 0.002;
@@ -186,7 +209,6 @@ export function TagSphere() {
       s.lastPointerX = e.clientX;
       s.lastPointerY = e.clientY;
     } else {
-      // Hover: use position relative to center
       const rect = container.getBoundingClientRect();
       const x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
       const y = ((e.clientY - rect.top) / rect.height) * 2 - 1;
@@ -203,7 +225,6 @@ export function TagSphere() {
 
   const onPointerUp = useCallback(() => {
     state.current.isDragging = false;
-    // Let it coast, then slowly decay back to idle spin
     setTimeout(() => {
       if (!state.current.isDragging) {
         state.current.targetVelX = 0;
@@ -218,7 +239,6 @@ export function TagSphere() {
     state.current.targetVelY = 0.0003;
   }, []);
 
-  // Touch interactivity — drag to spin on mobile
   const onTouchStart = useCallback((e) => {
     if (e.touches.length !== 1) return;
     state.current.isDragging = true;
@@ -247,7 +267,6 @@ export function TagSphere() {
     }, 2000);
   }, []);
 
-  // Attach window-level mouseup so drag doesn't stick
   useEffect(() => {
     window.addEventListener('mouseup', onPointerUp);
     window.addEventListener('touchend', onTouchEnd);

@@ -4,8 +4,25 @@ const CartContext = createContext(null);
 
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
+  const [currentStoreId, setCurrentStoreId] = useState(null);
+  const [currentStoreName, setCurrentStoreName] = useState('');
 
-  const addToCart = (product) => {
+  // Returns { success: boolean, conflictStoreName?: string }
+  const addToCart = (product, storeId, storeName = 'another store') => {
+    // Default to the product's embedded storeId if not passed directly (useful for "Buy it again" cards)
+    const targetStoreId = storeId || product.storeId;
+    const targetStoreName = storeName || product.storeName || 'another store';
+
+    if (cartItems.length > 0 && currentStoreId && targetStoreId && currentStoreId !== targetStoreId) {
+       // Conflict detected
+       return { success: false, conflictStoreName: currentStoreName || 'another store' };
+    }
+
+    if (cartItems.length === 0 && targetStoreId) {
+      setCurrentStoreId(targetStoreId);
+      setCurrentStoreName(targetStoreName);
+    }
+
     setCartItems((prevItems) => {
       const existing = prevItems.find((item) => item.product.id === product.id);
       if (existing) {
@@ -15,8 +32,10 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-      return [...prevItems, { product, quantity: 1 }];
+      return [...prevItems, { product, quantity: 1, storeId: targetStoreId }];
     });
+
+    return { success: true };
   };
 
   const removeFromCart = (productId) => {
@@ -29,17 +48,29 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-      return prevItems.filter((item) => item.product.id !== productId);
+      const newItems = prevItems.filter((item) => item.product.id !== productId);
+      if (newItems.length === 0) {
+        setCurrentStoreId(null);
+        setCurrentStoreName('');
+      }
+      return newItems;
     });
   };
 
   const clearCart = () => {
     setCartItems([]);
+    setCurrentStoreId(null);
+    setCurrentStoreName('');
+  };
+
+  const getProductQuantity = (productId) => {
+    const item = cartItems.find((item) => item.product.id === productId);
+    return item ? item.quantity : 0;
   };
 
   const getCartTotal = () => {
     return cartItems.reduce(
-      (total, item) => total + item.product.unitPrice * item.quantity,
+      (total, item) => total + (item.product.unitPrice || item.product.price || 0) * item.quantity,
       0
     );
   };
@@ -52,9 +83,12 @@ export const CartProvider = ({ children }) => {
     <CartContext.Provider
       value={{
         cartItems,
+        currentStoreId,
+        currentStoreName,
         addToCart,
         removeFromCart,
         clearCart,
+        getProductQuantity,
         getCartTotal,
         getCartCount
       }}

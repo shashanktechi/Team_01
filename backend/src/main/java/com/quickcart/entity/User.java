@@ -19,6 +19,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(unique = true, nullable = true, length = 50)
+    private String username;
+
     @Column(unique = true, nullable = true, length = 20)
     private String phone;
 
@@ -57,4 +60,10 @@ public class User {
 
     @Column(length = 100)
     private String city;
+
+    @Column(name = "vehicle_type", length = 50)
+    private String vehicleType;
+
+    @Column(name = "vehicle_number", length = 50)
+    private String vehicleNumber;
 }

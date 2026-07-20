@@ -9,7 +9,7 @@ import { BrandMark } from '../../components/ui/BrandMark';
 import { TagSphere } from '../../components/ui/TagSphere';
 
 export function LoginPage() {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,9 @@ export function LoginPage() {
     setLoading(true);
 
     try {
-      await login({ email, password });
+      const isEmail = identifier.includes('@');
+      const payload = isEmail ? { email: identifier, password } : { username: identifier, password };
+      await login(payload);
       navigate('/');
     } catch (err) {
       setError('Invalid email or password. Please try again.');
@@ -62,11 +64,11 @@ export function LoginPage() {
               </div>
             )}
             <Input
-              label="Email"
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              label="Email or Username"
+              type="text"
+              placeholder="name@example.com or username"
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
               required
             />
             <Input

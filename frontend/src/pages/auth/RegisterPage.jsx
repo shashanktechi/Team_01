@@ -10,8 +10,8 @@ import { Mail, Phone, User, Lock, Store, MapPin, Building2, Loader2, KeyRound } 
 
 export function RegisterPage() {
   const [formData, setFormData] = useState({ 
-    name: '', email: '', phone: '', password: '', role: 'CUSTOMER',
-    storeName: '', city: '', storeAddress: '', otp: ''
+    name: '', username: '', email: '', phone: '', password: '', role: 'CUSTOMER',
+    storeName: '', city: '', storeAddress: '', otp: '', vehicleType: 'Bike', vehicleNumber: ''
   });
   const [step, setStep] = useState(1); // 1: details, 2: otp
   const [error, setError] = useState('');
@@ -151,6 +151,19 @@ export function RegisterPage() {
                   </div>
 
                   <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40" />
+                    <Input
+                      name="username"
+                      placeholder="Username"
+                      value={formData.username}
+                      onChange={handleChange}
+                      required
+                      minLength={3}
+                      className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
+                    />
+                  </div>
+
+                  <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40" />
                     <Input
                       name="email"
@@ -212,28 +225,51 @@ export function RegisterPage() {
                         <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40 z-10" />
                         <Input
                           name="city"
-                          placeholder="Operating City / Town"
+                          placeholder="Mandal / Village / Town"
                           value={formData.city}
                           onChange={handleChange}
                           required
                           className="pl-10 h-12 border-ink/20 focus:border-bazaar-green"
-                          list="popular-cities"
+                          list="local-areas"
                         />
-                        <datalist id="popular-cities">
-                          <option value="Mumbai" />
-                          <option value="Delhi" />
-                          <option value="Bangalore" />
-                          <option value="Hyderabad" />
-                          <option value="Ahmedabad" />
-                          <option value="Chennai" />
-                          <option value="Kolkata" />
-                          <option value="Surat" />
-                          <option value="Pune" />
-                          <option value="Jaipur" />
-                          <option value="Lucknow" />
-                          <option value="Kanpur" />
+                        <datalist id="local-areas">
+                          <option value="Mandal A" />
+                          <option value="Village B" />
+                          <option value="Town C" />
                         </datalist>
                       </div>
+
+                      {formData.role === 'DELIVERY_PARTNER' && (
+                        <>
+                          <div className="relative">
+                            <select 
+                              name="vehicleType" 
+                              value={formData.vehicleType} 
+                              onChange={handleChange}
+                              className="w-full h-12 bg-transparent border border-ink/20 rounded-lg pl-10 pr-4 font-body focus:border-bazaar-green focus:ring-1 focus:ring-bazaar-green outline-none transition-colors appearance-none"
+                            >
+                              <option value="Bike">Bike</option>
+                              <option value="Auto">Auto Rickshaw</option>
+                              <option value="Mini-truck">Mini-truck</option>
+                            </select>
+                            <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40 pointer-events-none" />
+                            <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-ink/40">
+                              ▼
+                            </div>
+                          </div>
+                          
+                          <div className="relative">
+                            <Input
+                              name="vehicleNumber"
+                              placeholder="Vehicle Number (e.g. AP 16 XX 1234)"
+                              value={formData.vehicleNumber}
+                              onChange={handleChange}
+                              required
+                              className="pl-4 h-12 border-ink/20 focus:border-bazaar-green"
+                            />
+                          </div>
+                        </>
+                      )}
 
                       {formData.role === 'STORE_ADMIN' && (
                         <div className="relative">
@@ -295,6 +331,9 @@ export function RegisterPage() {
                   </Button>
                   <Button type="button" variant="outline" className="w-full h-12 text-lg" onClick={() => setStep(1)} disabled={loading}>
                     Back
+                  </Button>
+                  <Button type="button" variant="ghost" className="w-full h-12 text-sm text-ink-muted hover:text-ink transition-colors" onClick={handleSendOtp} disabled={loading}>
+                    Didn't receive code? Resend
                   </Button>
                 </div>
               </form>

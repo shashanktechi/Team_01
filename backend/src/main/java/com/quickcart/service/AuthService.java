@@ -275,9 +275,9 @@ public class AuthService {
                 user.setPhoneVerified(true);
                 userRepository.save(user);
             }
-        } else if (request.getEmail() != null && request.getPassword() != null) {
-            String emailClean = request.getEmail().trim().toLowerCase();
-            user = userRepository.findByEmail(emailClean)
+        } else if ((request.getEmail() != null || request.getUsername() != null) && request.getPassword() != null) {
+            String identifier = request.getEmail() != null ? request.getEmail().trim().toLowerCase() : request.getUsername().trim().toLowerCase();
+            user = userRepository.findByEmailOrUsername(identifier, identifier)
                     .orElseThrow(() -> new RuntimeException("User not found"));
             if (!user.getIsActive()) {
                 throw new RuntimeException("Account is deactivated");
@@ -359,12 +359,26 @@ public class AuthService {
             throw new RuntimeException("Email already registered");
         }
 
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("Username is required");
+        }
+        String usernameClean = request.getUsername().trim().toLowerCase();
+        if (userRepository.findByUsername(usernameClean).isPresent()) {
+            throw new RuntimeException("Username already taken");
+        }
+
         User user = new User();
+        user.setUsername(usernameClean);
         user.setPhone(request.getPhone());
         user.setEmail(emailClean);
         user.setFullName(request.getName());
         user.setRole(role);
         user.setPhoneVerified(true);
+
+        if ("DELIVERY_PARTNER".equals(role)) {
+            user.setVehicleType(request.getVehicleType());
+            user.setVehicleNumber(request.getVehicleNumber());
+        }
 
         if ("STORE_ADMIN".equals(role) || "DELIVERY_PARTNER".equals(role)) {
             user.setVerificationStatus("PENDING");

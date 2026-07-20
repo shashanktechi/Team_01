@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { X, Home, Clock, Plus, Minus, ChevronRight, Tag, Info, Wallet, ArrowRight, Loader2 } from 'lucide-react';
+import { X, Home, Clock, Plus, Minus, ChevronRight, Info, Wallet, ArrowRight, Loader2, Sparkles, AlertCircle } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
@@ -9,13 +9,22 @@ import { TicketCard } from '../components/ui/TicketCard';
 
 export function CartPage() {
   const navigate = useNavigate();
-  const { cartItems, addToCart, removeFromCart, getCartTotal, clearCart } = useCart();
+  const { cartItems, addToCart, removeFromCart, getCartTotal, clearCart, currentStoreName } = useCart();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [tipAmount, setTipAmount] = useState(20);
 
-  const deliveryFee = getCartTotal() > 500 ? 0 : 40;
-  const grandTotal = getCartTotal() + deliveryFee;
+  const itemTotal = getCartTotal();
+  const freeDeliveryThreshold = 500;
+  const isFreeDelivery = itemTotal >= freeDeliveryThreshold;
+  const remainingForFreeDelivery = isFreeDelivery ? 0 : freeDeliveryThreshold - itemTotal;
+  
+  const deliveryFee = isFreeDelivery ? 0 : 40;
+  const handlingFee = 5;
+  const taxes = itemTotal * 0.05; // 5% tax
+
+  const grandTotal = itemTotal + deliveryFee + handlingFee + taxes + tipAmount;
 
   const handleCheckout = async () => {
     if (cartItems.length === 0) return;
@@ -47,13 +56,15 @@ export function CartPage() {
   if (cartItems.length === 0) {
     return (
       <div className="bg-kraft font-body text-ink antialiased min-h-screen">
-        <div className="max-w-[480px] mx-auto bg-kraft h-full min-h-screen flex flex-col relative items-center justify-center p-8">
-          <TicketCard className="w-full p-8 text-center bg-chalk shadow-sm border-ink/10">
-            <h2 className="font-display font-black text-2xl text-ink mb-6">Your cart is empty</h2>
-            <Button onClick={() => navigate('/')} className="w-full text-lg h-12">
-              Start Shopping
-            </Button>
-          </TicketCard>
+        <div className="max-w-3xl mx-auto bg-chalk h-full min-h-screen flex flex-col relative items-center justify-center p-8">
+          <div className="text-6xl mb-6 opacity-80">🛒</div>
+          <h2 className="font-display font-black text-2xl text-ink mb-2">Your cart is empty</h2>
+          <p className="font-body text-ink-muted mb-8 text-center max-w-sm">
+            Looks like you haven't added anything yet. Explore top categories to find what you need!
+          </p>
+          <Button onClick={() => navigate('/')} className="w-full max-w-xs text-lg h-12">
+            Start Shopping
+          </Button>
         </div>
       </div>
     );
@@ -61,9 +72,14 @@ export function CartPage() {
 
   return (
     <div className="bg-kraft font-body text-ink antialiased min-h-screen">
-      <div className="max-w-[480px] mx-auto bg-kraft h-full min-h-screen flex flex-col relative">
+      <div className="max-w-3xl mx-auto bg-kraft h-full min-h-screen flex flex-col relative">
         <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-ink/10 sticky top-0 bg-kraft/90 backdrop-blur-md z-10">
-          <h2 className="font-display font-black text-2xl text-ink tracking-tight">My Cart ({cartItems.length})</h2>
+          <div className="flex flex-col">
+            <h2 className="font-display font-black text-2xl text-ink tracking-tight">Checkout</h2>
+            {currentStoreName && (
+              <span className="font-mono text-xs text-ink-muted">From {currentStoreName}</span>
+            )}
+          </div>
           <button onClick={() => navigate(-1)} className="p-2 rounded-full hover:bg-ink/5 transition-colors">
             <X className="h-6 w-6 text-ink" />
           </button>
@@ -71,128 +87,175 @@ export function CartPage() {
 
         <div className="flex-1 overflow-y-auto pb-32">
           {error && (
-            <div className="mx-margin-mobile mt-4 bg-error-container text-on-error-container p-3 rounded-lg text-sm">
-              {error}
+            <div className="mx-4 mt-4 bg-error-container text-on-error-container p-3 rounded-lg text-sm flex items-start gap-2">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{error}</span>
             </div>
           )}
-          {/* Delivery Address */}
-          <div className="px-4 mt-4">
-            <TicketCard className="bg-chalk border-ink/10 shadow-sm p-0 overflow-hidden">
-              <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-ink/5 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Home className="h-6 w-6 text-marigold" />
-                  <div className="text-left">
-                    <span className="font-mono text-xs uppercase tracking-wider font-bold block">Delivering to Home</span>
-                    <span className="font-body text-sm text-ink-muted block truncate w-48">{user?.address || '123 Emerald Street, Block B, Apt 4G'}</span>
-                  </div>
-                </div>
-                <ChevronRight className="h-5 w-5 text-ink-muted" />
-              </button>
-            </TicketCard>
-          </div>
 
-          {/* Estimated Delivery */}
-          <div className="px-4 mt-4">
-            <div className="flex items-center gap-2 bg-bazaar-green/10 text-bazaar-green p-3 border border-bazaar-green/20">
-              <Clock className="h-5 w-5" />
-              <span className="font-display font-bold text-lg">Delivery in 10-15 mins</span>
+          {/* Delivery Details Section */}
+          <div className="px-4 mt-4 flex flex-col gap-3">
+            <div className="flex items-center justify-between bg-surface rounded-xl p-4 shadow-sm border border-ink/5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-bazaar-green/10 flex items-center justify-center">
+                  <Clock className="h-5 w-5 text-bazaar-green" />
+                </div>
+                <div>
+                  <span className="font-display font-bold text-sm block text-ink">Delivery in 12 mins</span>
+                  <span className="font-body text-xs text-ink-muted">To Home</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-surface rounded-xl p-4 shadow-sm border border-ink/5 flex items-start justify-between cursor-pointer hover:bg-ink/5 transition-colors">
+              <div className="flex gap-3">
+                <Home className="h-5 w-5 text-ink-muted mt-0.5" />
+                <div>
+                  <span className="font-body font-bold text-sm block">Home</span>
+                  <span className="font-body text-xs text-ink-muted block mt-1 leading-relaxed max-w-[200px] truncate">
+                    {user?.address || '123 Emerald Street, Block B, Apt 4G'}
+                  </span>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] font-bold text-primary uppercase tracking-widest mt-1">Change</span>
             </div>
           </div>
 
           {/* Cart Items */}
-          <div className="mt-4 px-4 flex flex-col gap-4">
-            {cartItems.map(item => (
-              <TicketCard key={item.product.id} className="flex items-start gap-4 p-3 bg-chalk shadow-sm border-ink/10">
-                <div className="w-16 h-16 bg-kraft border border-ink/10 flex items-center justify-center mix-blend-multiply shrink-0 p-1">
-                  <img className="w-full h-full object-contain" alt={item.product.name} src={item.product.image} />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-body font-bold text-ink line-clamp-2 leading-snug">{item.product.name}</h3>
-                  <span className="font-mono text-xs uppercase tracking-wider text-ink-muted block mt-1">{item.product.size}</span>
-                  <div className="mt-3 flex items-center justify-between">
-                    <span className="font-mono font-bold text-lg text-ink">${item.product.price.toFixed(2)}</span>
-                    <div className="flex items-center border-2 border-ink bg-chalk h-8">
-                      <button onClick={() => removeFromCart(item.product.id)} className="w-8 h-full flex items-center justify-center hover:bg-ink/10 active:bg-ink/20 transition-colors border-r-2 border-ink">
-                        <Minus className="h-4 w-4" />
-                      </button>
-                      <span className="w-8 text-center font-mono font-bold text-ink">{item.quantity}</span>
-                      <button onClick={() => addToCart(item.product)} className="w-8 h-full flex items-center justify-center hover:bg-ink/10 active:bg-ink/20 transition-colors border-l-2 border-ink">
-                        <Plus className="h-4 w-4" />
-                      </button>
+          <div className="mt-6 px-4">
+            <h3 className="font-display font-black text-lg mb-3">Items ({cartItems.length})</h3>
+            <div className="bg-surface rounded-xl shadow-sm border border-ink/5 overflow-hidden">
+              {cartItems.map((item, idx) => (
+                <div key={item.product.id} className={`flex items-start gap-3 p-4 ${idx !== cartItems.length - 1 ? 'border-b border-ink/5' : ''}`}>
+                  <div className="w-16 h-16 bg-kraft border border-ink/10 rounded-lg flex items-center justify-center mix-blend-multiply shrink-0 p-1">
+                    <img className="w-full h-full object-contain" alt={item.product.name} src={item.product.image} />
+                  </div>
+                  <div className="flex-1 flex flex-col justify-between h-16">
+                    <div>
+                      <h4 className="font-body text-sm font-medium text-ink line-clamp-1">{item.product.name}</h4>
+                      <span className="font-mono text-xs text-ink-muted">{item.product.size}</span>
+                    </div>
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-mono font-bold text-sm">₹{item.product.price?.toFixed(2) || item.product.price}</span>
+                      <div className="flex items-center border border-primary bg-primary/5 rounded-lg h-7 overflow-hidden">
+                        <button onClick={() => removeFromCart(item.product.id)} className="w-7 h-full flex items-center justify-center active:bg-primary/20 transition-colors text-primary">
+                          <Minus className="h-3 w-3" />
+                        </button>
+                        <span className="w-6 text-center font-mono font-bold text-xs text-primary">{item.quantity}</span>
+                        <button onClick={() => addToCart(item.product)} className="w-7 h-full flex items-center justify-center active:bg-primary/20 transition-colors text-primary">
+                          <Plus className="h-3 w-3" />
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </TicketCard>
-            ))}
+              ))}
+            </div>
+          </div>
+
+          {/* Delivery Tip */}
+          <div className="px-4 mt-6">
+            <h3 className="font-display font-black text-lg mb-3">Tip your delivery partner</h3>
+            <div className="bg-surface rounded-xl p-4 shadow-sm border border-ink/5">
+              <p className="font-body text-xs text-ink-muted mb-3">100% of the tip goes to the partner.</p>
+              <div className="flex gap-2">
+                {[10, 20, 30, 50].map((amount) => (
+                  <button
+                    key={amount}
+                    onClick={() => setTipAmount(tipAmount === amount ? 0 : amount)}
+                    className={`flex-1 py-2 rounded-lg font-mono text-xs font-bold border transition-colors ${
+                      tipAmount === amount ? 'bg-primary text-white border-primary' : 'bg-surface border-ink/20 text-ink hover:bg-ink/5'
+                    }`}
+                  >
+                    ₹{amount}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Bill Summary */}
-          <div className="px-4 mt-8">
-            <TicketCard className="bg-chalk shadow-sm border-ink/10 p-4">
-              <h3 className="font-display font-black text-xl text-ink mb-3 border-b-2 border-dashed border-ink/20 pb-2 uppercase tracking-tight">Bill Details</h3>
-              <div className="flex justify-between items-center py-2">
-                <span className="font-mono text-sm uppercase tracking-wider text-ink-muted">Item Total</span>
-                <span className="font-mono text-sm font-bold">${getCartTotal().toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between items-center py-2">
-                <span className="font-mono text-sm uppercase tracking-wider text-ink-muted flex items-center gap-1">
-                  Delivery Fee <Info className="h-3.5 w-3.5" />
-                </span>
-                <div className="flex items-center gap-2">
-                  {deliveryFee === 0 ? (
-                    <>
-                      <span className="font-mono text-sm line-through opacity-50">$40.00</span>
-                      <span className="font-mono text-[10px] font-bold text-ink bg-marigold px-1.5 py-0.5 border border-ink">FREE</span>
-                    </>
-                  ) : (
-                    <span className="font-mono text-sm font-bold">${deliveryFee.toFixed(2)}</span>
-                  )}
+          <div className="px-4 mt-6 mb-8">
+            <div className="bg-surface rounded-xl shadow-sm border border-ink/5 p-4">
+              <h3 className="font-display font-black text-lg mb-4">Bill Summary</h3>
+              
+              <div className="flex flex-col gap-3">
+                <div className="flex justify-between items-center">
+                  <span className="font-body text-sm text-ink-muted">Item Total</span>
+                  <span className="font-mono text-sm font-bold">₹{itemTotal.toFixed(2)}</span>
                 </div>
-              </div>
-              <div className="border-t-2 border-dashed border-ink/20 mt-3 pt-3 flex justify-between items-center">
-                <span className="font-display font-black text-xl text-ink">Grand Total</span>
-                <span className="font-mono font-bold text-xl">${grandTotal.toFixed(2)}</span>
-              </div>
-            </TicketCard>
-          </div>
-
-          {/* Payment Method */}
-          <div className="px-4 mt-4 mb-8">
-            <TicketCard className="bg-chalk shadow-sm border-ink/10 p-0 overflow-hidden">
-              <button className="w-full px-4 py-3 flex items-center justify-between hover:bg-ink/5 transition-colors">
-                <div className="flex items-center gap-3">
-                  <Wallet className="h-6 w-6 text-bazaar-green" />
-                  <div className="text-left">
-                    <span className="font-mono text-xs uppercase tracking-wider font-bold block">Pay via</span>
-                    <span className="font-body text-sm text-ink-muted block">Credit/Debit Card</span>
+                
+                <div className="flex justify-between items-center">
+                  <span className="font-body text-sm text-ink-muted flex items-center gap-1">
+                    Delivery Fee <Info className="h-3.5 w-3.5" />
+                  </span>
+                  <div className="flex items-center gap-2">
+                    {deliveryFee === 0 ? (
+                      <>
+                        <span className="font-mono text-sm line-through opacity-50">₹40.00</span>
+                        <span className="font-mono text-[10px] font-bold text-bazaar-green bg-bazaar-green/10 px-1.5 py-0.5 rounded-sm">FREE</span>
+                      </>
+                    ) : (
+                      <span className="font-mono text-sm">₹{deliveryFee.toFixed(2)}</span>
+                    )}
                   </div>
                 </div>
-                <ChevronRight className="h-5 w-5 text-ink-muted rotate-90" />
-              </button>
-            </TicketCard>
+
+                <div className="flex justify-between items-center">
+                  <span className="font-body text-sm text-ink-muted">Handling Fee</span>
+                  <span className="font-mono text-sm">₹{handlingFee.toFixed(2)}</span>
+                </div>
+
+                <div className="flex justify-between items-center">
+                  <span className="font-body text-sm text-ink-muted">Taxes</span>
+                  <span className="font-mono text-sm">₹{taxes.toFixed(2)}</span>
+                </div>
+
+                {tipAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="font-body text-sm text-ink-muted">Delivery Partner Tip</span>
+                    <span className="font-mono text-sm">₹{tipAmount.toFixed(2)}</span>
+                  </div>
+                )}
+              </div>
+
+              {remainingForFreeDelivery > 0 && (
+                <div className="mt-4 bg-bazaar-green/10 rounded-lg p-3 flex items-center gap-2 border border-bazaar-green/20">
+                  <Sparkles className="h-4 w-4 text-bazaar-green" />
+                  <span className="font-body text-xs font-medium text-bazaar-green">
+                    Add ₹{remainingForFreeDelivery.toFixed(2)} more to get FREE delivery!
+                  </span>
+                </div>
+              )}
+
+              <div className="border-t border-ink/10 mt-4 pt-4 flex justify-between items-center">
+                <span className="font-display font-black text-xl text-ink">Grand Total</span>
+                <span className="font-mono font-bold text-xl">₹{grandTotal.toFixed(2)}</span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Sticky Bottom Bar */}
-        <div className="absolute bottom-0 w-full bg-kraft border-t border-ink/10 p-4 z-20">
+        <div className="absolute bottom-0 w-full bg-chalk border-t border-ink/10 p-4 pb-safe z-20 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
           <Button 
             onClick={handleCheckout} 
             disabled={loading}
-            className="w-full h-16 flex justify-between items-center px-4"
+            className="w-full h-14 flex justify-between items-center px-6 rounded-xl text-lg font-bold bg-primary text-on-primary hover:opacity-90 active:scale-[0.98] transition-all"
           >
             <div className="flex flex-col text-left">
-              <span className="font-mono font-bold text-lg leading-tight">${grandTotal.toFixed(2)}</span>
-              <span className="font-mono text-[10px] uppercase tracking-widest opacity-80">TOTAL</span>
+              <span className="font-mono text-lg leading-tight">₹{grandTotal.toFixed(2)}</span>
+              <span className="font-mono text-[9px] uppercase tracking-widest opacity-80">TOTAL</span>
             </div>
             <div className="flex items-center gap-2">
               {loading ? (
                 <>
                   <Loader2 className="h-5 w-5 animate-spin" />
-                  <span className="font-mono uppercase tracking-widest text-sm">Processing...</span>
+                  <span>Processing</span>
                 </>
               ) : (
                 <>
-                  <span className="font-mono uppercase tracking-widest text-sm font-bold">Proceed to Pay</span>
+                  <span>Place Order</span>
                   <ArrowRight className="h-5 w-5" />
                 </>
               )}

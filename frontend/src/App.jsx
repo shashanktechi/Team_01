@@ -11,6 +11,8 @@ import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage';
 import { StorePage } from './pages/StorePage';
 import { CartPage } from './pages/CartPage';
 import { TrackOrderPage } from './pages/TrackOrderPage';
+import { OrdersPage } from './pages/OrdersPage';
+import { ProfilePage } from './pages/ProfilePage';
 import { PendingApprovalPage } from './pages/auth/PendingApprovalPage';
 import { CitySelectorModal } from './components/ui/CitySelectorModal';
 import { LandingPage } from './pages/LandingPage';
@@ -37,6 +39,8 @@ function App() {
             <Route element={<MainLayout />}>
               <Route path="/stores" element={<HomePage />} />
               <Route path="/store/:id" element={<StorePage />} />
+              <Route path="/orders" element={<OrdersPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
             </Route>
 
             {/* Protected Routes */}

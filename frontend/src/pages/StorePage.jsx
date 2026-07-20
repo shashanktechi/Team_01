@@ -6,14 +6,17 @@ import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { BrandMark } from '../components/ui/BrandMark';
+import { ProductCard } from '../components/ui/ProductCard';
+import { ConflictModal } from '../components/ui/ConflictModal';
 
 export function StorePage() {
   const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState('All');
   const [products, setProducts] = useState([]);
   const [storeDetails, setStoreDetails] = useState(null);
+  const [conflictState, setConflictState] = useState({ isOpen: false });
   
-  const { cartItems, addToCart, removeFromCart, getCartTotal, getCartCount } = useCart();
+  const { cartItems, addToCart, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart();
 
   useEffect(() => {
     const fetchInventory = async () => {
@@ -51,13 +54,23 @@ export function StorePage() {
     ? products 
     : products.filter(p => p.category === activeCategory);
 
-  const getProductQuantity = (productId) => {
-    const item = cartItems.find(item => item.product.id === productId);
-    return item ? item.quantity : 0;
+  const handleConflict = (conflictStoreName, targetStoreName, onConfirm) => {
+    setConflictState({
+      isOpen: true,
+      conflictStoreName,
+      targetStoreName,
+      onConfirm: () => {
+        clearCart();
+        onConfirm();
+        setConflictState({ isOpen: false });
+      },
+      onCancel: () => setConflictState({ isOpen: false })
+    });
   };
 
   return (
     <div className="bg-kraft text-ink min-h-screen pb-24 font-body">
+      <ConflictModal {...conflictState} />
       <header className="fixed top-0 w-full z-50 bg-kraft/90 backdrop-blur-md border-b border-ink/10">
         <div className="flex flex-col gap-2 px-4 py-3 w-full">
           <div className="flex items-center gap-3">
@@ -120,42 +133,22 @@ export function StorePage() {
         <section className="p-margin-mobile md:p-0 md:py-margin-desktop">
           <h2 className="font-display font-black text-2xl text-ink tracking-tight mb-4">{activeCategory}</h2>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-            {filteredProducts.map(p => {
-              const qty = getProductQuantity(p.id);
-              return (
-                <article key={p.id} className="bg-chalk border border-ink/10 shadow-sm rounded-none flex flex-col hover:-translate-y-1 transition-transform duration-200">
-                  <div className="relative aspect-square bg-kraft/50 p-4 border-b border-ink/10">
-                    <img className="w-full h-full object-contain mix-blend-multiply" alt={p.name} src={p.image} />
-                  </div>
-                  <div className="p-3 flex flex-col flex-grow justify-between gap-3">
-                    <div>
-                      <h3 className="font-body font-bold text-ink line-clamp-2 leading-snug">{p.name}</h3>
-                      <p className="font-mono text-xs text-ink-muted mt-1 uppercase tracking-wider">{p.size}</p>
-                    </div>
-                    <div className="flex flex-col gap-3 mt-auto">
-                      <div className="flex items-center gap-1">
-                        <span className="font-mono font-bold text-lg text-ink">${p.price?.toFixed(2)}</span>
-                      </div>
-                      {qty > 0 ? (
-                        <div className="flex items-center justify-between border-2 border-ink bg-chalk h-10">
-                          <button onClick={() => removeFromCart(p.id)} className="w-10 h-full flex items-center justify-center active:bg-ink/10 transition-colors border-r-2 border-ink text-ink">
-                            <Minus className="h-4 w-4" />
-                          </button>
-                          <span className="font-mono font-bold text-ink">{qty}</span>
-                          <button onClick={() => addToCart(p)} className="w-10 h-full flex items-center justify-center active:bg-ink/10 transition-colors border-l-2 border-ink text-ink">
-                            <Plus className="h-4 w-4" />
-                          </button>
-                        </div>
-                      ) : (
-                        <Button variant="outline" onClick={() => addToCart(p)} className="w-full h-10 font-mono uppercase tracking-wider border-ink text-ink hover:bg-ink hover:text-chalk">
-                          ADD
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                </article>
-              );
-            })}
+            {filteredProducts.map(p => (
+              <ProductCard 
+                key={p.id}
+                id={p.id}
+                name={p.name}
+                size={p.size}
+                price={p.price}
+                mrp={p.price * 1.2} // Dummy MRP for demonstration
+                discountPercent={15} // Dummy discount for demonstration
+                image={p.image}
+                storeId={storeDetails?.id}
+                storeName={storeDetails?.name}
+                isOutOfStock={p.stock === 0}
+                onConflict={handleConflict}
+              />
+            ))}
           </div>
         </section>
       </main>

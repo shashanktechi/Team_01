@@ -12,15 +12,11 @@ export function SystemAdminUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        // Fallback mock data if API doesn't exist yet
-        setUsers([
-          { id: 1, fullName: 'Alice Smith', email: 'alice@example.com', role: 'CUSTOMER', city: 'New York', isActive: true },
-          { id: 2, fullName: 'Bob Jones', email: 'bob@example.com', role: 'DELIVERY_PARTNER', city: 'Los Angeles', isActive: true },
-          { id: 3, fullName: 'Charlie Brown', email: 'charlie@example.com', role: 'STORE_ADMIN', city: 'Chicago', isActive: false },
-        ]);
-        setLoading(false);
+        const response = await api.get('/admin/users');
+        setUsers(response.data);
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching users:', err);
+      } finally {
         setLoading(false);
       }
     };
