@@ -28,7 +28,7 @@ export function SystemAdminStores() {
 
   const handleStoreVerify = async (storeId, status) => {
     try {
-      await api.put(`/admin/stores/${storeId}/verify`, { status });
+      await api.put(`/admin/stores/${storeId}/verify?status=${encodeURIComponent(status)}`);
       // Update local state
       setStores(stores.map(s => 
         s.id === storeId 

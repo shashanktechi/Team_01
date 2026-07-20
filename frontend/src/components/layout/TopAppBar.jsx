@@ -1,14 +1,16 @@
 import React from 'react';
-import { ShoppingCart, MapPin, ChevronDown, Zap } from 'lucide-react';
+import { ShoppingCart, MapPin, ChevronDown, Zap, User } from 'lucide-react';
 import { useCity } from '../../context/CityContext';
 import { useNavigate } from 'react-router';
 import { BrandMark } from '../ui/BrandMark';
 import { useCart } from '../../context/CartContext';
+import { useAuth } from '../../context/AuthContext';
 
 export function TopAppBar() {
   const { selectedCity, setIsCityModalOpen } = useCity();
   const navigate = useNavigate();
   const { getCartCount } = useCart();
+  const { user } = useAuth();
   const cartCount = getCartCount();
 
   return (
@@ -53,15 +55,25 @@ export function TopAppBar() {
               </span>
             )}
           </button>
-          <button 
-            onClick={() => navigate('/profile')}
-            className="bg-ink text-white font-mono font-bold text-xs uppercase tracking-wider px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
-          >
-            Login
-          </button>
+          {user ? (
+            <button 
+              onClick={() => navigate('/profile')}
+              className="flex items-center gap-2 bg-primary/10 text-primary font-mono font-bold text-xs uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-primary/20 transition-colors"
+            >
+              <User className="w-4 h-4" />
+              {user.fullName ? user.fullName.split(' ')[0] : 'Profile'}
+            </button>
+          ) : (
+            <button 
+              onClick={() => navigate('/login')}
+              className="bg-ink text-white font-mono font-bold text-xs uppercase tracking-wider px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+            >
+              Login
+            </button>
+          )}
         </div>
         
-        {/* Mobile Profile Icon placeholder */}
+        {/* Mobile Profile Icon */}
         <div className="md:hidden flex gap-3 items-center">
            <button 
              onClick={() => navigate('/cart')}
@@ -74,8 +86,15 @@ export function TopAppBar() {
                </span>
              )}
            </button>
-           <button onClick={() => navigate('/profile')} className="w-8 h-8 rounded-full bg-background flex items-center justify-center border border-border">
-             <span className="text-sm font-bold text-ink">U</span>
+           <button 
+             onClick={() => navigate('/profile')} 
+             className="w-8 h-8 rounded-full bg-background flex items-center justify-center border border-border overflow-hidden"
+           >
+             {user?.profilePhotoUrl ? (
+               <img src={user.profilePhotoUrl} alt="avatar" className="w-full h-full object-cover" />
+             ) : (
+               <span className="text-sm font-bold text-ink">{user?.fullName?.[0]?.toUpperCase() || 'U'}</span>
+             )}
            </button>
         </div>
       </div>

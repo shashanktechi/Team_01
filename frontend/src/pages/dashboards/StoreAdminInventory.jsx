@@ -284,7 +284,21 @@ export function StoreAdminInventory() {
               <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold mb-1">Category</label>
-                    <Input required value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})} placeholder="e.g. Dairy" />
+                    <select 
+                      required 
+                      value={newProduct.category} 
+                      onChange={e => setNewProduct({...newProduct, category: e.target.value})}
+                      className="w-full h-10 px-3 rounded-lg border border-border bg-surface text-ink focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                    >
+                      <option value="" disabled>Select category</option>
+                      <option value="Dairy">Dairy</option>
+                      <option value="Vegetables">Vegetables</option>
+                      <option value="Non-Veg">Non-Veg</option>
+                      <option value="Snacks">Snacks</option>
+                      <option value="Fruits">Fruits</option>
+                      <option value="Beverages">Beverages</option>
+                      <option value="Household">Household</option>
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-bold mb-1">Unit Price ($)</label>

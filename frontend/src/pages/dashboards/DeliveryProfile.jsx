@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { Loader2, User, Phone, ShieldCheck } from 'lucide-react';
+import { Loader2, User, Phone, ShieldCheck, Truck, Image, FileText, Edit2 } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
-import { ImageUploader } from '../../components/ui/ImageUploader';
+import { Button } from '../../components/ui/Button';
+import { useNavigate } from 'react-router';
 
 export function DeliveryProfile() {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchProfile = async () => {
     try {
@@ -25,10 +27,6 @@ export function DeliveryProfile() {
     fetchProfile();
   }, []);
 
-  const handleDocumentSuccess = (url) => {
-    setProfile(prev => ({ ...prev, vehicleDocUrl: url }));
-  };
-
   if (loading || !profile) {
     return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
   }
@@ -38,26 +36,41 @@ export function DeliveryProfile() {
 
   return (
     <div className="flex flex-col gap-6 p-4">
-      <div>
-        <h2 className="font-display font-black text-2xl text-ink">Partner Profile</h2>
-        <p className="font-mono text-sm text-ink-muted mt-1 uppercase tracking-wider">Manage your documents and details</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="font-display font-black text-2xl text-ink">Partner Profile</h2>
+          <p className="font-mono text-sm text-ink-muted mt-1 uppercase tracking-wider">Manage your documents and details</p>
+        </div>
+        <Button onClick={() => navigate('/profile/settings')} className="flex items-center gap-2">
+          <Edit2 className="w-4 h-4" /> Edit Profile & Vehicle
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Personal Details */}
         <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-6">
-          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2">Personal Information</h3>
+          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2 flex items-center gap-2">
+            <User className="w-5 h-5 text-primary" /> Personal Information
+          </h3>
           
-          <div className="flex items-center justify-between">
-             <div className="flex items-center gap-3">
-                 <User className="w-5 h-5 text-ink-muted" />
-                 <span className="font-bold text-lg">{profile.fullName || 'N/A'}</span>
-             </div>
+          <div className="flex items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-background border border-border overflow-hidden flex items-center justify-center">
+              {profile.profilePhotoUrl ? (
+                <img src={profile.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover" />
+              ) : (
+                <User className="w-8 h-8 text-ink-muted" />
+              )}
+            </div>
+            <div className="flex flex-col gap-1">
+              <span className="font-bold text-lg text-ink">{profile.fullName || 'N/A'}</span>
+              <span className="font-mono text-sm text-ink-muted">{profile.email}</span>
+            </div>
           </div>
 
           <div className="flex items-center justify-between">
              <div className="flex items-center gap-3">
                  <Phone className="w-5 h-5 text-ink-muted" />
-                 <span className="font-bold text-lg">{profile.phone || 'N/A'}</span>
+                 <span className="font-bold text-lg text-ink">{profile.phone || 'N/A'}</span>
              </div>
           </div>
 
@@ -70,17 +83,58 @@ export function DeliveryProfile() {
           </div>
         </Card>
 
+        {/* Vehicle Information */}
+        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-6">
+          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2 flex items-center gap-2">
+            <Truck className="w-5 h-5 text-primary" /> Vehicle Information
+          </h3>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <span className="block text-xs text-ink-muted uppercase">Vehicle Name</span>
+              <span className="font-bold text-base text-ink">{profile.vehicleName || 'Not Set'}</span>
+            </div>
+            <div>
+              <span className="block text-xs text-ink-muted uppercase">Model / Year</span>
+              <span className="font-bold text-base text-ink">{profile.vehicleModel || 'Not Set'}</span>
+            </div>
+            <div className="col-span-2">
+              <span className="block text-xs text-ink-muted uppercase">Vehicle Number</span>
+              <span className="font-bold text-base text-ink uppercase">{profile.vehicleNumber || 'Not Set'}</span>
+            </div>
+          </div>
+        </Card>
+
+        {/* Documents */}
         <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-4">
-          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2">Vehicle Documents</h3>
-          <p className="text-sm text-ink-muted">Upload a clear photo of your vehicle registration or driving license to maintain your active status.</p>
-          
-          <ImageUploader 
-            currentImageUrl={profile.vehicleDocUrl}
-            uploadEndpoint="/media/delivery/vehicle-doc/upload-url"
-            confirmEndpoint="/media/delivery/vehicle-doc"
-            onUploadSuccess={handleDocumentSuccess}
-            label="Upload Document"
-          />
+          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2 flex items-center gap-2">
+            <FileText className="w-5 h-5 text-primary" /> RC Document
+          </h3>
+          {profile.vehicleDocUrl ? (
+            <div className="w-full aspect-video rounded-lg overflow-hidden border border-border bg-background">
+              <img src={profile.vehicleDocUrl} alt="Vehicle Document" className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-full aspect-video rounded-lg border border-dashed border-border flex items-center justify-center text-ink-muted bg-background">
+              No Document Uploaded
+            </div>
+          )}
+        </Card>
+
+        {/* Bike Photo */}
+        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-4">
+          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2 flex items-center gap-2">
+            <Image className="w-5 h-5 text-primary" /> Bike Photo
+          </h3>
+          {profile.vehiclePhotoUrl ? (
+            <div className="w-full aspect-video rounded-lg overflow-hidden border border-border bg-background">
+              <img src={profile.vehiclePhotoUrl} alt="Bike Photo" className="w-full h-full object-cover" />
+            </div>
+          ) : (
+            <div className="w-full aspect-video rounded-lg border border-dashed border-border flex items-center justify-center text-ink-muted bg-background">
+              No Bike Photo Uploaded
+            </div>
+          )}
         </Card>
       </div>
     </div>

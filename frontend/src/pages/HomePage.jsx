@@ -11,7 +11,7 @@ import { ChevronRight, Percent, Clock, Search, Mic } from 'lucide-react';
 export function HomePage() {
   const [categories, setCategories] = useState([]);
   const [stores, setStores] = useState([]);
-  const [recentProducts, setRecentProducts] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
   const [topPicks, setTopPicks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -68,25 +68,36 @@ export function HomePage() {
       }
 
       setCategories([
-        { id: 1, name: 'Fresh Fruits', icon: '🍎', color: 'bg-error/10' },
+        { id: 1, name: 'Fruits', icon: '🍎', color: 'bg-error/10' },
         { id: 2, name: 'Vegetables', icon: '🥦', color: 'bg-primary/10' },
-        { id: 3, name: 'Dairy & Bread', icon: '🥛', color: 'bg-info/10' },
+        { id: 3, name: 'Dairy', icon: '🥛', color: 'bg-info/10' },
         { id: 4, name: 'Snacks', icon: '🥨', color: 'bg-warning/20' },
         { id: 5, name: 'Beverages', icon: '🥤', color: 'bg-purple-500/10' },
-        { id: 6, name: 'Meat & Eggs', icon: '🥚', color: 'bg-error/10' },
+        { id: 6, name: 'Non-Veg', icon: '🥚', color: 'bg-error/10' },
         { id: 7, name: 'Household', icon: '🧼', color: 'bg-teal-500/10' },
         { id: 8, name: 'See All', icon: '➡️', color: 'bg-surface' },
       ]);
 
-      const mockProducts = [
-        { id: 101, name: 'Whole Wheat Bread', size: '400g', price: 45, mrp: 50, discountPercent: 10, image: '/placeholder-product.svg', storeId: 1, storeName: 'Downtown Fresh', stock: 10 },
-        { id: 102, name: 'Fresh Milk', size: '1L', price: 33, mrp: 35, discountPercent: 5, image: '/placeholder-product.svg', storeId: 1, storeName: 'Downtown Fresh', stock: 20 },
-        { id: 103, name: 'Farm Eggs', size: '6 pcs', price: 40, mrp: 45, discountPercent: 11, image: '/placeholder-product.svg', storeId: 2, storeName: 'Uptown Grocers', stock: 15 },
-        { id: 104, name: 'Lays Classic', size: '50g', price: 20, image: '/placeholder-product.svg', storeId: 1, storeName: 'Downtown Fresh', stock: 5 },
-      ];
-
-      setRecentProducts(mockProducts.slice(0, 2));
-      setTopPicks(mockProducts.slice(2, 4));
+      try {
+        const invResponse = await api.get(`/public/inventory/by-city?city=${encodeURIComponent(selectedCity)}`);
+        const mappedProducts = invResponse.data.map(inv => ({
+          id: inv.product.id,
+          name: inv.product.name,
+          size: inv.product.sku,
+          price: inv.product.unitPrice,
+          mrp: inv.product.unitPrice, // No MRP field in DB yet
+          discountPercent: 0,
+          image: inv.product.imageUrl || '/placeholder-product.svg',
+          storeId: inv.store.id,
+          storeName: inv.store.name,
+          stock: inv.quantity,
+          category: inv.product.category
+        }));
+        setAllProducts(mappedProducts);
+        setTopPicks(mappedProducts.slice(0, 8)); // Just show some as top picks
+      } catch (error) {
+        console.error("Failed to fetch inventory", error);
+      }
 
       setLoading(false);
     };
@@ -99,6 +110,15 @@ export function HomePage() {
     const q = searchQuery.toLowerCase();
     return stores.filter(s => s.name.toLowerCase().includes(q) || s.categories.toLowerCase().includes(q));
   }, [stores, searchQuery]);
+
+  const filteredProducts = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+    const q = searchQuery.toLowerCase();
+    return allProducts.filter(p => 
+      p.name.toLowerCase().includes(q) || 
+      (p.category && p.category.toLowerCase() === q)
+    );
+  }, [allProducts, searchQuery]);
 
   return (
     <div className="flex flex-col gap-6 pt-4 pb-12">
@@ -178,7 +198,7 @@ export function HomePage() {
       <section className="px-4 md:px-0">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-xl text-ink tracking-tight">
-            {searchQuery ? 'Search Results' : 'Nearby Stores'}
+            {searchQuery ? 'Matching Stores' : 'Nearby Stores'}
           </h2>
           {!searchQuery && (
             <span className="text-sm font-bold text-primary flex items-center cursor-pointer">
@@ -209,21 +229,19 @@ export function HomePage() {
         )}
       </section>
 
-      {/* Buy it Again */}
-      {recentProducts.length > 0 && !searchQuery && (
-        <section className="px-4 md:px-0">
-          <h2 className="font-bold text-xl text-ink tracking-tight mb-4">Buy it Again</h2>
-          <div className="flex overflow-x-auto gap-4 pb-4 hide-scrollbar w-full">
-            <div className="flex gap-4 w-max">
-              {recentProducts.map((product) => (
-                <ProductCard 
-                  key={product.id} 
-                  {...product} 
-                  isOutOfStock={product.stock === 0}
-                  onConflict={handleConflict}
-                />
-              ))}
-            </div>
+      {/* Filtered Products View */}
+      {searchQuery && filteredProducts.length > 0 && (
+        <section className="px-4 md:px-0 mt-6 mb-4">
+          <h2 className="font-bold text-xl text-ink tracking-tight mb-4">Products Found</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 w-full">
+            {filteredProducts.map((product) => (
+              <ProductCard 
+                key={product.id} 
+                {...product} 
+                isOutOfStock={product.stock === 0}
+                onConflict={handleConflict}
+              />
+            ))}
           </div>
         </section>
       )}

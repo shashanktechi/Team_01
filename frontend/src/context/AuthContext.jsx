@@ -14,6 +14,11 @@ export const AuthProvider = ({ children }) => {
         try {
           const userData = await authService.getCurrentUser();
           setUser(userData);
+          if (userData.storeId) {
+            localStorage.setItem('storeId', userData.storeId);
+          } else {
+            localStorage.removeItem('storeId');
+          }
         } catch (error) {
           console.error('Failed to fetch user:', error);
           localStorage.removeItem('token');
@@ -32,6 +37,11 @@ export const AuthProvider = ({ children }) => {
     await authService.login(credentials);
     const userData = await authService.getCurrentUser();
     setUser(userData);
+    if (userData.storeId) {
+      localStorage.setItem('storeId', userData.storeId);
+    } else {
+      localStorage.removeItem('storeId');
+    }
   };
 
   const logout = () => {

@@ -59,9 +59,9 @@ export function SystemAdminOverview() {
     try {
       const status = action === 'approve' ? 'APPROVED' : 'REJECTED';
       if (type === 'STORE_ADMIN') {
-        await api.put(`/admin/stores/${approvalId}/verify`, { status });
+        await api.put(`/admin/stores/${approvalId}/verify?status=${encodeURIComponent(status)}`);
       } else {
-        await api.put(`/admin/delivery-partners/${approvalId}/verify`, { status });
+        await api.put(`/admin/delivery-partners/${approvalId}/verify?status=${encodeURIComponent(status)}`);
       }
       setApprovals(approvals.filter(a => !(a.id === approvalId && a.type === type)));
       setToastMessage(`${type.replace('_', ' ')} has been ${status.toLowerCase()} successfully!`);

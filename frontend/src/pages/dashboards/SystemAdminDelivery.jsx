@@ -9,6 +9,7 @@ export function SystemAdminDelivery() {
   const [partners, setPartners] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState('All');
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const fetchPartners = async () => {
     setLoading(true);
@@ -29,7 +30,7 @@ export function SystemAdminDelivery() {
 
   const handlePartnerVerify = async (partnerId, status) => {
     try {
-      await api.put(`/admin/delivery-partners/${partnerId}/verify`, { status });
+      await api.put(`/admin/delivery-partners/${partnerId}/verify?status=${encodeURIComponent(status)}`);
       // Update local state instead of filtering out
       setPartners(partners.map(p => 
         p.id === partnerId 
@@ -80,8 +81,12 @@ export function SystemAdminDelivery() {
           {filteredPartners.map(p => (
             <Card key={p.id} className="bg-surface shadow-sm border-border p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-surface rounded-full flex items-center justify-center text-ink/50 border border-border">
-                  <User className="w-6 h-6" />
+                <div className="w-12 h-12 bg-surface rounded-full flex items-center justify-center text-ink/50 border border-border overflow-hidden">
+                  {p.profilePhotoUrl ? (
+                    <img src={p.profilePhotoUrl} alt="Profile" className="w-full h-full object-cover cursor-pointer" onClick={() => setSelectedImage(p.profilePhotoUrl)} />
+                  ) : (
+                    <User className="w-6 h-6" />
+                  )}
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-lg text-ink leading-tight flex items-center gap-2">
@@ -95,9 +100,29 @@ export function SystemAdminDelivery() {
                   </h3>
                   <p className="font-body text-sm text-ink-muted">{p.email} • {p.phone}</p>
                   {p.vehicleName && (
-                    <p className="font-body text-xs text-ink-muted mt-1 bg-ink/5 inline-block px-2 py-1 rounded">
-                      Vehicle: {p.vehicleName} ({p.vehicleNumber})
-                    </p>
+                    <div className="mt-2 flex flex-col gap-1">
+                      <p className="font-body text-xs text-ink-muted bg-ink/5 inline-block px-2 py-1 rounded w-fit">
+                        Vehicle: {p.vehicleName} {p.vehicleModel ? `(${p.vehicleModel})` : ''} • {p.vehicleNumber}
+                      </p>
+                      <div className="flex gap-4">
+                        {p.vehicleDocUrl && (
+                          <button 
+                            onClick={() => setSelectedImage(p.vehicleDocUrl)}
+                            className="text-xs font-bold text-primary underline w-fit"
+                          >
+                            View Vehicle Document
+                          </button>
+                        )}
+                        {p.vehiclePhotoUrl && (
+                          <button 
+                            onClick={() => setSelectedImage(p.vehiclePhotoUrl)}
+                            className="text-xs font-bold text-primary underline w-fit"
+                          >
+                            View Bike Photo
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   )}
                 </div>
               </div>
@@ -120,6 +145,17 @@ export function SystemAdminDelivery() {
               </div>
             </Card>
           ))}
+        </div>
+      )}
+
+      {selectedImage && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setSelectedImage(null)}>
+          <div className="relative max-w-4xl max-h-[90vh] w-full bg-surface rounded-2xl overflow-hidden p-2">
+            <button className="absolute top-4 right-4 bg-black/50 text-white rounded-full p-2 hover:bg-black/70" onClick={() => setSelectedImage(null)}>
+              <XCircle className="w-6 h-6" />
+            </button>
+            <img src={selectedImage} alt="Document View" className="w-full h-full object-contain" />
+          </div>
         </div>
       )}
     </div>

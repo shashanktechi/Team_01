@@ -19,6 +19,7 @@ import { LandingPage } from './pages/LandingPage';
 import { SystemAdminDashboard } from './pages/dashboards/SystemAdminDashboard';
 import { StoreAdminDashboard } from './pages/dashboards/StoreAdminDashboard';
 import { DeliveryDashboard } from './pages/dashboards/DeliveryDashboard';
+import { ProfileSettingsPage } from './pages/ProfileSettingsPage';
 
 import { CityProvider } from './context/CityContext';
 
@@ -45,6 +46,7 @@ function App() {
 
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
+              <Route path="/profile/settings" element={<ProfileSettingsPage />} />
               <Route path="/pending" element={<PendingApprovalPage />} />
               <Route element={<RoleProtectedRoute role="CUSTOMER" />}>
                 <Route path="/cart" element={<CartPage />} />

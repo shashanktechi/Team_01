@@ -9,6 +9,8 @@ export const authService = {
       localStorage.setItem('userId', response.data.userId);
       if (response.data.storeId) {
         localStorage.setItem('storeId', response.data.storeId);
+      } else {
+        localStorage.removeItem('storeId');
       }
     }
     return response.data;
@@ -22,6 +24,8 @@ export const authService = {
       localStorage.setItem('userId', response.data.userId);
       if (response.data.storeId) {
         localStorage.setItem('storeId', response.data.storeId);
+      } else {
+        localStorage.removeItem('storeId');
       }
     }
     return response.data;
