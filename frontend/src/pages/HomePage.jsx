@@ -52,13 +52,14 @@ export function HomePage() {
         const mappedStores = response.data.map(store => ({
           id: store.id,
           name: store.name,
-          bannerImage: store.bannerUrl || 'https://via.placeholder.com/400x150',
-          logoImage: store.logoUrl || 'https://via.placeholder.com/64',
+          bannerImage: store.bannerUrl || '/placeholder-store-banner.svg',
+          logoImage: store.logoUrl || '/placeholder-store-logo.svg',
           rating: store.freshnessScore || '4.5',
           categories: 'Groceries • Fresh Produce',
           status: store.isOpen ? 'Open Now' : 'Closed',
           deliveryTime: '10-15 min',
-          distance: '1.2 km'
+          distance: '1.2 km',
+          rawStore: store
         }));
         setStores(mappedStores);
       } catch (error) {
@@ -79,10 +80,10 @@ export function HomePage() {
 
       // Mock Product Data
       const mockProducts = [
-        { id: 101, name: 'Whole Wheat Bread', size: '400g', price: 45, mrp: 50, discountPercent: 10, image: 'https://via.placeholder.com/150', storeId: 1, storeName: 'Downtown Fresh', stock: 10 },
-        { id: 102, name: 'Fresh Milk', size: '1L', price: 33, mrp: 35, discountPercent: 5, image: 'https://via.placeholder.com/150', storeId: 1, storeName: 'Downtown Fresh', stock: 20 },
-        { id: 103, name: 'Farm Eggs', size: '6 pcs', price: 40, mrp: 45, discountPercent: 11, image: 'https://via.placeholder.com/150', storeId: 2, storeName: 'Uptown Grocers', stock: 15 },
-        { id: 104, name: 'Lays Classic', size: '50g', price: 20, image: 'https://via.placeholder.com/150', storeId: 1, storeName: 'Downtown Fresh', stock: 5 },
+        { id: 101, name: 'Whole Wheat Bread', size: '400g', price: 45, mrp: 50, discountPercent: 10, image: '/placeholder-product.svg', storeId: 1, storeName: 'Downtown Fresh', stock: 10 },
+        { id: 102, name: 'Fresh Milk', size: '1L', price: 33, mrp: 35, discountPercent: 5, image: '/placeholder-product.svg', storeId: 1, storeName: 'Downtown Fresh', stock: 20 },
+        { id: 103, name: 'Farm Eggs', size: '6 pcs', price: 40, mrp: 45, discountPercent: 11, image: '/placeholder-product.svg', storeId: 2, storeName: 'Uptown Grocers', stock: 15 },
+        { id: 104, name: 'Lays Classic', size: '50g', price: 20, image: '/placeholder-product.svg', storeId: 1, storeName: 'Downtown Fresh', stock: 5 },
       ];
 
       setRecentProducts(mockProducts.slice(0, 2));

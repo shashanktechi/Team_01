@@ -14,6 +14,7 @@ export function CartPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [tipAmount, setTipAmount] = useState(20);
+  const [deliveryAddress, setDeliveryAddress] = useState(user?.address || '');
 
   const itemTotal = getCartTotal();
   const freeDeliveryThreshold = 500;
@@ -37,9 +38,9 @@ export function CartPage() {
           productId: item.product.id,
           qty: item.quantity
         })),
-        deliveryAddress: user?.address || '123 Emerald Street, Block B, Apt 4G',
-        customerLat: 12.9716,
-        customerLng: 77.5946
+        deliveryAddress: deliveryAddress || 'Address not provided',
+        customerLat: 0.0,
+        customerLng: 0.0
       };
       
       const response = await api.post('/customer/orders', orderRequest);
@@ -107,17 +108,17 @@ export function CartPage() {
               </div>
             </div>
 
-            <div className="bg-surface rounded-xl p-4 shadow-sm border border-ink/5 flex items-start justify-between cursor-pointer hover:bg-ink/5 transition-colors">
-              <div className="flex gap-3">
-                <Home className="h-5 w-5 text-ink-muted mt-0.5" />
-                <div>
-                  <span className="font-body font-bold text-sm block">Home</span>
-                  <span className="font-body text-xs text-ink-muted block mt-1 leading-relaxed max-w-[200px] truncate">
-                    {user?.address || '123 Emerald Street, Block B, Apt 4G'}
-                  </span>
-                </div>
-              </div>
-              <span className="font-mono text-[10px] font-bold text-primary uppercase tracking-widest mt-1">Change</span>
+            <div className="bg-surface rounded-xl p-4 shadow-sm border border-ink/5">
+              <label className="font-body font-bold text-sm block mb-2 flex items-center gap-2">
+                <Home className="h-4 w-4" /> Delivery Address
+              </label>
+              <textarea 
+                className="w-full bg-kraft border border-ink/10 rounded-lg p-3 font-body text-sm outline-none focus:border-primary resize-none"
+                placeholder="Enter your full delivery address"
+                rows={2}
+                value={deliveryAddress}
+                onChange={(e) => setDeliveryAddress(e.target.value)}
+              />
             </div>
           </div>
 

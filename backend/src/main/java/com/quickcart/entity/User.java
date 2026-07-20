@@ -66,4 +66,7 @@ public class User {
 
     @Column(name = "vehicle_number", length = 50)
     private String vehicleNumber;
+
+    @Column(length = 255)
+    private String address;
 }

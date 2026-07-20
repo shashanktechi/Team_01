@@ -8,7 +8,10 @@ import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { MapPin, Navigation, Package, LogOut, Loader2 } from 'lucide-react';
 
+import { User } from 'lucide-react';
 import { DeliveryTasks } from './DeliveryTasks';
+import { DeliveryBatch } from './DeliveryBatch';
+import { DeliveryProfile } from './DeliveryProfile';
 
 export function DeliveryDashboard() {
   const location = useLocation();
@@ -90,14 +93,23 @@ export function DeliveryDashboard() {
           >
             <Package className="w-4 h-4" /> Batch Finding
           </NavLink>
+          <NavLink 
+            to="profile"
+            className={({ isActive }) => `flex items-center gap-2 px-4 py-2 font-mono text-sm font-bold uppercase tracking-wider rounded-lg transition-colors ${isActive ? 'bg-ink text-chalk' : 'bg-transparent text-ink-muted hover:bg-ink/5'}`}
+          >
+            <User className="w-4 h-4" /> Profile
+          </NavLink>
         </div>
 
         {/* Nested Routes */}
         <div className="mt-4">
           <Routes>
             <Route index element={<Navigate to="tasks" replace />} />
-            <Route path="tasks" element={<DeliveryTasks tasks={tasks} />} />
-            <Route path="batch" element={<div className="p-8 text-center bg-chalk rounded-xl border border-ink/10 shadow-sm"><Package className="w-12 h-12 mx-auto text-ink/20 mb-4"/><p className="font-mono text-ink-muted">Batch finding coming soon</p></div>} />
+            <Route path="tasks" element={<DeliveryTasks tasks={tasks} onTaskUpdate={() => {
+                 api.get('/delivery/tasks').then(res => setTasks(res.data)).catch(console.error);
+            }} />} />
+            <Route path="batch" element={<DeliveryBatch />} />
+            <Route path="profile" element={<DeliveryProfile />} />
           </Routes>
         </div>
       </main>

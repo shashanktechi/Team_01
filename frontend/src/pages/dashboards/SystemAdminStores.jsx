@@ -7,6 +7,7 @@ import { Store, Loader2 } from 'lucide-react';
 export function SystemAdminStores() {
   const [stores, setStores] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [filterStatus, setFilterStatus] = useState('All');
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -33,11 +34,24 @@ export function SystemAdminStores() {
           <h2 className="font-display font-black text-2xl text-ink">Store Network</h2>
           <p className="font-mono text-sm text-ink-muted mt-1 uppercase tracking-wider">Monitor all active stores</p>
         </div>
-        <Button>Add Store</Button>
+      </div>
+
+      <div className="flex gap-2 mb-2 overflow-x-auto pb-2">
+        {['All', 'PENDING', 'APPROVED', 'REJECTED'].map(status => (
+          <Button
+            key={status}
+            variant={filterStatus === status ? 'primary' : 'outline'}
+            size="sm"
+            onClick={() => setFilterStatus(status)}
+            className="whitespace-nowrap"
+          >
+            {status}
+          </Button>
+        ))}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {stores.map(store => (
+        {stores.filter(s => filterStatus === 'All' || s.verificationStatus === filterStatus).map(store => (
           <TicketCard key={store.id} className="bg-chalk shadow-sm border-ink/10 p-6 flex flex-col gap-4">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-marigold rounded-full flex items-center justify-center text-ink">

@@ -73,7 +73,10 @@ export function TrackOrderPage() {
 
         {/* Map Area */}
         <div className="w-full h-[40vh] bg-surface relative flex items-center justify-center overflow-hidden">
-          <div className="absolute inset-0 bg-[url('https://maps.googleapis.com/maps/api/staticmap?center=12.9716,77.5946&zoom=15&size=600x600&maptype=roadmap&style=feature:all|element:labels.text.fill|color:0x333333&style=feature:water|element:geometry|color:0x006c4a&sensor=false')] bg-cover bg-center"></div>
+          <div 
+            className="absolute inset-0 bg-cover bg-center"
+            style={{ backgroundImage: `url('https://maps.googleapis.com/maps/api/staticmap?center=${order.customerLat || 0},${order.customerLng || 0}&zoom=15&size=600x600&maptype=roadmap&style=feature:all|element:labels.text.fill|color:0x333333&style=feature:water|element:geometry|color:0x006c4a&sensor=false')` }}
+          ></div>
           
           {/* Faded overlay for better text contrast at top */}
           <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-black/20 to-transparent"></div>

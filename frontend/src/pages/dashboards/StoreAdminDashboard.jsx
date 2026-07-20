@@ -8,6 +8,8 @@ import { Store, ListOrdered, Package, LogOut, Loader2, Plus, User } from 'lucide
 
 import { StoreAdminOverview } from './StoreAdminOverview';
 import { StoreAdminOrders } from './StoreAdminOrders';
+import { StoreAdminInventory } from './StoreAdminInventory';
+import { StoreAdminProfile } from './StoreAdminProfile';
 
 export function StoreAdminDashboard() {
   const { user, logout } = useAuth();
@@ -113,8 +115,8 @@ export function StoreAdminDashboard() {
             <Route index element={<Navigate to="overview" replace />} />
             <Route path="overview" element={<StoreAdminOverview store={store} orders={orders} />} />
             <Route path="orders" element={<StoreAdminOrders orders={orders} onOrderUpdate={fetchDashboardData} />} />
-            <Route path="inventory" element={<div className="p-8 text-center bg-chalk rounded-xl border border-ink/10 shadow-sm"><Package className="w-12 h-12 mx-auto text-ink/20 mb-4"/><p className="font-mono text-ink-muted">Inventory tracking coming soon</p></div>} />
-            <Route path="profile" element={<div className="p-8 text-center bg-chalk rounded-xl border border-ink/10 shadow-sm"><User className="w-12 h-12 mx-auto text-ink/20 mb-4"/><p className="font-mono text-ink-muted">Profile editing coming soon</p></div>} />
+            <Route path="inventory" element={<StoreAdminInventory />} />
+            <Route path="profile" element={<StoreAdminProfile storeId={store?.id} />} />
           </Routes>
         </div>
       </main>

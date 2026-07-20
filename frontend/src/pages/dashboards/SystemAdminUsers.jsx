@@ -21,7 +21,18 @@ export function SystemAdminUsers() {
       }
     };
     fetchUsers();
+    fetchUsers();
   }, []);
+
+  const handleStatusChange = async (userId, newStatus) => {
+    try {
+      await api.patch(`/admin/users/${userId}/status`, { active: newStatus });
+      setUsers(users.map(u => u.id === userId ? { ...u, isActive: newStatus } : u));
+    } catch (err) {
+      console.error('Error updating status:', err);
+      alert('Failed to update status');
+    }
+  };
 
   if (loading) {
     return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-bazaar-green" /></div>;
@@ -34,7 +45,6 @@ export function SystemAdminUsers() {
           <h2 className="font-display font-black text-2xl text-ink">Platform Users</h2>
           <p className="font-mono text-sm text-ink-muted mt-1 uppercase tracking-wider">Manage all accounts</p>
         </div>
-        <Button>Export CSV</Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
@@ -53,7 +63,7 @@ export function SystemAdminUsers() {
               <Badge variant={u.isActive ? "bazaar-green" : "chalk"} className="uppercase">
                 {u.role}
               </Badge>
-              <Button variant="outline" size="sm" className="w-full sm:w-auto">
+              <Button variant="outline" size="sm" className="w-full sm:w-auto" onClick={() => handleStatusChange(u.id, !u.isActive)}>
                 {u.isActive ? 'Suspend' : 'Activate'}
               </Button>
             </div>

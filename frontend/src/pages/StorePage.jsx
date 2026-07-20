@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router';
-import { ArrowLeft, ShoppingCart, Truck, BadgeCheck, Plus, Minus } from 'lucide-react';
+import { useNavigate, useParams, useLocation } from 'react-router';
+import { ArrowLeft, ShoppingCart, Truck, BadgeCheck, Plus, Minus, Star, Search } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
@@ -11,9 +11,11 @@ import { ConflictModal } from '../components/ui/ConflictModal';
 
 export function StorePage() {
   const navigate = useNavigate();
+  const { id: storeId } = useParams();
+  const location = useLocation();
   const [activeCategory, setActiveCategory] = useState('All');
   const [products, setProducts] = useState([]);
-  const [storeDetails, setStoreDetails] = useState(null);
+  const [storeDetails, setStoreDetails] = useState(location.state?.storeDetails || null);
   const [conflictState, setConflictState] = useState({ isOpen: false });
   
   const { cartItems, addToCart, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart();
@@ -21,9 +23,12 @@ export function StorePage() {
   useEffect(() => {
     const fetchInventory = async () => {
       try {
-        // Fetch store 1 for now, in a real app this comes from useParams
-        const storeId = 1; 
-        const response = await api.get(`/customer/stores/${storeId}/inventory`);
+        if (!storeDetails) {
+          const storeResponse = await api.get(`/public/stores/${storeId}`);
+          setStoreDetails(storeResponse.data);
+        }
+
+        const response = await api.get(`/public/stores/${storeId}/inventory`);
         
         // Maps backend Inventory array to Product array
         const mappedProducts = response.data.map(inv => ({
@@ -32,22 +37,16 @@ export function StorePage() {
           category: inv.product.category || 'All',
           size: inv.product.unit || '1 pc',
           price: inv.product.unitPrice,
-          image: inv.product.imageUrl || 'https://via.placeholder.com/150',
+          image: inv.product.imageUrl || '/placeholder-product.svg',
           stock: inv.quantity
         }));
         setProducts(mappedProducts);
-
-        // Fetch nearby stores just to get details of this store
-        const storesResponse = await api.get('/customer/stores/nearby?lat=12.9716&lng=77.5946');
-        const foundStore = storesResponse.data.find(s => s.id === storeId);
-        if (foundStore) setStoreDetails(foundStore);
-
       } catch (error) {
         console.error("Failed to fetch inventory", error);
       }
     };
     fetchInventory();
-  }, []);
+  }, [storeId]);
 
   const categories = ['All', ...new Set(products.map(p => p.category))];
   const filteredProducts = activeCategory === 'All' 
@@ -97,11 +96,11 @@ export function StorePage() {
 
       <main className="pt-[72px] w-full md:px-margin-desktop">
         <div className="relative w-full h-48 md:h-64 md:rounded-xl overflow-hidden shadow-sm mt-4 md:mt-0">
-          <div className="bg-cover bg-center w-full h-full absolute inset-0" style={{ backgroundImage: `url('${storeDetails?.bannerUrl || 'https://via.placeholder.com/400x150'}')` }}></div>
+          <div className="bg-cover bg-center w-full h-full absolute inset-0" style={{ backgroundImage: `url('${storeDetails?.bannerUrl || '/placeholder-store-banner.svg'}')` }}></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 md:p-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-surface rounded-lg shadow-md flex items-center justify-center border-2 border-primary overflow-hidden">
-                <img className="w-10 h-10 object-contain" alt="Store logo" src={storeDetails?.logoUrl || 'https://via.placeholder.com/64'} />
+                <img className="w-10 h-10 object-contain" alt="Store logo" src={storeDetails?.logoUrl || '/placeholder-store-logo.svg'} />
               </div>
               <div>
                 <h1 className="font-headline-md text-headline-md text-white">{storeDetails?.name || 'Loading Store...'}</h1>

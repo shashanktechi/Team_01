@@ -42,6 +42,17 @@ public class AdminController {
         return ResponseEntity.ok(storeRepository.findAll());
     }
 
+    @PatchMapping("/users/{id}/status")
+    public ResponseEntity<?> updateUserStatus(@PathVariable Long id, @RequestBody java.util.Map<String, Boolean> request) {
+        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("User not found"));
+        Boolean active = request.get("active");
+        if (active != null) {
+            user.setIsActive(active);
+            userRepository.save(user);
+        }
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
     @GetMapping("/stores/pending")
     public ResponseEntity<?> getPendingStores() {
         return ResponseEntity.ok(storeRepository.findByVerificationStatus("PENDING"));

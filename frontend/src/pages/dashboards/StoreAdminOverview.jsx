@@ -9,7 +9,7 @@ export function StoreAdminOverview({ store, orders }) {
       <TicketCard className="bg-chalk shadow-sm border-ink/10 p-6 flex flex-col gap-4">
         <div className="flex items-center gap-4">
           <div className="w-16 h-16 rounded-lg bg-surface border border-ink/10 overflow-hidden flex items-center justify-center">
-            <img src={store?.logoUrl || "https://via.placeholder.com/64"} alt="Logo" className="w-12 h-12 object-contain" />
+            <img src={store?.logoUrl || "/placeholder-store-logo.svg"} alt="Logo" className="w-12 h-12 object-contain" />
           </div>
           <div>
             <h2 className="font-display font-black text-xl text-ink leading-tight">{store?.name || 'Your Store'}</h2>

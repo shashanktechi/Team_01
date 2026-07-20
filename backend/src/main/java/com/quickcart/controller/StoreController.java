@@ -108,6 +108,20 @@ public class StoreController {
         ));
     }
 
+    @PutMapping("/profile")
+    public ResponseEntity<?> updateStoreProfile(@RequestBody Map<String, Object> request) {
+        Store store = getCurrentStoreForMutatingOperations();
+        if (request.containsKey("name") && request.get("name") != null) store.setName((String) request.get("name"));
+        if (request.containsKey("address")) store.setAddress((String) request.get("address"));
+        if (request.containsKey("city") && request.get("city") != null) store.setCity((String) request.get("city"));
+        if (request.containsKey("whatsappNumber")) store.setWhatsappNumber((String) request.get("whatsappNumber"));
+        if (request.containsKey("isOpen")) store.setIsOpen((Boolean) request.get("isOpen"));
+        
+        com.quickcart.repository.StoreRepository storeRepositoryLocal = storeRepository;
+        storeRepositoryLocal.save(store);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
     @GetMapping("/orders/incoming")
     public ResponseEntity<?> getIncomingOrders() {
         Long storeId = currentUserProvider.getCurrentStoreId();

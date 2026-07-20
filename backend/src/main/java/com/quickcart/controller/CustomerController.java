@@ -53,6 +53,13 @@ public class CustomerController {
         return ResponseEntity.ok(inventoryList);
     }
 
+    @GetMapping("/stores/{storeId}")
+    public ResponseEntity<?> getStoreDetails(@PathVariable Long storeId) {
+        Store store = storeRepository.findById(storeId)
+                .orElseThrow(() -> new RuntimeException("Store not found"));
+        return ResponseEntity.ok(store);
+    }
+
     @GetMapping("/orders")
     public ResponseEntity<?> getOrderHistory() {
         Long customerId = currentUserProvider.getCurrentUserId();
@@ -93,7 +100,8 @@ public class CustomerController {
                 "role", user.getRole(),
                 "trustScore", user.getTrustScore(),
                 "profilePhotoUrl", user.getProfilePhotoUrl() != null ? user.getProfilePhotoUrl() : "",
-                "vehicleDocUrl", user.getVehicleDocUrl() != null ? user.getVehicleDocUrl() : ""
+                "vehicleDocUrl", user.getVehicleDocUrl() != null ? user.getVehicleDocUrl() : "",
+                "address", user.getAddress() != null ? user.getAddress() : ""
         ));
     }
 

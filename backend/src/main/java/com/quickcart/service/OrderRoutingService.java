@@ -47,8 +47,32 @@ public class OrderRoutingService {
         User customer = userRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Customer not found"));
 
+        if (request.getDeliveryAddress() != null && !request.getDeliveryAddress().isEmpty()) {
+            customer.setAddress(request.getDeliveryAddress());
+            userRepository.save(customer);
+        }
+
+        Double lat = request.getCustomerLat();
+        Double lng = request.getCustomerLng();
+
+        if (lat == null || lat == 0.0 || lng == null || lng == 0.0) {
+            if (!request.getItems().isEmpty()) {
+                List<Inventory> itemStock = inventoryRepository.findByProductId(request.getItems().get(0).getProductId());
+                if (!itemStock.isEmpty() && itemStock.get(0).getStore() != null && itemStock.get(0).getStore().getLocation() != null) {
+                    lat = itemStock.get(0).getStore().getLocation().getY();
+                    lng = itemStock.get(0).getStore().getLocation().getX();
+                } else {
+                    lat = 12.9716;
+                    lng = 77.5946;
+                }
+            } else {
+                lat = 12.9716;
+                lng = 77.5946;
+            }
+        }
+
         // 1. Find nearest stores
-        List<Store> nearestStores = storeRepository.findNearestStores(request.getCustomerLat(), request.getCustomerLng());
+        List<Store> nearestStores = storeRepository.findNearestStores(lat, lng);
 
         Store selectedStore = null;
 
@@ -79,8 +103,8 @@ public class OrderRoutingService {
         order.setStore(selectedStore);
         order.setStatus("PENDING");
         order.setDeliveryAddress(request.getDeliveryAddress());
-        order.setCustomerLat(request.getCustomerLat());
-        order.setCustomerLng(request.getCustomerLng());
+        order.setCustomerLat(lat);
+        order.setCustomerLng(lng);
         order = orderRepository.save(order);
 
         for (OrderItemDto item : request.getItems()) {
@@ -102,7 +126,35 @@ public class OrderRoutingService {
         }
 
         order.setTotalAmount(totalAmount);
-        order.setEstimatedDeliveryTime(25); // simple mock for now
+        
+        // Calculate estimated delivery time using Haversine formula
+        int estimatedTime = 25; // default fallback
+        if (selectedStore.getLocation() != null && lat != null && lng != null) {
+            double storeLat = selectedStore.getLocation().getY();
+            double storeLng = selectedStore.getLocation().getX();
+            
+            double R = 6371; // Earth radius in km
+            double dLat = Math.toRadians(lat - storeLat);
+            double dLng = Math.toRadians(lng - storeLng);
+            double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                       Math.cos(Math.toRadians(storeLat)) * Math.cos(Math.toRadians(lat)) *
+                       Math.sin(dLng/2) * Math.sin(dLng/2);
+            double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+            double distanceKm = R * c;
+            
+            // Note: This is a temporary interim calculation. If customer coordinates are fallback, use city average.
+            // Integrating a real maps API (like Google Maps Distance Matrix) would significantly improve accuracy.
+            if (distanceKm < 0.1 || (lat == 12.9716 && lng == 77.5946)) {
+                estimatedTime = 30; // City average fallback
+            } else {
+                int basePrepTime = 10; // minutes
+                double avgSpeedKmH = 20.0; // km/h (urban average)
+                int travelTimeMins = (int) Math.ceil((distanceKm / avgSpeedKmH) * 60);
+                estimatedTime = basePrepTime + travelTimeMins;
+            }
+        }
+        order.setEstimatedDeliveryTime(estimatedTime);
+        
         Order savedOrder = orderRepository.save(order);
         if (savedOrder.getStore() != null) {
             notificationService.notifyStore(savedOrder.getStore().getId(), savedOrder);

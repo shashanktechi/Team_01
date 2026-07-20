@@ -8,6 +8,7 @@ import { ShieldCheck, Loader2 } from 'lucide-react';
 export function SystemAdminApprovals() {
   const [approvals, setApprovals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toastMessage, setToastMessage] = useState(null);
 
   const fetchApprovals = async () => {
     try {
@@ -55,6 +56,8 @@ export function SystemAdminApprovals() {
         await api.put(`/admin/delivery-partners/${approvalId}/verify`, { status });
       }
       setApprovals(approvals.filter(a => !(a.id === approvalId && a.type === type)));
+      setToastMessage(`${type.replace('_', ' ')} has been ${status.toLowerCase()} successfully!`);
+      setTimeout(() => setToastMessage(null), 3000);
     } catch (err) {
       console.error('Action failed:', err);
       alert('Action failed');
@@ -73,6 +76,13 @@ export function SystemAdminApprovals() {
           <p className="font-mono text-sm text-ink-muted mt-1 uppercase tracking-wider">Review new registrations</p>
         </div>
       </div>
+
+      {toastMessage && (
+        <div className="bg-bazaar-green text-white p-4 rounded-xl shadow-lg font-body text-sm flex items-center justify-between">
+          <span>{toastMessage}</span>
+          <button onClick={() => setToastMessage(null)} className="opacity-80 hover:opacity-100">✕</button>
+        </div>
+      )}
 
       {approvals.length === 0 ? (
         <TicketCard className="bg-chalk p-12 text-center flex flex-col items-center">

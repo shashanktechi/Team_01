@@ -3,12 +3,12 @@ import { Zap, Star, MapPin } from 'lucide-react';
 import { TicketCard } from './TicketCard';
 import { useNavigate } from 'react-router';
 
-export function StoreCard({ id, bannerImage, logoImage, name, rating, categories, status, deliveryTime, distance }) {
+export function StoreCard({ id, bannerImage, logoImage, name, rating, categories, status, deliveryTime, distance, rawStore }) {
   const navigate = useNavigate();
   const isOpen = status === 'Open Now';
 
   return (
-    <div onClick={() => navigate(`/stores/${id}`)} className="cursor-pointer">
+    <div onClick={() => navigate(`/store/${id}`, { state: { storeDetails: rawStore || { id, name, bannerUrl: bannerImage, logoUrl: logoImage, freshnessScore: rating } } })} className="cursor-pointer">
       <TicketCard className={`overflow-hidden flex flex-col relative group hover:-translate-y-1 transition-transform duration-300 ${!isOpen ? 'opacity-70 grayscale-[30%]' : ''}`}>
         <div className="h-32 w-full relative bg-kraft/20">
           <img className="w-full h-full object-cover" alt={`${name} banner`} src={bannerImage} />
