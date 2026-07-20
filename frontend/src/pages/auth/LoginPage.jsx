@@ -51,7 +51,7 @@ export function LoginPage() {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <Card className="w-full max-w-md border-0 shadow-none bg-transparent">
           <CardHeader className="text-center px-0 flex flex-col items-center">
-            <BrandStamp className="w-16 h-16 mb-4" />
+            <BrandStamp className="w-32 md:w-40 h-auto mb-4" />
             <CardDescription className="font-body text-ink-muted">Enter your credentials to access your account</CardDescription>
           </CardHeader>
         <form onSubmit={handleSubmit}>

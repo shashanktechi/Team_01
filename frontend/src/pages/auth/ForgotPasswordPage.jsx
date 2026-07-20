@@ -84,7 +84,7 @@ export function ForgotPasswordPage() {
             </p>
           </div>
           <div className="relative z-10">
-            <BrandStamp className="w-24 h-24 text-bazaar-green opacity-50" />
+            <BrandStamp className="w-48 md:w-56 h-auto text-bazaar-green opacity-50" />
           </div>
         </div>
 

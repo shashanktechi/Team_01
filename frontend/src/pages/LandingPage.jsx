@@ -64,7 +64,7 @@ export function LandingPage() {
         {/* Right Column: Hero Content */}
         <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-16 bg-background">
           <div className="max-w-md text-center lg:text-left flex flex-col items-center lg:items-start relative">
-            <BrandStamp className="w-24 h-24 mb-6" animateThump={false} />
+            <BrandStamp className="w-48 md:w-56 h-auto mb-6" animateThump={false} />
 
             <h1 className="text-5xl lg:text-7xl font-display font-black text-ink tracking-tight mb-4 leading-none">
               Fresh <br className="hidden lg:block"/> From <br className="hidden lg:block"/> The Mandi.

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router';
-import { BrandStamp } from './BrandStamp';
+import quickcartLogo from '../../assets/quickcart-logo.png';
 
 export function BrandMark({ className = '' }) {
   return (
@@ -8,10 +8,11 @@ export function BrandMark({ className = '' }) {
       to="/" 
       className={`group flex items-center gap-2 cursor-pointer transition-all duration-200 hover:opacity-90 active:scale-[0.98] ${className}`}
     >
-      <BrandStamp className="w-8 h-8 md:w-9 md:h-9 shrink-0 transition-transform duration-200 group-hover:-rotate-3" animateThump={false} />
-      <span className="font-display font-black text-ink text-xl md:text-2xl leading-none tracking-tight">
-        Quick Cart
-      </span>
+      <img 
+        src={quickcartLogo} 
+        alt="QuickCart for local" 
+        className="h-9 md:h-10 w-auto object-contain transition-transform duration-200 group-hover:-rotate-1" 
+      />
     </Link>
   );
 }
