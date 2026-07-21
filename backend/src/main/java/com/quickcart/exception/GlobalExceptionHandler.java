@@ -27,6 +27,8 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("message", "Validation failed.");
+        body.put("error", "Validation failed.");
 
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
@@ -44,6 +46,8 @@ public class GlobalExceptionHandler {
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("message", "Constraint violation.");
+        body.put("error", "Constraint violation.");
 
         Map<String, String> errors = new HashMap<>();
         Set<ConstraintViolation<?>> violations = ex.getConstraintViolations();
@@ -88,19 +92,30 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<Object> handleRuntimeExceptions(RuntimeException ex) {
-        logger.error("Runtime exception occurred: ", ex);
+        logger.error("Runtime exception occurred: " + ex.getMessage(), ex);
 
         Map<String, Object> body = new LinkedHashMap<>();
         body.put("timestamp", LocalDateTime.now());
-        body.put("status", HttpStatus.BAD_REQUEST.value());
-        body.put("message", ex.getMessage());
-        body.put("error", ex.getMessage());
+        
+        String message = ex.getMessage();
+        body.put("message", message);
+        body.put("error", message);
 
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        if (ex.getMessage() != null && ex.getMessage().contains("not found")) {
-            status = HttpStatus.NOT_FOUND;
-            body.put("status", HttpStatus.NOT_FOUND.value());
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (message != null) {
+            String messageLower = message.toLowerCase();
+            if (ex instanceof IllegalArgumentException || 
+                messageLower.contains("invalid") || 
+                messageLower.contains("required") || 
+                messageLower.contains("must be")) {
+                status = HttpStatus.BAD_REQUEST;
+            } else if (messageLower.contains("not found")) {
+                status = HttpStatus.NOT_FOUND;
+            }
+        } else if (ex instanceof IllegalArgumentException) {
+            status = HttpStatus.BAD_REQUEST;
         }
+        body.put("status", status.value());
 
         return new ResponseEntity<>(body, status);
     }
@@ -113,6 +128,7 @@ public class GlobalExceptionHandler {
         body.put("timestamp", LocalDateTime.now());
         body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         body.put("message", "An unexpected error occurred. Please contact system administrator.");
+        body.put("error", "An unexpected error occurred. Please contact system administrator.");
 
         return new ResponseEntity<>(body, HttpStatus.INTERNAL_SERVER_ERROR);
     }

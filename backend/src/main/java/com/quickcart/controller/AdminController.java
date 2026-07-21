@@ -113,10 +113,8 @@ public class AdminController {
                 try {
                     emailService.sendVerificationRejectionEmail(
                         owner.getEmail(),
-                        reason,
-                        "Your Quick Cart Store Verification Needs Attention",
-                        "Store Verification Rejected",
-                        "We regret to inform you that your store registration for '" + store.getName() + "' has been rejected for the following reason:"
+                        "Store Admin",
+                        reason
                     );
                 } catch (Exception e) {
                     // Log but don't fail transaction
@@ -182,10 +180,8 @@ public class AdminController {
                 try {
                     emailService.sendVerificationRejectionEmail(
                         partner.getEmail(),
-                        reason,
-                        "Your Quick Cart Delivery Partner Verification Needs Attention",
-                        "Delivery Partner Verification Rejected",
-                        "We regret to inform you that your delivery partner application has been rejected for the following reason:"
+                        "Delivery Partner",
+                        reason
                     );
                 } catch (Exception e) {
                     // Log but don't fail transaction

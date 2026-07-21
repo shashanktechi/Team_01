@@ -94,6 +94,33 @@ public class EmailService {
         }
     }
 
+    public void sendVerificationRejectionEmail(String toEmail, String roleLabel, String reason) {
+        log.info("Sending verification rejection email from={} to={} with roleLabel={} and reason={}", fromAddress, toEmail, roleLabel, reason);
+        try {
+            jakarta.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
+            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(mimeMessage, "utf-8");
+            
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject("Your QuickCart " + roleLabel + " Verification Needs Attention");
+            
+            String displayReason = (reason != null && !reason.trim().isEmpty()) ? reason.trim() : "Please review your submitted documents and try again.";
+            String htmlMsg = getHtmlTemplate(
+                roleLabel + " Rejection", 
+                "We regret to inform you that your application as a " + roleLabel + " has been rejected for the following reason:", 
+                displayReason, 
+                "If you have any questions, please contact our support team."
+            );
+            helper.setText(htmlMsg, true);
+
+            mailSender.send(mimeMessage);
+            log.info("Successfully sent verification rejection email to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send verification rejection email to {} using fromAddress={}: {}", toEmail, fromAddress, e.getMessage(), e);
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
     private String getHtmlTemplate(String title, String message, String otp, String footer) {
         return "<!DOCTYPE html>"
                 + "<html>"

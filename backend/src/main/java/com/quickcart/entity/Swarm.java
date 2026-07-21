@@ -7,11 +7,14 @@ import lombok.AllArgsConstructor;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "swarms")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Swarm {
 
     @Id
