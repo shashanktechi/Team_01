@@ -71,8 +71,8 @@ public class OrderRoutingService {
             }
         }
 
-        // 1. Find nearest stores
-        List<Store> nearestStores = storeRepository.findNearestStores(lat, lng);
+        // 1. Find nearest stores (fetch up to 50 candidates to check stock)
+        List<Store> nearestStores = storeRepository.findNearestStores(lat, lng, 50);
 
         Store selectedStore = null;
 
@@ -105,6 +105,8 @@ public class OrderRoutingService {
         order.setDeliveryAddress(request.getDeliveryAddress());
         order.setCustomerLat(lat);
         order.setCustomerLng(lng);
+        order.setPaymentMethod(request.getPaymentMethod() != null ? request.getPaymentMethod() : "COD");
+        order.setPaymentStatus("PENDING");
         order = orderRepository.save(order);
 
         for (OrderItemDto item : request.getItems()) {

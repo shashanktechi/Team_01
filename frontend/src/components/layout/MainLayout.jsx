@@ -25,7 +25,7 @@ export function MainLayout() {
   return (
     <div className="bg-background text-ink font-body min-h-[100dvh] w-full">
       <TopAppBar />
-      <main className="pt-[130px] pb-[80px] md:pb-8 w-full max-w-7xl mx-auto flex flex-col">
+      <main className="pt-[130px] pb-[80px] md:pb-8 w-full flex flex-col md:px-6 lg:px-8">
         <Outlet />
       </main>
       <BottomNavBar />

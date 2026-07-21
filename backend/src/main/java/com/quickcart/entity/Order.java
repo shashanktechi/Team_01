@@ -60,6 +60,18 @@ public class Order {
     @Column(name = "created_at", updatable = false)
     private java.time.Instant createdAt;
 
+    @Column(name = "payment_method", length = 50)
+    private String paymentMethod; // COD, RAZORPAY
+
+    @Column(name = "payment_status", length = 50)
+    private String paymentStatus; // PENDING, PAID, FAILED
+
+    @Column(name = "razorpay_order_id")
+    private String razorpayOrderId;
+
+    @Column(name = "razorpay_payment_id")
+    private String razorpayPaymentId;
+
     @PrePersist
     protected void onCreate() {
         if (createdAt == null) {

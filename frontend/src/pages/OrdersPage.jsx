@@ -12,7 +12,7 @@ export function OrdersPage() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await api.get('/customer/orders/history');
+        const response = await api.get('/customer/orders');
         setOrders(response.data);
       } catch (err) {
         console.error("Failed to fetch orders", err);
@@ -24,8 +24,8 @@ export function OrdersPage() {
   }, []);
 
   return (
-    <div className="bg-background font-body text-ink antialiased min-h-screen">
-      <div className="max-w-[480px] mx-auto bg-background h-full min-h-screen flex flex-col relative pb-24">
+    <div className="bg-background text-ink font-body min-h-[100dvh]">
+      <div className="w-full bg-background h-full min-h-screen flex flex-col relative pb-24">
         {/* Header */}
         <header className="bg-surface text-ink px-4 py-4 flex items-center gap-3 sticky top-0 z-10 border-b border-border shadow-sm">
           <button onClick={() => navigate('/stores')} className="p-2 -ml-2 rounded-full hover:bg-ink/5 transition-colors">

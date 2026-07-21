@@ -61,6 +61,10 @@ cors:
   allowed:
     origins: "http://localhost:3000,http://localhost:5173,http://localhost:5174"
 
+razorpay:
+  key-id: ${RAZORPAY_KEY_ID:rzp_test_TG4Dgisjo7B8Wa}
+  key-secret: ${RAZORPAY_KEY_SECRET:6ZxhtPrU4uSB3vxWIkhqFFXj}
+
 springdoc:
   api-docs:
     path: /v3/api-docs

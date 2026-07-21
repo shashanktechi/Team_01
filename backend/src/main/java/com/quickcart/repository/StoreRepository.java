@@ -10,14 +10,40 @@ import java.util.List;
 
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
+
     List<Store> findByOwnerId(Long ownerId);
 
-    // Find stores that have all requested product IDs with required quantity
-    // For simplicity, we pass a list of product IDs, but checking quantities for multiple products in a single native query requires advanced SQL.
-    // We can fetch nearest stores first, and then check inventory, or use a complex native query.
-    // We will use a native query to find nearest stores that are open and approved.
-    @Query(value = "SELECT * FROM stores s WHERE s.is_open = true AND s.verification_status = 'APPROVED' ORDER BY s.location <-> ST_SetSRID(ST_MakePoint(:lng, :lat), 4326) ASC", nativeQuery = true)
-    List<Store> findNearestStores(@Param("lat") double lat, @Param("lng") double lng);
+    /**
+     * Nearest-store KNN query using PostGIS <-> distance operator.
+     * Ordered by geography distance (metres) from the given point.
+     * LIMIT is applied in-SQL via the :limit param.
+     */
+    @Query(value = """
+            SELECT *
+            FROM stores s
+            WHERE s.is_open = true AND s.verification_status = 'APPROVED'
+              AND s.location IS NOT NULL
+            ORDER BY s.location <-> ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)
+            LIMIT :limit
+            """, nativeQuery = true)
+    List<Store> findNearestStores(@Param("lat") double lat,
+                                  @Param("lng") double lng,
+                                  @Param("limit") int limit);
+
+    /**
+     * Stores within a given radius in metres using ST_DWithin on geography.
+     */
+    @Query(value = """
+            SELECT *
+            FROM stores s
+            WHERE s.is_open = true AND s.verification_status = 'APPROVED'
+              AND s.location IS NOT NULL
+              AND ST_DWithin(s.location, ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)::geography, :radiusMetres)
+            ORDER BY s.location <-> ST_SetSRID(ST_MakePoint(:lng, :lat), 4326)
+            """, nativeQuery = true)
+    List<Store> findStoresWithinRadius(@Param("lat") double lat,
+                                       @Param("lng") double lng,
+                                       @Param("radiusMetres") double radiusMetres);
 
     List<Store> findByCityIgnoreCase(String city);
 
@@ -25,3 +51,4 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
     long countByVerificationStatus(String verificationStatus);
 }
+

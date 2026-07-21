@@ -6,12 +6,13 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { BrandStamp } from '../../components/ui/BrandStamp';
 import { BrandMark } from '../../components/ui/BrandMark';
-import { Mail, Phone, User, Lock, Store, MapPin, Building2, Loader2, KeyRound } from 'lucide-react';
+import { Mail, Phone, User, Lock, Store, MapPin, Building2, Loader2, KeyRound, Locate } from 'lucide-react';
+import { getUserLocation } from '../../utils/geo';
 
 export function RegisterPage() {
   const [formData, setFormData] = useState({ 
     name: '', username: '', email: '', phone: '', password: '', role: 'CUSTOMER',
-    storeName: '', city: '', storeAddress: '', otp: '', vehicleType: 'Bike', vehicleNumber: '', vehicleName: '', vehicleModel: ''
+    storeName: '', city: '', storeAddress: '', otp: '', vehicleType: 'Bike', vehicleNumber: '', vehicleName: '', vehicleModel: '', storeLat: '', storeLng: ''
   });
   const [step, setStep] = useState(1); // 1: details, 2: otp
   const [error, setError] = useState('');
@@ -60,8 +61,11 @@ export function RegisterPage() {
     try {
       const payload = { ...formData };
       if (payload.role === 'STORE_ADMIN') {
-        payload.storeLat = 0.0;
-        payload.storeLng = 0.0;
+        if (!payload.storeLat || !payload.storeLng) {
+          setError('Please detect your location for the store.');
+          setLoading(false);
+          return;
+        }
       }
       
       await authService.register(payload);
@@ -271,17 +275,38 @@ export function RegisterPage() {
                       )}
 
                       {formData.role === 'STORE_ADMIN' && (
-                        <div className="relative">
-                          <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40" />
-                          <Input
-                            name="storeAddress"
-                            placeholder="Full Store Address"
-                            value={formData.storeAddress}
-                            onChange={handleChange}
-                            required
-                            className="pl-10 h-12 border-border focus:border-bazaar-green"
-                          />
-                        </div>
+                        <>
+                          <div className="relative">
+                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-ink/40" />
+                            <Input
+                              name="storeAddress"
+                              placeholder="Full Store Address"
+                              value={formData.storeAddress}
+                              onChange={handleChange}
+                              required
+                              className="pl-10 h-12 border-border focus:border-bazaar-green"
+                            />
+                          </div>
+                          <div className="relative">
+                            <Button 
+                              type="button" 
+                              variant="outline" 
+                              className="w-full h-12 border-border focus:border-bazaar-green flex items-center justify-center gap-2"
+                              onClick={async () => {
+                                try {
+                                  const loc = await getUserLocation();
+                                  setFormData(prev => ({ ...prev, storeLat: loc.lat, storeLng: loc.lng }));
+                                  alert('Location captured successfully!');
+                                } catch (err) {
+                                  alert('Failed to get location. Please enable permissions.');
+                                }
+                              }}
+                            >
+                              <Locate className="h-5 w-5" /> 
+                              {formData.storeLat ? 'Location Captured' : 'Detect Store Location'}
+                            </Button>
+                          </div>
+                        </>
                       )}
                     </div>
                   )}

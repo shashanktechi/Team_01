@@ -42,8 +42,9 @@ public class CustomerController {
     private CurrentUserProvider currentUserProvider;
 
     @GetMapping("/stores/nearby")
-    public ResponseEntity<?> getNearbyStores(@RequestParam double lat, @RequestParam double lng) {
-        List<Store> stores = storeRepository.findNearestStores(lat, lng);
+    public ResponseEntity<?> getNearbyStores(@RequestParam double lat, @RequestParam double lng,
+                                              @RequestParam(defaultValue = "20") int limit) {
+        List<Store> stores = storeRepository.findNearestStores(lat, lng, limit);
         return ResponseEntity.ok(stores);
     }
 

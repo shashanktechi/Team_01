@@ -1,3 +1,6 @@
+-- Enable PostGIS spatial extension (idempotent)
+CREATE EXTENSION IF NOT EXISTS postgis;
+
 CREATE TABLE IF NOT EXISTS otp_requests (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -59,6 +62,10 @@ CREATE TABLE IF NOT EXISTS stores (
     logo_url VARCHAR(255),
     banner_url VARCHAR(255)
 );
+
+-- Spatial index on stores.location for efficient nearest-store queries
+CREATE INDEX IF NOT EXISTS idx_stores_location ON stores USING GIST (location);
+
 
 -- Products Table
 CREATE TABLE IF NOT EXISTS products (
@@ -265,3 +272,9 @@ ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS target_store_id BIGINT;
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS metadata TEXT;
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS ip_address VARCHAR(45);
 ALTER TABLE audit_logs ADD COLUMN IF NOT EXISTS created_at TIMESTAMP;
+
+-- Orders Payment Additions
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS payment_status VARCHAR(50);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS razorpay_order_id VARCHAR(255);
+ALTER TABLE orders ADD COLUMN IF NOT EXISTS razorpay_payment_id VARCHAR(255);

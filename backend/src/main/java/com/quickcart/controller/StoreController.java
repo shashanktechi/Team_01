@@ -142,11 +142,11 @@ public class StoreController {
         return ResponseEntity.ok(Map.of("success", true));
     }
 
-    @GetMapping("/orders/incoming")
-    public ResponseEntity<?> getIncomingOrders() {
+    @GetMapping("/orders")
+    public ResponseEntity<?> getOrders() {
         Long storeId = currentUserProvider.getCurrentStoreId();
         if (storeId == null) return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-        return ResponseEntity.ok(orderRepository.findByStoreIdAndStatus(storeId, "PENDING"));
+        return ResponseEntity.ok(orderRepository.findByStoreId(storeId));
     }
 
     @PutMapping("/orders/{id}/status")

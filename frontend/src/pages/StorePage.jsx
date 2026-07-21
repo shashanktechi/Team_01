@@ -70,13 +70,10 @@ export function StorePage() {
   return (
     <div className="bg-background text-ink min-h-screen pb-24 font-body">
       <ConflictModal {...conflictState} />
-      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-border">
-        <div className="flex flex-col gap-2 px-4 py-3 w-full">
+      <header className="fixed top-0 left-0 w-full z-[60] bg-surface/90 backdrop-blur-md border-b border-border shadow-sm">
+        <div className="flex flex-col gap-2 px-4 sm:px-6 lg:px-8 py-3 w-full">
           <div className="flex items-center gap-3">
-            <button 
-              onClick={() => navigate('/stores')}
-              className="p-1 hover:bg-surface-variant rounded-full transition-colors active:scale-95 text-ink-muted"
-            >
+            <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-ink hover:bg-surface-variant rounded-full transition-colors active:scale-95">
               <ArrowLeft className="h-6 w-6" />
             </button>
             <div className="flex-1">
@@ -94,7 +91,7 @@ export function StorePage() {
         </div>
       </header>
 
-      <main className="pt-[72px] w-full md:px-6">
+      <main className="pt-[72px] w-full">
         <div className="relative w-full h-48 md:h-64 md:rounded-xl overflow-hidden shadow-sm mt-4 md:mt-0">
           <div className="bg-cover bg-center w-full h-full absolute inset-0" style={{ backgroundImage: `url('${storeDetails?.bannerUrl || '/placeholder-store-banner.svg'}')` }}></div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-4 md:p-6">
@@ -153,10 +150,10 @@ export function StorePage() {
       </main>
 
       {getCartCount() > 0 && (
-        <div className="fixed bottom-0 left-0 w-full z-50 bg-background border-t border-border p-4">
-          <div onClick={() => navigate('/cart')} className="max-w-7xl mx-auto flex items-center justify-between bg-ink text-white p-4 border border-border shadow-[4px_4px_0px_var(--color-ink)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_var(--color-ink)] transition-all cursor-pointer">
+        <div className="fixed bottom-0 md:bottom-6 left-0 right-0 p-4 md:px-6 lg:px-8 z-50">
+          <div onClick={() => navigate('/cart')} className="w-full flex items-center justify-between bg-ink text-white p-4 border border-border shadow-[4px_4px_0px_var(--color-ink)] active:translate-y-[2px] active:translate-x-[2px] active:shadow-[2px_2px_0px_var(--color-ink)] transition-all cursor-pointer">
             <div className="flex flex-col">
-              <span className="font-mono text-xs uppercase tracking-widest text-white/70">{getCartCount()} Item(s) | ${getCartTotal().toFixed(2)}</span>
+              <span className="font-mono text-xs uppercase tracking-widest text-white/70">{getCartCount()} Item(s) | ₹{getCartTotal().toFixed(2)}</span>
               <span className="font-display font-black text-xl tracking-tight text-warning">View Cart</span>
             </div>
             <div className="flex items-center gap-2">

@@ -8,6 +8,7 @@ import org.locationtech.jts.geom.Point;
 import java.math.BigDecimal;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
@@ -25,9 +26,11 @@ public class Store {
     @JoinColumn(name = "owner_id")
     private User owner;
 
+    @NotBlank(message = "Store name is required")
     @Column(nullable = false)
     private String name;
 
+    @NotBlank
     @Column
     private String city = "Hyderabad";
 

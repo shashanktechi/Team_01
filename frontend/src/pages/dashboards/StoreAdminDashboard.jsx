@@ -26,7 +26,7 @@ export function StoreAdminDashboard() {
       setStore(profileRes.data.store);
       setStoreUser(profileRes.data.user);
       
-      const ordersRes = await api.get('/store/orders/incoming');
+      const ordersRes = await api.get('/store/orders');
       setOrders(ordersRes.data);
     } catch (err) {
       console.error("Failed to load dashboard", err);

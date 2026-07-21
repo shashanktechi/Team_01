@@ -21,8 +21,8 @@ export function ProfilePage() {
   ];
 
   return (
-    <div className="bg-background font-body text-ink antialiased min-h-screen w-full">
-      <div className="w-full max-w-2xl mx-auto bg-background h-full min-h-screen flex flex-col relative pb-24">
+    <div className="bg-background font-body text-ink antialiased min-h-screen">
+      <div className="w-full bg-background h-full min-h-screen flex flex-col relative pb-24">
         {/* Header */}
         <header className="bg-primary text-white px-4 py-8 rounded-b-3xl shadow-sm relative z-10 overflow-hidden">
           <div className="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -translate-y-1/2 translate-x-1/3 blur-2xl"></div>

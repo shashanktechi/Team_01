@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +21,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Product name is required")
     @Column(nullable = false)
     private String name;
 
@@ -27,6 +30,7 @@ public class Product {
     @Column(length = 100)
     private String category;
 
+    @NotNull(message = "Unit price is required")
     @Column(name = "unit_price", nullable = false)
     private java.math.BigDecimal unitPrice;
 

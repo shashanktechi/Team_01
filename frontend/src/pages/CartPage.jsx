@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { X, Home, Clock, Plus, Minus, ChevronRight, Info, Wallet, ArrowRight, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { X, Home, Clock, Plus, Minus, ChevronRight, Info, Wallet, ArrowRight, Loader2, Sparkles, AlertCircle, Banknote, CreditCard } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
+import { getUserLocation } from '../utils/geo';
 
 export function CartPage() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ export function CartPage() {
   const [error, setError] = useState(null);
   const [tipAmount, setTipAmount] = useState(20);
   const [deliveryAddress, setDeliveryAddress] = useState(user?.address || '');
+  const [paymentMethod, setPaymentMethod] = useState('COD');
 
   const itemTotal = getCartTotal();
   const freeDeliveryThreshold = 500;
@@ -33,23 +35,71 @@ export function CartPage() {
     setLoading(true);
     setError(null);
     try {
+      let lat = 0.0;
+      let lng = 0.0;
+      try {
+        const loc = await getUserLocation();
+        lat = loc.lat;
+        lng = loc.lng;
+      } catch (e) {
+        console.warn('Could not fetch location for checkout, using defaults', e);
+      }
+
       const orderRequest = {
         items: cartItems.map(item => ({
           productId: item.product.id,
           qty: item.quantity
         })),
         deliveryAddress: deliveryAddress || 'Address not provided',
-        customerLat: 0.0,
-        customerLng: 0.0
+        customerLat: lat,
+        customerLng: lng,
+        paymentMethod: paymentMethod
       };
       
       const response = await api.post('/customer/orders', orderRequest);
-      clearCart();
-      navigate('/track', { state: { orderId: response.data.id } });
+      const orderId = response.data.id;
+
+      if (paymentMethod === 'RAZORPAY') {
+        const rzpRes = await api.post('/payment/create-razorpay-order', { orderId });
+        const options = {
+            key: "rzp_test_TG4Dgisjo7B8Wa",
+            amount: Math.round(grandTotal * 100), // in paise
+            currency: "INR",
+            name: "QuickCart",
+            description: "Order Payment",
+            order_id: rzpRes.data.razorpayOrderId,
+            handler: async function (response) {
+                await api.post('/payment/verify', {
+                    razorpayOrderId: response.razorpay_order_id,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpaySignature: response.razorpay_signature,
+                    orderId: orderId.toString()
+                });
+                clearCart();
+                navigate('/track', { state: { orderId } });
+            },
+            prefill: {
+                name: user?.name || "Customer",
+                email: user?.email || "",
+                contact: user?.phone || ""
+            },
+            theme: {
+                color: "#16A34A"
+            }
+        };
+        const rzp = new window.Razorpay(options);
+        rzp.on('payment.failed', function (response){
+            alert('Payment failed. Please try again.');
+            setLoading(false);
+        });
+        rzp.open();
+      } else {
+        clearCart();
+        navigate('/track', { state: { orderId } });
+      }
     } catch (err) {
       console.error('Checkout failed', err);
       setError('Checkout failed. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
@@ -57,7 +107,7 @@ export function CartPage() {
   if (cartItems.length === 0) {
     return (
       <div className="bg-background font-body text-ink antialiased min-h-screen">
-        <div className="max-w-3xl mx-auto bg-surface h-full min-h-screen flex flex-col relative items-center justify-center p-8">
+        <div className="w-full bg-surface h-full min-h-screen flex flex-col relative items-center justify-center p-8">
           <div className="text-6xl mb-6 opacity-80">🛒</div>
           <h2 className="font-display font-black text-2xl text-ink mb-2">Your cart is empty</h2>
           <p className="font-body text-ink-muted mb-8 text-center max-w-sm">
@@ -73,7 +123,7 @@ export function CartPage() {
 
   return (
     <div className="bg-background font-body text-ink antialiased min-h-screen">
-      <div className="max-w-3xl mx-auto bg-background h-full min-h-screen flex flex-col relative">
+      <div className="w-full bg-background h-full min-h-screen flex flex-col relative">
         <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-border sticky top-0 bg-background/90 backdrop-blur-md z-10">
           <div className="flex flex-col">
             <h2 className="font-display font-black text-2xl text-ink tracking-tight">Checkout</h2>
@@ -172,6 +222,44 @@ export function CartPage() {
                   </button>
                 ))}
               </div>
+            </div>
+          </div>
+
+          {/* Payment Method */}
+          <div className="px-4 mt-6">
+            <h3 className="font-display font-black text-lg mb-3">Payment Method</h3>
+            <div className="flex flex-col gap-3">
+              <label className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'RAZORPAY' ? 'bg-primary/5 border-primary shadow-sm' : 'bg-surface border-border hover:bg-ink/5'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'RAZORPAY' ? 'bg-primary text-white' : 'bg-background border border-border text-ink'}`}>
+                    <CreditCard className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-ink">Online Payment (Razorpay)</p>
+                    <p className="text-xs text-ink-muted">UPI, Cards, NetBanking</p>
+                  </div>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'RAZORPAY' ? 'border-primary' : 'border-ink/20'}`}>
+                  {paymentMethod === 'RAZORPAY' && <div className="w-2.5 h-2.5 bg-primary rounded-full" />}
+                </div>
+                <input type="radio" name="payment" value="RAZORPAY" className="hidden" checked={paymentMethod === 'RAZORPAY'} onChange={() => setPaymentMethod('RAZORPAY')} />
+              </label>
+
+              <label className={`flex items-center justify-between p-4 border rounded-xl cursor-pointer transition-all ${paymentMethod === 'COD' ? 'bg-primary/5 border-primary shadow-sm' : 'bg-surface border-border hover:bg-ink/5'}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${paymentMethod === 'COD' ? 'bg-primary text-white' : 'bg-background border border-border text-ink'}`}>
+                    <Banknote className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <p className="font-bold text-sm text-ink">Cash on Delivery</p>
+                    <p className="text-xs text-ink-muted">Pay at your doorstep</p>
+                  </div>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === 'COD' ? 'border-primary' : 'border-ink/20'}`}>
+                  {paymentMethod === 'COD' && <div className="w-2.5 h-2.5 bg-primary rounded-full" />}
+                </div>
+                <input type="radio" name="payment" value="COD" className="hidden" checked={paymentMethod === 'COD'} onChange={() => setPaymentMethod('COD')} />
+              </label>
             </div>
           </div>
 

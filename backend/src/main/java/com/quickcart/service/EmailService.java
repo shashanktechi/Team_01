@@ -121,6 +121,32 @@ public class EmailService {
         }
     }
 
+    public void sendOrderDeliveredEmail(String toEmail, Long orderId) {
+        log.info("Sending order delivered email from={} to={} for orderId={}", fromAddress, toEmail, orderId);
+        try {
+            jakarta.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
+            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(mimeMessage, "utf-8");
+            
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject("Your QuickCart Order Delivered");
+            
+            String htmlMsg = getHtmlTemplate(
+                "Order Delivered", 
+                "Great news! Your QuickCart order has been successfully delivered.", 
+                "Order #" + orderId, 
+                "Thank you for shopping with us!"
+            );
+            helper.setText(htmlMsg, true);
+
+            mailSender.send(mimeMessage);
+            log.info("Successfully sent order delivered email to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send order delivered email to {} using fromAddress={}: {}", toEmail, fromAddress, e.getMessage(), e);
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
     private String getHtmlTemplate(String title, String message, String otp, String footer) {
         return "<!DOCTYPE html>"
                 + "<html>"

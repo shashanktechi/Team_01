@@ -21,4 +21,12 @@ public class OrderRequest {
 
     @NotNull(message = "Longitude is required")
     private Double customerLng;
+
+    private String paymentMethod; // COD, RAZORPAY
+
+    private String razorpayPaymentId;
+    
+    private String razorpayOrderId;
+    
+    private String razorpaySignature;
 }

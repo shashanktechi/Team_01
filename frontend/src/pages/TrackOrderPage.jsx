@@ -64,8 +64,8 @@ export function TrackOrderPage() {
   const estimatedMins = order.estimatedDeliveryTime || 12;
 
   return (
-    <div className="bg-surface font-body text-ink antialiased min-h-screen pb-6">
-      <div className="max-w-md mx-auto bg-surface min-h-screen flex flex-col relative">
+    <div className="bg-background font-body text-ink antialiased min-h-screen">
+      <div className="w-full bg-surface min-h-screen flex flex-col relative">
         {/* Header (Overlaid on map) */}
         <button onClick={() => navigate('/')} className="absolute top-4 left-4 z-20 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-md text-ink hover:bg-white active:scale-95 transition-all">
           <ArrowLeft className="h-5 w-5" />
@@ -134,28 +134,211 @@ export function TrackOrderPage() {
             </div>
           )}
 
-          {/* Order Status Timeline */}
-          <div className="mb-8 pl-2">
-            <h3 className="font-display font-black text-lg text-ink mb-5">Order Tracking</h3>
-            <div className="flex flex-col gap-6 relative">
-              <div className="absolute left-[11px] top-4 bottom-4 w-0.5 bg-ink/10"></div>
+          {/* ═══════════════════ 3D VISUAL TRACKER ═══════════════════ */}
+          <div className="mb-10 px-2">
+            <h3 className="font-display font-black text-lg text-ink mb-8">Order Progress</h3>
+            
+            {/* 3D Stage */}
+            <div 
+              className="relative w-full mx-auto"
+              style={{ perspective: '800px' }}
+            >
+              {/* The tilted 3D platform */}
+              <div
+                className="relative mx-auto px-6 py-10"
+                style={{
+                  transform: 'rotateX(18deg)',
+                  transformStyle: 'preserve-3d',
+                }}
+              >
+                {/* Background platform slab */}
+                <div 
+                  className="absolute inset-0 rounded-3xl"
+                  style={{
+                    background: 'linear-gradient(135deg, #f0fdf4 0%, #ecfdf5 40%, #f0f9ff 100%)',
+                    border: '1px solid rgba(15, 157, 110, 0.12)',
+                    boxShadow: '0 20px 60px -15px rgba(15, 81, 50, 0.15), 0 8px 24px -8px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.8)',
+                    transform: 'translateZ(-10px)',
+                  }}
+                />
+
+                {/* Horizontal dotted rail */}
+                <div className="relative flex items-center justify-between w-full" style={{ transformStyle: 'preserve-3d' }}>
+                  {/* Rail track (dotted background) */}
+                  <div className="absolute top-1/2 left-[28px] right-[28px] -translate-y-1/2 h-[3px]" style={{ transform: 'translateZ(2px)' }}>
+                    <div className="w-full h-full" style={{ backgroundImage: 'repeating-linear-gradient(90deg, rgba(15,157,110,0.2) 0px, rgba(15,157,110,0.2) 6px, transparent 6px, transparent 14px)', backgroundSize: '14px 3px' }} />
+                  </div>
+                  {/* Rail progress fill */}
+                  <div 
+                    className="absolute top-1/2 left-[28px] -translate-y-1/2 h-[3px] rounded-full transition-all duration-1000 ease-out"
+                    style={{ 
+                      width: `calc(${(currentIndex / 3) * 100}% * (1 - 56px / 100%))`,
+                      maxWidth: `calc(100% - 56px)`,
+                      background: 'linear-gradient(90deg, #0F9D6E, #10B981)',
+                      boxShadow: '0 0 12px rgba(15, 157, 110, 0.4)',
+                      transform: 'translateZ(2px)',
+                    }}
+                  >
+                    {/* Glowing tip */}
+                    <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-[0_0_8px_rgba(15,157,110,0.8)]" />
+                  </div>
+
+                  {/* 4 Junction Nodes */}
+                  {[
+                    { label: 'Confirmed', icon: '📋', color: '#059669' },
+                    { label: 'Packed', icon: '📦', color: '#0891B2' },
+                    { label: 'On the Way', icon: '🏍️', color: '#7C3AED' },
+                    { label: 'Delivered', icon: '✅', color: '#16A34A' }
+                  ].map((step, idx) => {
+                    const isActive = currentIndex >= idx;
+                    const isCurrent = currentIndex === idx;
+
+                    return (
+                      <div key={idx} className="relative flex flex-col items-center z-10" style={{ transformStyle: 'preserve-3d' }}>
+                        {/* 3D Floating Node */}
+                        <div
+                          className="relative transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]"
+                          style={{
+                            transform: `translateZ(${isActive ? '24px' : '4px'}) ${isCurrent ? 'scale(1.15)' : 'scale(1)'}`,
+                            transformStyle: 'preserve-3d',
+                          }}
+                        >
+                          {/* Shadow beneath node */}
+                          <div 
+                            className="absolute -bottom-3 left-1/2 -translate-x-1/2 rounded-full transition-all duration-700"
+                            style={{
+                              width: isActive ? '36px' : '28px',
+                              height: '8px',
+                              background: isActive ? 'radial-gradient(ellipse, rgba(15,81,50,0.25) 0%, transparent 70%)' : 'radial-gradient(ellipse, rgba(0,0,0,0.08) 0%, transparent 70%)',
+                              transform: 'translateZ(-28px)',
+                              filter: 'blur(2px)',
+                            }}
+                          />
+                          
+                          {/* Main node circle */}
+                          <div 
+                            className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-700 ${isCurrent ? 'animate-pulse' : ''}`}
+                            style={{
+                              background: isActive 
+                                ? `linear-gradient(145deg, ${step.color}dd, ${step.color})` 
+                                : 'linear-gradient(145deg, #f9fafb, #e5e7eb)',
+                              boxShadow: isActive 
+                                ? `0 8px 32px ${step.color}44, inset 0 1px 0 rgba(255,255,255,0.3)` 
+                                : '0 2px 8px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)',
+                              border: isActive ? `2px solid ${step.color}` : '2px solid #e5e7eb',
+                            }}
+                          >
+                            <span className={`text-2xl transition-all duration-500 ${!isActive ? 'grayscale opacity-40' : ''} ${isCurrent ? 'scale-110' : ''}`} style={{ filter: isActive ? 'drop-shadow(0 2px 4px rgba(0,0,0,0.2))' : 'none' }}>
+                              {step.icon}
+                            </span>
+                          </div>
+
+                          {/* Checkmark badge */}
+                          {isActive && !isCurrent && (
+                            <div className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md border border-primary/20" style={{ transform: 'translateZ(4px)' }}>
+                              <CheckCircle2 className="h-3.5 w-3.5 text-primary" />
+                            </div>
+                          )}
+
+                          {/* Pulse ring for current step */}
+                          {isCurrent && (
+                            <div className="absolute inset-0 rounded-2xl animate-ping opacity-20" style={{ background: step.color, animationDuration: '2s' }} />
+                          )}
+                        </div>
+                        
+                        {/* Label below node */}
+                        <div 
+                          className="mt-4 flex flex-col items-center gap-1 transition-all duration-500"
+                          style={{ transform: 'translateZ(8px)' }}
+                        >
+                          <span className={`font-display font-black text-[11px] whitespace-nowrap transition-colors duration-500 ${isActive ? 'text-ink' : 'text-ink-muted/50'}`}>
+                            {step.label}
+                          </span>
+                          {isCurrent && (
+                            <span className="font-mono text-[9px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                              Current
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ═══════════════ STEPPED POINT TRACKER ═══════════════ */}
+          <div className="mb-8 px-2">
+            <h3 className="font-display font-black text-lg text-ink mb-6">Tracking Details</h3>
+            <div className="flex flex-col relative ml-1">
               
               {[
-                { label: 'Order Confirmed', desc: 'We have received your order' },
-                { label: 'Order Packed', desc: 'Store has packed your items' },
-                { label: 'Out for Delivery', desc: 'Partner is on the way' },
-                { label: 'Delivered', desc: 'Order delivered successfully' }
+                { label: 'Order Confirmed', desc: 'We have received your order', time: 'Just now', icon: '📋' },
+                { label: 'Order Packed', desc: 'Store has packed your items', time: 'Preparing', icon: '📦' },
+                { label: 'Out for Delivery', desc: 'Delivery partner is on the way', time: 'En route', icon: '🏍️' },
+                { label: 'Delivered', desc: 'Order delivered successfully', time: 'Completed', icon: '✅' }
               ].map((step, idx) => {
                 const isActive = currentIndex >= idx;
                 const isCurrent = currentIndex === idx;
+                const isLast = idx === 3;
+
                 return (
-                  <div key={idx} className="flex gap-5 relative z-10">
-                    <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 border-2 mt-0.5 transition-colors ${isActive ? 'bg-primary border-primary text-white' : 'bg-surface border-border text-transparent'}`}>
-                      {isActive && <CheckCircle2 className="h-4 w-4" />}
+                  <div key={idx} className="flex gap-5 relative">
+                    {/* Vertical connector column */}
+                    <div className="flex flex-col items-center">
+                      {/* Node dot */}
+                      <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 transition-all duration-500 relative z-10 ${
+                        isCurrent 
+                          ? 'bg-primary text-white shadow-[0_0_0_4px_rgba(15,157,110,0.15)]' 
+                          : isActive 
+                            ? 'bg-primary text-white' 
+                            : 'bg-background border-2 border-border'
+                      }`}>
+                        {isActive ? (
+                          <CheckCircle2 className="h-4 w-4" />
+                        ) : (
+                          <div className="w-2 h-2 rounded-full bg-border" />
+                        )}
+                      </div>
+                      {/* Dotted connector line */}
+                      {!isLast && (
+                        <div className="w-0 flex-1 my-1" style={{ 
+                          minHeight: '32px',
+                          borderLeft: `2px ${isActive ? 'solid' : 'dotted'} ${isActive ? '#0F9D6E' : '#E5E7EB'}`,
+                          transition: 'border-color 0.5s ease'
+                        }} />
+                      )}
                     </div>
-                    <div className="flex flex-col">
-                      <span className={`font-body font-bold ${isActive ? 'text-ink' : 'text-ink-muted'}`}>{step.label}</span>
-                      <span className="font-body text-xs text-ink-muted mt-1">{step.desc}</span>
+
+                    {/* Content card */}
+                    <div className={`flex-1 pb-8 transition-all duration-500 ${isLast ? 'pb-0' : ''}`}>
+                      <div className={`rounded-xl p-3 transition-all duration-500 ${
+                        isCurrent 
+                          ? 'bg-primary/5 border border-primary/20 shadow-sm' 
+                          : isActive 
+                            ? 'bg-transparent' 
+                            : 'bg-transparent opacity-50'
+                      }`}>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2.5">
+                            <span className="text-lg">{step.icon}</span>
+                            <span className={`font-display font-bold text-sm ${isActive ? 'text-ink' : 'text-ink-muted'}`}>
+                              {step.label}
+                            </span>
+                          </div>
+                          {isActive && (
+                            <span className={`font-mono text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full ${
+                              isCurrent ? 'bg-primary/10 text-primary' : 'bg-ink/5 text-ink-muted'
+                            }`}>
+                              {isCurrent ? 'In Progress' : 'Done'}
+                            </span>
+                          )}
+                        </div>
+                        <p className={`font-body text-xs mt-1.5 ml-[30px] ${isActive ? 'text-ink-muted' : 'text-ink-muted/50'}`}>
+                          {step.desc}
+                        </p>
+                      </div>
                     </div>
                   </div>
                 );

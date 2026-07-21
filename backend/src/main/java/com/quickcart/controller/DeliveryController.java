@@ -9,6 +9,7 @@ import com.quickcart.entity.Swarm;
 import com.quickcart.entity.User;
 import com.quickcart.service.NotificationService;
 import com.quickcart.service.SwarmBatchingService;
+import com.quickcart.service.EmailService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +36,9 @@ public class DeliveryController {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private SwarmBatchingService swarmBatchingService;
@@ -99,6 +103,37 @@ public class DeliveryController {
         ));
     }
 
+    /** Returns all orders with PENDING status that have no delivery partner assigned yet. */
+    @GetMapping("/pending-orders")
+    public ResponseEntity<?> getPendingOrders() {
+        getCurrentDeliveryPartner();
+        List<Order> pending = orderRepository.findAll().stream()
+                .filter(o -> "PENDING".equals(o.getStatus()) && o.getDeliveryPartner() == null)
+                .collect(java.util.stream.Collectors.toList());
+        return ResponseEntity.ok(pending);
+    }
+
+    /** Delivery agent accepts (claims) a pending order. */
+    @PostMapping("/accept-order/{orderId}")
+    public ResponseEntity<?> acceptOrder(@PathVariable Long orderId) {
+        User partner = getCurrentDeliveryPartner();
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Order not found"));
+        if (!"PENDING".equals(order.getStatus())) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Order is not in PENDING status"));
+        }
+        if (order.getDeliveryPartner() != null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Order already claimed by another delivery partner"));
+        }
+        order.setDeliveryPartner(partner);
+        order.setStatus("ACCEPTED");
+        Order saved = orderRepository.save(order);
+        if (saved.getCustomer() != null) {
+            notificationService.notifyCustomer(saved.getCustomer().getId(), saved);
+        }
+        return ResponseEntity.ok(Map.of("accepted", true, "orderId", orderId, "status", "ACCEPTED"));
+    }
+
     @PatchMapping("/status")
     public ResponseEntity<?> updateOrderStatus(@RequestBody @jakarta.validation.Valid com.quickcart.dto.request.OrderStatusUpdateRequest request) {
         // Check delivery partner approval for mutating operation
@@ -124,6 +159,9 @@ public class DeliveryController {
 
         if (savedOrder.getCustomer() != null) {
             notificationService.notifyCustomer(savedOrder.getCustomer().getId(), savedOrder);
+            if ("DELIVERED".equals(statusStr) && savedOrder.getCustomer().getEmail() != null) {
+                emailService.sendOrderDeliveredEmail(savedOrder.getCustomer().getEmail(), savedOrder.getId());
+            }
         }
 
         return ResponseEntity.ok(Map.of(

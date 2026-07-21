@@ -83,7 +83,8 @@ public class OrderRoutingServiceTest {
             assertNotNull(order);
         } catch (RuntimeException e) {
             // Expected since we didn't populate inventory
-            assertEquals("No nearby store has all requested items in stock", e.getMessage());
+            assertEquals("No store has all items in stock nearby.", e.getMessage());
         }
     }
 }
+

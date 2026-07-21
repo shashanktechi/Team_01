@@ -28,6 +28,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     List<Order> findByStoreIdAndStatus(Long storeId, String status);
 
+    List<Order> findByStoreId(Long storeId);
+
     List<Order> findByCustomerId(Long customerId);
 
     @Query("SELECT COUNT(o) FROM Order o WHERE o.status NOT IN ('DELIVERED', 'CANCELLED', 'REFUNDED')")
