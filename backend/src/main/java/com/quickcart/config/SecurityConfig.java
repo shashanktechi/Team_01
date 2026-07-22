@@ -35,7 +35,7 @@ public class SecurityConfig {
     @Autowired
     private AuthenticationCheckFilter authenticationCheckFilter;
 
-    @Value("${cors.allowed.origins:http://localhost:3000}")
+    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174,https://quickcart01.vercel.app}")
     private String corsAllowedOrigins;
 
     @Bean

@@ -8,13 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    @Value("${cors.allowed.origins:http://localhost:5173,http://localhost:5174,http://localhost:3000}")
-    private String[] allowedOrigins;
+    @Value("${cors.allowed-origins:http://localhost:3000,http://localhost:5173,http://localhost:5174,https://quickcart01.vercel.app}")
+    private String allowedOriginsRaw;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
+        String[] origins = allowedOriginsRaw.split(",");
         registry.addMapping("/**")
-                .allowedOrigins(allowedOrigins)
+                .allowedOrigins(origins)
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
                 .allowedHeaders("*")
                 .allowCredentials(true);

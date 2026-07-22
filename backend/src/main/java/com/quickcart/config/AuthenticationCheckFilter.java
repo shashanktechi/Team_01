@@ -27,7 +27,16 @@ public class AuthenticationCheckFilter extends OncePerRequestFilter {
 
         // Skip authentication check for auth endpoints, websocket, and swagger (same as SecurityConfig)
         String path = request.getRequestURI();
+        String method = request.getMethod();
+
+        // Always pass through OPTIONS preflight requests — CORS handler responds to these
+        if ("OPTIONS".equalsIgnoreCase(method)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (path.startsWith("/api/auth/") ||
+            path.startsWith("/api/public/") ||
             path.startsWith("/ws/") ||
             path.startsWith("/swagger-ui/") ||
             path.startsWith("/v3/api-docs/")) {
