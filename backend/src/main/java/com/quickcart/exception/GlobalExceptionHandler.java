@@ -104,13 +104,28 @@ public class GlobalExceptionHandler {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         if (message != null) {
             String messageLower = message.toLowerCase();
-            if (ex instanceof IllegalArgumentException || 
-                messageLower.contains("invalid") || 
-                messageLower.contains("required") || 
-                messageLower.contains("must be")) {
+            if (ex instanceof IllegalArgumentException ||
+                messageLower.contains("invalid") ||
+                messageLower.contains("required") ||
+                messageLower.contains("must be") ||
+                messageLower.contains("otp") ||
+                messageLower.contains("expired") ||
+                messageLower.contains("too many") ||
+                messageLower.contains("limit exceeded") ||
+                messageLower.contains("already used") ||
+                messageLower.contains("already registered") ||
+                messageLower.contains("already taken") ||
+                messageLower.contains("please request") ||
+                messageLower.contains("please start over")) {
                 status = HttpStatus.BAD_REQUEST;
             } else if (messageLower.contains("not found")) {
                 status = HttpStatus.NOT_FOUND;
+            } else if (messageLower.contains("not approved") ||
+                       messageLower.contains("deactivated")) {
+                status = HttpStatus.FORBIDDEN;
+            } else if (messageLower.contains("failed to send") ||
+                       messageLower.contains("failed to")) {
+                status = HttpStatus.SERVICE_UNAVAILABLE;
             }
         } else if (ex instanceof IllegalArgumentException) {
             status = HttpStatus.BAD_REQUEST;
