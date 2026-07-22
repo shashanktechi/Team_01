@@ -3,7 +3,9 @@ import axios from 'axios';
 export const api = axios.create({
   // When the Vite proxy is active, relative '/api' requests are forwarded to
   // http://localhost:8082, so we fall back to the full URL only in production.
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  baseURL: (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '').endsWith('/api') 
+    ? (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '') 
+    : (import.meta.env.VITE_API_BASE_URL || '/api').replace(/\/+$/, '') + '/api',
   headers: {
     'Content-Type': 'application/json',
   },
