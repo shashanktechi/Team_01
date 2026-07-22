@@ -5,7 +5,7 @@ import { BrandStamp } from '../components/ui/BrandStamp';
 import { BrandMark } from '../components/ui/BrandMark';
 import { useCity } from '../context/CityContext';
 import { useAuth } from '../context/AuthContext';
-import { TagSphere } from '../components/ui/TagSphere';
+import { HeroSphere3D } from '../components/ui/HeroSphere3D';
 import { Card } from '../components/ui/Card';
 import { MapPin, Navigation, CheckCircle, Users } from 'lucide-react';
 
