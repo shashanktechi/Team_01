@@ -1,5 +1,5 @@
 import React, { Suspense, useMemo, useRef, useEffect, useState } from 'react';
-import { Canvas, useFrame } from '@react-three/fiber';
+import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls, Environment } from '@react-three/drei';
 import * as THREE from 'three';
 import { TagSphere as TagSphereFallback } from './TagSphere';
@@ -123,13 +123,17 @@ function Chip({ position, emoji, index }) {
 
 function SphereScene({ isMobile }) {
   const groupRef = useRef();
+  const { viewport } = useThree();
+  
+  // Dynamic scale based on viewport to fit the window perfectly
+  const scale = Math.min(Math.max(viewport.width / 10, 0.8), 2.2);
   
   // Generate Fibonacci sphere points
   const points = useMemo(() => {
     // Reduce items on mobile to save performance
     const activeItems = isMobile ? items.slice(0, Math.floor(items.length * 0.6)) : items;
     const N = activeItems.length;
-    const radius = isMobile ? 3.5 : 4.5;
+    const radius = 4.8; // Base radius, scale will handle the responsive sizing
     
     return activeItems.map((item, i) => {
       const y = 1 - (i / (N - 1)) * 2;
@@ -150,11 +154,21 @@ function SphereScene({ isMobile }) {
     if (groupRef.current) {
       // Auto-rotate slowly
       groupRef.current.rotation.y += delta * 0.15;
+      
+      // Map scroll to 3D rotation for interactivity
+      const scrollY = window.scrollY;
+      const targetRotationX = scrollY * 0.0015;
+      const targetRotationY = scrollY * 0.0025;
+      
+      // Smoothly lerp towards the target scroll rotation
+      groupRef.current.rotation.x = THREE.MathUtils.lerp(groupRef.current.rotation.x, targetRotationX, 0.08);
+      // We don't lerp Y completely because we want the auto-rotation to persist, 
+      // but we can add the scroll velocity to it. We'll stick to lerping X for the scroll effect.
     }
   });
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={scale}>
       {points.map((point, i) => (
         <Chip key={point.id} position={point.position} emoji={point.icon} index={i} />
       ))}
@@ -200,7 +214,7 @@ export function HeroSphere3D() {
   }
 
   return (
-    <div className="relative w-full max-w-[420px] sm:max-w-[540px] md:max-w-[660px] lg:max-w-[780px] aspect-square mx-auto touch-none">
+    <div className="relative w-full h-full touch-none">
       <Suspense fallback={<div className="w-full h-full flex items-center justify-center opacity-50">Loading 3D Experience...</div>}>
         <Canvas camera={{ position: [0, 0, 9], fov: 45 }} gl={{ antialias: true, alpha: true }}>
           <ambientLight intensity={1.5} />

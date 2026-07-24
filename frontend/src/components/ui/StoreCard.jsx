@@ -27,15 +27,15 @@ export function StoreCard({ id, bannerImage, logoImage, name, rating, categories
             </div>
           )}
         </div>
-        <div className="p-4 pt-6 relative bg-surface">
+        <div className="p-4 pt-6 relative bg-transparent">
           {/* Overlapping Logo */}
-          <div className="absolute -top-6 left-4 w-12 h-12 rounded border border-border bg-surface overflow-hidden shadow-sm flex items-center justify-center p-1">
+          <div className="absolute -top-6 left-4 w-12 h-12 rounded border border-border bg-white/50 backdrop-blur-md overflow-hidden shadow-sm flex items-center justify-center p-1">
             <img className="w-full h-full object-contain" alt={`${name} logo`} src={logoImage} />
           </div>
           
           <div className="flex justify-between items-start mb-1">
-            <h3 className="font-body font-bold text-base text-ink line-clamp-1">{name}</h3>
-            <div className="flex items-center gap-1 bg-warning/10 border border-marigold/30 px-1.5 py-0.5 rounded text-xs font-bold text-ink">
+            <h3 className="font-body font-bold text-base text-black line-clamp-1">{name}</h3>
+            <div className="flex items-center gap-1 bg-warning/20 border border-warning/30 px-1.5 py-0.5 rounded text-xs font-bold text-black">
               <span>{rating}</span>
               <Star className="text-warning h-3 w-3" fill="currentColor" />
             </div>

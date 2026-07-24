@@ -105,36 +105,94 @@ export function DeliveryProfile() {
           </div>
         </Card>
 
-        {/* Documents */}
-        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-4">
+        {/* KYC Documents */}
+        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-6 col-span-1 md:col-span-2">
           <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2 flex items-center gap-2">
-            <FileText className="w-5 h-5 text-primary" /> RC Document
+            <FileText className="w-5 h-5 text-primary" /> KYC Documents
           </h3>
-          {profile.vehicleDocUrl ? (
-            <div className="w-full aspect-video rounded-lg overflow-hidden border border-border bg-background">
-              <img src={profile.vehicleDocUrl} alt="Vehicle Document" className="w-full h-full object-cover" />
+          <p className="text-sm text-ink-muted mb-2">Upload all 6 documents to complete your KYC verification.</p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            
+            {/* 1. SSC */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold flex items-center justify-between">
+                SSC Certificate {profile.sscVerified && <ShieldCheck className="w-4 h-4 text-bazaar-green" />}
+              </span>
+              <ImageUploader 
+                currentImageUrl={profile.sscCertUrl}
+                confirmEndpoint={`/media/kyc-documents?docType=ssc`}
+                onUploadSuccess={fetchProfile}
+                label="Upload SSC"
+              />
             </div>
-          ) : (
-            <div className="w-full aspect-video rounded-lg border border-dashed border-border flex items-center justify-center text-ink-muted bg-background">
-              No Document Uploaded
-            </div>
-          )}
-        </Card>
 
-        {/* Bike Photo */}
-        <Card className="bg-surface shadow-sm border-border p-6 flex flex-col gap-4">
-          <h3 className="font-display font-bold text-xl text-ink border-b border-border pb-2 flex items-center gap-2">
-            <Image className="w-5 h-5 text-primary" /> Bike Photo
-          </h3>
-          {profile.vehiclePhotoUrl ? (
-            <div className="w-full aspect-video rounded-lg overflow-hidden border border-border bg-background">
-              <img src={profile.vehiclePhotoUrl} alt="Bike Photo" className="w-full h-full object-cover" />
+            {/* 2. Inter */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold flex items-center justify-between">
+                Inter Certificate {profile.interVerified && <ShieldCheck className="w-4 h-4 text-bazaar-green" />}
+              </span>
+              <ImageUploader 
+                currentImageUrl={profile.interCertUrl}
+                confirmEndpoint={`/media/kyc-documents?docType=inter`}
+                onUploadSuccess={fetchProfile}
+                label="Upload Inter"
+              />
             </div>
-          ) : (
-            <div className="w-full aspect-video rounded-lg border border-dashed border-border flex items-center justify-center text-ink-muted bg-background">
-              No Bike Photo Uploaded
+
+            {/* 3. Driver License */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold flex items-center justify-between">
+                Driver License {profile.driverLicenseVerified && <ShieldCheck className="w-4 h-4 text-bazaar-green" />}
+              </span>
+              <ImageUploader 
+                currentImageUrl={profile.driverLicenseUrl}
+                confirmEndpoint={`/media/kyc-documents?docType=driverLicense`}
+                onUploadSuccess={fetchProfile}
+                label="Upload License"
+              />
             </div>
-          )}
+
+            {/* 4. Bike RC */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold flex items-center justify-between">
+                Bike RC {profile.bikeRcVerified && <ShieldCheck className="w-4 h-4 text-bazaar-green" />}
+              </span>
+              <ImageUploader 
+                currentImageUrl={profile.bikeRcUrl}
+                confirmEndpoint={`/media/kyc-documents?docType=bikeRc`}
+                onUploadSuccess={fetchProfile}
+                label="Upload Bike RC"
+              />
+            </div>
+
+            {/* 5. Other Cert */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold flex items-center justify-between">
+                Other Certificate {profile.otherCertVerified && <ShieldCheck className="w-4 h-4 text-bazaar-green" />}
+              </span>
+              <ImageUploader 
+                currentImageUrl={profile.otherCertUrl}
+                confirmEndpoint={`/media/kyc-documents?docType=otherCert`}
+                onUploadSuccess={fetchProfile}
+                label="Upload Other"
+              />
+            </div>
+
+            {/* 6. Aadhar */}
+            <div className="flex flex-col gap-2">
+              <span className="text-sm font-bold flex items-center justify-between">
+                Aadhar Card {profile.aadharVerified && <ShieldCheck className="w-4 h-4 text-bazaar-green" />}
+              </span>
+              <ImageUploader 
+                currentImageUrl={profile.aadharUrl}
+                confirmEndpoint={`/media/kyc-documents?docType=aadhar`}
+                onUploadSuccess={fetchProfile}
+                label="Upload Aadhar"
+              />
+            </div>
+            
+          </div>
         </Card>
       </div>
     </div>

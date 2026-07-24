@@ -7,6 +7,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { MapPin, Navigation, Package, LogOut, Loader2 } from 'lucide-react';
+import { useEnvironment } from '../../context/EnvironmentContext';
 
 import { User } from 'lucide-react';
 import { DeliveryTasks } from './DeliveryTasks';
@@ -19,6 +20,11 @@ export function DeliveryDashboard() {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState({ swarms: [], orders: [] });
   const [loading, setLoading] = useState(true);
+  const { setMode } = useEnvironment();
+
+  useEffect(() => {
+    setMode('dashboard');
+  }, [setMode]);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -50,8 +56,8 @@ export function DeliveryDashboard() {
   const hasActiveTasks = tasks.swarms.length > 0 || tasks.orders.length > 0;
 
   return (
-    <div className="bg-background font-body text-ink min-h-screen pb-12">
-      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
+    <div className="bg-transparent font-body text-ink min-h-screen pb-12">
+      <header className="fixed top-0 w-full z-50 bg-[var(--color-surface)]/90 backdrop-blur-md border-b border-border shadow-night">
         <div className="flex items-center justify-between px-6 py-4 w-full">
           <BrandMark />
           <div className="flex items-center gap-4">

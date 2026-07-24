@@ -4,6 +4,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { BrandMark } from '../../components/ui/BrandMark';
 import { Button } from '../../components/ui/Button';
+import { useEnvironment } from '../../context/EnvironmentContext';
 import { Store, ListOrdered, Package, LogOut, Loader2, Plus, User } from 'lucide-react';
 
 import { StoreAdminOverview } from './StoreAdminOverview';
@@ -15,10 +16,15 @@ export function StoreAdminDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setMode } = useEnvironment();
   const [store, setStore] = useState(null);
   const [storeUser, setStoreUser] = useState(null);
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setMode('dashboard');
+  }, [setMode]);
 
   const fetchDashboardData = async () => {
     try {
@@ -62,8 +68,8 @@ export function StoreAdminDashboard() {
   }
 
   return (
-    <div className="bg-background font-body text-ink min-h-screen pb-12">
-      <header className="fixed top-0 w-full z-50 bg-background/90 backdrop-blur-md border-b border-border shadow-sm">
+    <div className="bg-transparent font-body text-ink min-h-screen pb-12">
+      <header className="fixed top-0 w-full z-50 bg-[var(--color-surface)]/90 backdrop-blur-md border-b border-border shadow-night">
         <div className="flex items-center justify-between px-6 py-4 w-full">
           <div className="flex items-center gap-6">
             <BrandMark />

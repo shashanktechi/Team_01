@@ -1,4 +1,15 @@
 {
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.compile.nullAnalysis.mode": "automatic"
+    "java.compile.nullAnalysis.mode": "automatic",
+
+    // Tailwind CSS v4 uses @theme, @utility, and @layer at-rules that VS Code's
+    // built-in CSS validator does not recognise. The Vite build handles these
+    // correctly; suppress the false-positive linter warnings here.
+    "css.validate": false,
+    "scss.validate": false,
+
+    // If you have the official Tailwind CSS IntelliSense extension installed it
+    // will provide accurate completions and validation in place of the above.
+    "tailwindCSS.experimental.classRegex": [],
+    "postman.settings.dotenv-detection-notification-visibility": false
 }

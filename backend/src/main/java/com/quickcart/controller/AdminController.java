@@ -214,6 +214,76 @@ public class AdminController {
         return ResponseEntity.ok(Map.of("success", true));
     }
 
+    @PutMapping("/delivery-partners/{id}/verify-document")
+    public ResponseEntity<?> verifyDeliveryPartnerDocument(@PathVariable Long id,
+                                                           @RequestBody Map<String, Object> body) {
+        User partner = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Delivery Partner not found"));
+
+        if (!"DELIVERY_PARTNER".equals(partner.getRole())) {
+            throw new RuntimeException("User is not a delivery partner");
+        }
+
+        String docType = (String) body.get("docType");
+        Boolean verified = (Boolean) body.get("verified");
+        if (docType == null || verified == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "docType and verified are required"));
+        }
+
+        switch (docType) {
+            case "ssc": partner.setSscVerified(verified); break;
+            case "inter": partner.setInterVerified(verified); break;
+            case "driverLicense": partner.setDriverLicenseVerified(verified); break;
+            case "bikeRc": partner.setBikeRcVerified(verified); break;
+            case "otherCert": partner.setOtherCertVerified(verified); break;
+            case "aadhar": partner.setAadharVerified(verified); break;
+            default: return ResponseEntity.badRequest().body(Map.of("error", "Invalid document type"));
+        }
+
+        userRepository.save(partner);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Document verified status updated"));
+    }
+
+    @PostMapping("/delivery-partners/{id}/send-kyc-email")
+    public ResponseEntity<?> sendKycEmail(@PathVariable Long id) {
+        User partner = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Delivery Partner not found"));
+
+        if (!"DELIVERY_PARTNER".equals(partner.getRole())) {
+            throw new RuntimeException("User is not a delivery partner");
+        }
+
+        boolean allVerified = Boolean.TRUE.equals(partner.getSscVerified()) &&
+                              Boolean.TRUE.equals(partner.getInterVerified()) &&
+                              Boolean.TRUE.equals(partner.getDriverLicenseVerified()) &&
+                              Boolean.TRUE.equals(partner.getBikeRcVerified()) &&
+                              Boolean.TRUE.equals(partner.getOtherCertVerified()) &&
+                              Boolean.TRUE.equals(partner.getAadharVerified());
+
+        if (allVerified) {
+            partner.setVerificationStatus("APPROVED");
+            partner.setIsActive(true);
+            userRepository.save(partner);
+            emailService.sendKycStatusEmail(partner.getEmail(), true, java.util.Collections.<String>emptyList());
+        } else {
+            partner.setVerificationStatus("REJECTED");
+            partner.setIsActive(false);
+            userRepository.save(partner);
+            
+            java.util.List<String> unverified = new java.util.ArrayList<>();
+            if (!Boolean.TRUE.equals(partner.getSscVerified())) unverified.add("SSC Certificate");
+            if (!Boolean.TRUE.equals(partner.getInterVerified())) unverified.add("Inter Certificate");
+            if (!Boolean.TRUE.equals(partner.getDriverLicenseVerified())) unverified.add("Driver License");
+            if (!Boolean.TRUE.equals(partner.getBikeRcVerified())) unverified.add("Bike RC");
+            if (!Boolean.TRUE.equals(partner.getOtherCertVerified())) unverified.add("Other Certificate");
+            if (!Boolean.TRUE.equals(partner.getAadharVerified())) unverified.add("Aadhar Card");
+
+            emailService.sendKycStatusEmail(partner.getEmail(), false, unverified);
+        }
+
+        return ResponseEntity.ok(Map.of("success", true, "message", "KYC email sent", "isApproved", allVerified));
+    }
+
     @Autowired
     private com.quickcart.repository.CategoryTaxRepository categoryTaxRepository;
 

@@ -1,9 +1,9 @@
 import React from 'react';
 
-const Card = React.forwardRef(({ className = '', ...props }, ref) => (
+const Card = React.forwardRef(({ className = '', floating = true, ...props }, ref) => (
   <div
     ref={ref}
-    className={`bg-surface rounded-xl border border-border shadow-sm ${className}`}
+    className={`fm-panel rounded-2xl ${floating ? 'hover:-translate-y-0.5 transition-transform duration-300' : ''} ${className}`}
     {...props}
   />
 ));

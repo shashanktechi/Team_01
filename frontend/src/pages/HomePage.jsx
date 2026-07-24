@@ -3,11 +3,15 @@ import { useNavigate } from 'react-router';
 import { StoreCard } from '../components/ui/StoreCard';
 import { ProductCard } from '../components/ui/ProductCard';
 import { ConflictModal } from '../components/ui/ConflictModal';
+import { CategoryItem } from '../components/ui/CategoryItem';
+import { LoadingSpinner3D } from '../components/ui/LoadingSpinner3D';
+import { EmptyState3D } from '../components/ui/EmptyState3D';
 import { api } from '../services/api';
 import { useCity } from '../context/CityContext';
 import { useCart } from '../context/CartContext';
 import { ChevronRight, Percent, Clock, Search, Mic, MapPin, Map as MapIcon } from 'lucide-react';
 import { getUserLocation, formatDistance } from '../utils/geo';
+import { useEnvironment } from '../context/EnvironmentContext';
 
 // Lazy-load the map so it doesn't bloat the initial bundle
 const StoreMap = lazy(() => import('../components/ui/StoreMap'));
@@ -19,6 +23,11 @@ export function HomePage() {
   const [topPicks, setTopPicks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const { setMode } = useEnvironment();
+
+  useEffect(() => {
+    setMode('storefront');
+  }, [setMode]);
 
   // ── Geolocation / nearby stores state ──────────────────────────────────────
   const [userLocation, setUserLocation] = useState(null);      // { lat, lng }
@@ -254,22 +263,16 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* Categories Grid */}
+      {/* Categories Grid — 3D icon chips */}
       <section className="px-4 md:px-0">
         <div className="grid grid-cols-4 md:grid-cols-8 gap-3 sm:gap-4">
           {categories.map((cat) => (
-            <div
+            <CategoryItem
               key={cat.id}
-              className="flex flex-col items-center gap-2 cursor-pointer group"
+              name={cat.name}
+              image={cat.icon}
               onClick={() => setSearchQuery(cat.name === 'See All' ? '' : cat.name)}
-            >
-              <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-2xl ${cat.color} flex items-center justify-center text-3xl sm:text-4xl shadow-sm group-hover:-translate-y-1 transition-transform border border-border`}>
-                {cat.icon}
-              </div>
-              <span className="text-[10px] sm:text-xs font-medium text-ink text-center leading-tight">
-                {cat.name}
-              </span>
-            </div>
+            />
           ))}
         </div>
       </section>
@@ -331,30 +334,26 @@ export function HomePage() {
         </div>
 
         {loading ? (
-          // Loading skeletons
-          <div className="flex flex-wrap gap-4 w-full">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="w-full sm:w-[320px] h-48 bg-surface border border-border rounded-2xl animate-pulse" />
-            ))}
+          // Loading state with 3D spinner
+          <div className="flex flex-col items-center justify-center py-16 gap-4">
+            <LoadingSpinner3D size={56} />
+            <p className="font-mono text-xs uppercase tracking-widest" style={{ color: '#6B6D76' }}>Finding stores near you…</p>
           </div>
         ) : regularStores.length === 0 && mandiStores.length === 0 ? (
-          <div className="bg-surface border border-border shadow-sm rounded-2xl p-8 text-center flex flex-col items-center justify-center">
-            <div className="w-16 h-16 bg-background rounded-full flex items-center justify-center mb-4 text-4xl shadow-inner">
-              🏪
-            </div>
-            <h3 className="font-bold text-xl text-ink mb-2">No stores in &ldquo;{selectedCity}&rdquo;</h3>
-            <p className="text-sm text-ink-muted mb-4 max-w-xs mx-auto">
-              We couldn&apos;t find any stores in your selected city. Try changing your city.
-            </p>
-            <div className="flex gap-3 flex-wrap justify-center">
+          <EmptyState3D
+            variant="crate"
+            title={`No stores in "${selectedCity || 'your city'}"`}
+            description="We couldn't find any stores here. Try changing your city."
+            action={
               <button
                 onClick={() => setIsCityModalOpen(true)}
-                className="bg-primary text-white font-mono text-sm font-bold uppercase tracking-wider px-6 py-2.5 rounded-lg shadow-md hover:bg-primary/90 active:scale-95 transition-all"
+                className="font-mono text-sm font-bold uppercase tracking-wider px-6 py-2.5 rounded-xl text-white transition-all hover:-translate-y-0.5"
+                style={{ background: '#16A34A', boxShadow: '0 0 20px rgba(22, 163, 74,0.3)' }}
               >
                 Change City
               </button>
-            </div>
-          </div>
+            }
+          />
         ) : (
           <div className="flex flex-wrap gap-4 w-full">
             {regularStores.map((store) => (

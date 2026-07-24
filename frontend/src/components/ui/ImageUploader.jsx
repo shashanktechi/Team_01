@@ -18,9 +18,9 @@ export const ImageUploader = ({
     const file = e.target.files[0];
     if (!file) return;
      
-    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp', 'application/pdf'];
     if (!validTypes.includes(file.type)) {
-      setError("Please select a valid image (JPEG, PNG, WebP).");
+      setError("Please select a valid file (JPEG, PNG, WebP, PDF).");
       return;
     }
 
@@ -56,11 +56,17 @@ export const ImageUploader = ({
   return (
     <div className={`flex flex-col items-start gap-4 ${className}`}>
       {currentImageUrl && (
-        <img 
-          src={currentImageUrl} 
-          alt="Current" 
-          className="w-32 h-32 object-cover rounded-lg border border-gray-200" 
-        />
+        currentImageUrl.toLowerCase().endsWith('.pdf') ? (
+          <div className="w-full h-32 flex items-center justify-center bg-surface border border-border rounded-lg text-ink-muted">
+            <a href={currentImageUrl} target="_blank" rel="noreferrer" className="text-primary hover:underline font-bold text-sm">View PDF Document</a>
+          </div>
+        ) : (
+          <img 
+            src={currentImageUrl} 
+            alt="Uploaded content" 
+            className="w-full max-h-48 object-contain rounded-lg border border-border"
+          />
+        )
       )}
       <div>
         <input

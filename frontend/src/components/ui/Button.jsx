@@ -10,36 +10,59 @@ export const Button = React.forwardRef(({
   ...props 
 }, ref) => {
   
-  const baseStyles = "relative inline-flex items-center justify-center font-bold transition-colors duration-150 active:scale-[0.98] disabled:opacity-50 disabled:pointer-events-none rounded";
+  const baseStyles = [
+    'relative inline-flex items-center justify-center font-bold transition-all duration-200',
+    'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2',
+    'disabled:opacity-50 disabled:pointer-events-none rounded-xl',
+    'active:scale-[0.97] active:translate-y-px',
+  ].join(' ');
   
-  // Custom price-tag clip path for primary/danger buttons
-  const tagClipPath = {
-    clipPath: "polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%)"
-  };
-
   const variants = {
-    primary: "bg-primary text-surface hover:brightness-95",
-    secondary: "border-2 border-ink text-ink hover:bg-ink/5",
-    danger: "bg-error text-surface hover:brightness-95",
-    outline: "border border-border text-ink hover:bg-ink/5",
-    ghost: "text-ink hover:bg-ink/5"
+    primary: [
+      'bg-[#16A34A] text-white',
+      'shadow-[0_0_24px_rgba(22, 163, 74,0.35),0_4px_16px_rgba(22, 163, 74,0.25)]',
+      'hover:bg-[#E04B12] hover:shadow-[0_0_32px_rgba(22, 163, 74,0.5),0_8px_24px_rgba(22, 163, 74,0.35)]',
+      'hover:-translate-y-0.5',
+      'focus-visible:ring-[#16A34A]',
+    ].join(' '),
+    secondary: [
+      'bg-[#22C55E] text-white',
+      'shadow-[0_0_20px_rgba(34, 197, 94,0.3)]',
+      'hover:bg-[#00B898] hover:shadow-[0_0_28px_rgba(34, 197, 94,0.45)]',
+      'hover:-translate-y-0.5',
+      'focus-visible:ring-[#22C55E]',
+    ].join(' '),
+    outline: [
+      'border-2 border-[#16A34A] text-[#16A34A] bg-transparent',
+      'hover:bg-[#16A34A]/8 hover:-translate-y-0.5',
+      'focus-visible:ring-[#16A34A]',
+    ].join(' '),
+    ghost: [
+      'text-ink bg-transparent hover:bg-ink/6',
+      'focus-visible:ring-ink',
+    ].join(' '),
+    danger: [
+      'bg-[#E53E3E] text-white',
+      'shadow-[0_4px_16px_rgba(229,62,62,0.3)]',
+      'hover:bg-[#C53030] hover:-translate-y-0.5',
+      'focus-visible:ring-[#E53E3E]',
+    ].join(' '),
+    // Legacy aliases
+    'secondary-outline': 'border-2 border-ink text-ink hover:bg-ink/5 focus-visible:ring-ink',
   };
 
   const sizes = {
-    default: "h-12 px-6 py-3",
-    sm: "h-9 px-4 py-2 text-sm",
-    lg: "h-14 px-8 py-4 text-lg",
-    icon: "h-10 w-10"
+    default: 'h-12 px-6 py-3 text-sm',
+    sm: 'h-9 px-4 py-2 text-xs',
+    lg: 'h-14 px-8 py-4 text-base',
+    icon: 'h-10 w-10 p-0',
   };
-
-  const isTagShape = variant === 'primary' || variant === 'danger';
 
   return (
     <button
       ref={ref}
       disabled={disabled || isLoading}
-      className={`${baseStyles} ${variants[variant]} ${sizes[size]} ${className}`}
-      style={isTagShape ? tagClipPath : {}}
+      className={`${baseStyles} ${variants[variant] || variants.primary} ${sizes[size]} ${className}`}
       {...props}
     >
       {isLoading ? (

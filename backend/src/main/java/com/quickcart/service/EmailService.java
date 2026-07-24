@@ -179,4 +179,41 @@ public class EmailService {
                 + "</body>"
                 + "</html>";
     }
+
+    public void sendKycStatusEmail(String toEmail, boolean isApproved, java.util.List<String> unverifiedDocs) {
+        log.info("Sending KYC status email to={}, isApproved={}", toEmail, isApproved);
+        try {
+            jakarta.mail.internet.MimeMessage mimeMessage = mailSender.createMimeMessage();
+            org.springframework.mail.javamail.MimeMessageHelper helper = new org.springframework.mail.javamail.MimeMessageHelper(mimeMessage, "utf-8");
+            
+            helper.setFrom(fromAddress);
+            helper.setTo(toEmail);
+            helper.setSubject("Delivery Partner KYC Status Update");
+            
+            String htmlMsg;
+            if (isApproved) {
+                htmlMsg = getHtmlTemplate(
+                    "KYC Verification Successful",
+                    "Congratulations!",
+                    "Your documents are verified, you can login.",
+                    "You are now ready to start delivering with QuickCart."
+                );
+            } else {
+                String missingDocsList = String.join("<br/>• ", unverifiedDocs);
+                htmlMsg = getHtmlTemplate(
+                    "KYC Verification Failed",
+                    "Action Required:",
+                    "Your documents are not verified. Please re-upload the following documents:<br/>• " + missingDocsList,
+                    "Login to your dashboard to upload the requested documents."
+                );
+            }
+            
+            helper.setText(htmlMsg, true);
+            mailSender.send(mimeMessage);
+            log.info("Successfully sent KYC status email to {}", toEmail);
+        } catch (Exception e) {
+            log.error("Failed to send KYC status email to {}: {}", toEmail, e.getMessage(), e);
+            throw new RuntimeException("Failed to send KYC status email", e);
+        }
+    }
 }

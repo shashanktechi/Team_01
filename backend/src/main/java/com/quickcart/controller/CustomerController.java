@@ -98,7 +98,7 @@ public class CustomerController {
         }
         User user = userRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return ResponseEntity.ok(Map.of(
+        java.util.Map<String, Object> responseMap = new java.util.HashMap<>(Map.of(
                 "id", user.getId(),
                 "phone", user.getPhone(),
                 "email", user.getEmail() != null ? user.getEmail() : "",
@@ -109,6 +109,22 @@ public class CustomerController {
                 "vehicleDocUrl", user.getVehicleDocUrl() != null ? user.getVehicleDocUrl() : "",
                 "address", user.getAddress() != null ? user.getAddress() : ""
         ));
+        
+        responseMap.put("verificationStatus", user.getVerificationStatus());
+        responseMap.put("sscCertUrl", user.getSscCertUrl());
+        responseMap.put("sscVerified", user.getSscVerified());
+        responseMap.put("interCertUrl", user.getInterCertUrl());
+        responseMap.put("interVerified", user.getInterVerified());
+        responseMap.put("driverLicenseUrl", user.getDriverLicenseUrl());
+        responseMap.put("driverLicenseVerified", user.getDriverLicenseVerified());
+        responseMap.put("bikeRcUrl", user.getBikeRcUrl());
+        responseMap.put("bikeRcVerified", user.getBikeRcVerified());
+        responseMap.put("otherCertUrl", user.getOtherCertUrl());
+        responseMap.put("otherCertVerified", user.getOtherCertVerified());
+        responseMap.put("aadharUrl", user.getAadharUrl());
+        responseMap.put("aadharVerified", user.getAadharVerified());
+        
+        return ResponseEntity.ok(responseMap);
     }
 
     @PostMapping("/orders")

@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +27,7 @@ public class SchedulerService {
 
     // Runs once every hour to flag inventory expiring in the next 24 hours
     @Scheduled(cron = "0 0 * * * *")
+    @Transactional
     public void flagNearExpiryInventory() {
         logger.info("Starting near-expiry inventory scan...");
         LocalDateTime threshold = LocalDateTime.now().plusHours(24);

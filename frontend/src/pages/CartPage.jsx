@@ -7,16 +7,19 @@ import { api } from '../services/api';
 import { Button } from '../components/ui/Button';
 import { getUserLocation, haversineDistance, formatDistance } from '../utils/geo';
 import { AddressMapModal } from '../components/ui/AddressMapModal';
-import { SuccessAnimation3D } from '../components/ui/SuccessAnimation3D';
+import { useEnvironment } from '../context/EnvironmentContext';
 
 export function CartPage() {
   const navigate = useNavigate();
   const { cartItems, addToCart, removeFromCart, getCartTotal, clearCart, currentStoreName } = useCart();
   const { user } = useAuth();
+  const { setMode, triggerOrderSuccess } = useEnvironment();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showSuccessAnim, setShowSuccessAnim] = useState(false);
-  const [successOrderId, setSuccessOrderId] = useState(null);
+
+  useEffect(() => {
+    setMode('storefront');
+  }, [setMode]);
 
   // Delivery & Location States
   const [deliveryAddress, setDeliveryAddress] = useState(user?.address || '');
@@ -129,39 +132,58 @@ export function CartPage() {
     setLoading(true);
     setError(null);
     try {
-      const orderRequest = {
-        items: cartItems.map((item) => ({
-          productId: item.product.id,
-          qty: item.quantity
-        })),
-        deliveryAddress: deliveryAddress || 'Selected Address',
-        customerLat: customerPos.lat,
-        customerLng: customerPos.lng,
-        paymentMethod: paymentMethod
-      };
+      // Group items by storeId to support multi-vendor carts
+      const itemsByStore = cartItems.reduce((acc, item) => {
+        const storeId = item.product.storeId || 'unknown';
+        if (!acc[storeId]) acc[storeId] = [];
+        acc[storeId].push(item);
+        return acc;
+      }, {});
 
-      const response = await api.post('/customer/orders', orderRequest);
-      const orderId = response.data.id;
+      let firstOrderId = null;
 
-      if (paymentMethod === 'RAZORPAY') {
-        const rzpRes = await api.post('/payment/create-razorpay-order', { orderId });
+      // Create an order for each store concurrently
+      const orderPromises = Object.values(itemsByStore).map(async (storeItems) => {
+        const orderRequest = {
+          items: storeItems.map((item) => ({
+            productId: item.product.id,
+            qty: item.quantity
+          })),
+          deliveryAddress: deliveryAddress || 'Selected Address',
+          customerLat: customerPos.lat,
+          customerLng: customerPos.lng,
+          paymentMethod: paymentMethod
+        };
+        const response = await api.post('/customer/orders', orderRequest);
+        return response.data.id;
+      });
+
+      const results = await Promise.all(orderPromises);
+      if (results.length > 0) {
+        firstOrderId = results[0];
+      }
+
+      if (paymentMethod === 'RAZORPAY' && firstOrderId) {
+        const rzpRes = await api.post('/payment/create-razorpay-order', { orderId: firstOrderId });
         const options = {
           key: "rzp_test_TG4Dgisjo7B8Wa",
           amount: Math.round(grandTotal * 100),
           currency: "INR",
           name: "QuickCart",
-          description: "Order Payment",
+          description: "Multi-Vendor Order Payment",
           order_id: rzpRes.data.razorpayOrderId,
           handler: async function (res) {
             await api.post('/payment/verify', {
               razorpayOrderId: res.razorpay_order_id,
               razorpayPaymentId: res.razorpay_payment_id,
               razorpaySignature: res.razorpay_signature,
-              orderId: orderId.toString()
+              orderId: firstOrderId.toString()
             });
             clearCart();
-            setSuccessOrderId(orderId);
-            setShowSuccessAnim(true);
+            triggerOrderSuccess();
+            setTimeout(() => {
+              navigate(`/track/${firstOrderId}`);
+            }, 2500);
           },
           prefill: {
             name: user?.name || "Customer",
@@ -178,8 +200,10 @@ export function CartPage() {
         rzp.open();
       } else {
         clearCart();
-        setSuccessOrderId(orderId);
-        setShowSuccessAnim(true);
+        triggerOrderSuccess();
+        setTimeout(() => {
+          navigate(`/track/${orderId}`);
+        }, 2500);
       }
     } catch (err) {
       console.error('Checkout failed', err);
@@ -190,8 +214,8 @@ export function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div className="bg-background font-body text-ink antialiased min-h-screen flex items-center justify-center p-8">
-        <div className="bg-surface p-8 rounded-2xl border border-border shadow-sm text-center max-w-sm w-full">
+      <div className="bg-transparent font-body text-ink antialiased min-h-screen flex items-center justify-center p-8 w-full">
+        <div className="bg-[var(--color-surface)]/90 backdrop-blur-md p-8 rounded-2xl border border-border shadow-night-lg text-center max-w-sm w-full">
           <div className="text-6xl mb-6 opacity-80">🛒</div>
           <h2 className="font-display font-black text-2xl text-ink mb-2">Your cart is empty</h2>
           <p className="font-body text-ink-muted mb-8 text-center">
@@ -206,14 +230,7 @@ export function CartPage() {
   }
 
   return (
-    <div className="bg-background font-body text-ink antialiased min-h-screen">
-      {showSuccessAnim && (
-        <SuccessAnimation3D 
-          onComplete={() => {
-            navigate('/track', { state: { orderId: successOrderId } });
-          }} 
-        />
-      )}
+    <div className="min-h-[calc(100vh-64px)] bg-transparent font-body text-ink antialiased flex flex-col lg:flex-row w-full max-w-7xl mx-auto">
       {/* Map Address Selector Modal */}
       <AddressMapModal
         isOpen={isMapModalOpen}
@@ -223,10 +240,10 @@ export function CartPage() {
         initialLng={customerPos.lng}
       />
 
-      <div className="w-full bg-background min-h-screen flex flex-col relative">
-        <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-border sticky top-0 bg-background/90 backdrop-blur-md z-10">
+      <div className="w-full bg-transparent min-h-screen flex flex-col relative z-10">
+        <div className="px-4 py-4 flex justify-between items-center shrink-0 border-b border-border sticky top-0 bg-[var(--color-night)]/80 backdrop-blur-md z-20 shadow-night">
           <div className="flex flex-col">
-            <h2 className="font-display font-black text-2xl text-ink tracking-tight">Checkout</h2>
+            <h2 className="font-display font-black text-2xl text-ink tracking-tight text-depth">Checkout</h2>
             {currentStoreName && (
               <span className="font-mono text-xs text-ink-muted">From {currentStoreName}</span>
             )}
@@ -236,7 +253,7 @@ export function CartPage() {
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto pb-32">
+        <div className="flex-grow overflow-y-auto p-4 sm:p-6 lg:p-8 space-y-6 pb-32 lg:pb-8 relative z-10">
           {error && (
             <div className="mx-4 mt-4 bg-danger/10 text-danger p-3 rounded-lg text-sm flex items-start gap-2">
               <AlertCircle className="w-5 h-5 shrink-0" />

@@ -49,6 +49,27 @@ export function SystemAdminDelivery() {
     }
   };
 
+  const handleDocumentVerify = async (partnerId, docType, verified) => {
+    try {
+      await api.put(`/admin/delivery-partners/${partnerId}/verify-document`, { docType, verified });
+      fetchPartners(); // Refresh to get updated booleans
+    } catch (err) {
+      console.error('Error verifying document:', err);
+      alert('Failed to verify document');
+    }
+  };
+
+  const handleSendKycEmail = async (partnerId) => {
+    try {
+      const res = await api.post(`/admin/delivery-partners/${partnerId}/send-kyc-email`);
+      alert(res.data.isApproved ? 'All docs verified. Approval email sent!' : 'Missing/rejected docs. Rejection email sent!');
+      fetchPartners(); // Refresh status
+    } catch (err) {
+      console.error('Error sending email:', err);
+      alert('Failed to send email');
+    }
+  };
+
   const filteredPartners = partners.filter(p => filterStatus === 'All' || p.verificationStatus === filterStatus);
 
   if (loading) {
@@ -105,47 +126,59 @@ export function SystemAdminDelivery() {
                     </Badge>
                   </h3>
                   <p className="font-body text-sm text-ink-muted">{p.email} • {p.phone}</p>
-                  {p.vehicleName && (
-                    <div className="mt-2 flex flex-col gap-1">
-                      <p className="font-body text-xs text-ink-muted bg-ink/5 inline-block px-2 py-1 rounded w-fit">
-                        Vehicle: {p.vehicleName} {p.vehicleModel ? `(${p.vehicleModel})` : ''} • {p.vehicleNumber}
-                      </p>
-                      <div className="flex gap-4">
-                        {p.vehicleDocUrl && (
-                          <button 
-                            onClick={() => setSelectedImage(p.vehicleDocUrl)}
-                            className="text-xs font-bold text-primary underline w-fit"
-                          >
-                            View Vehicle Document
-                          </button>
-                        )}
-                        {p.vehiclePhotoUrl && (
-                          <button 
-                            onClick={() => setSelectedImage(p.vehiclePhotoUrl)}
-                            className="text-xs font-bold text-primary underline w-fit"
-                          >
-                            View Bike Photo
-                          </button>
-                        )}
+                      {p.vehicleName && (
+                        <p className="font-body text-xs text-ink-muted bg-ink/5 inline-block px-2 py-1 rounded w-fit mb-2">
+                          Vehicle: {p.vehicleName} {p.vehicleModel ? `(${p.vehicleModel})` : ''} • {p.vehicleNumber}
+                        </p>
+                      )}
+                      
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-2 bg-surface p-4 rounded-lg border border-border">
+                        {[
+                          { key: 'ssc', label: 'SSC', url: p.sscCertUrl, verified: p.sscVerified },
+                          { key: 'inter', label: 'Inter', url: p.interCertUrl, verified: p.interVerified },
+                          { key: 'driverLicense', label: 'Driver License', url: p.driverLicenseUrl, verified: p.driverLicenseVerified },
+                          { key: 'bikeRc', label: 'Bike RC', url: p.bikeRcUrl, verified: p.bikeRcVerified },
+                          { key: 'otherCert', label: 'Other Cert', url: p.otherCertUrl, verified: p.otherCertVerified },
+                          { key: 'aadhar', label: 'Aadhar', url: p.aadharUrl, verified: p.aadharVerified }
+                        ].map((doc) => (
+                          <div key={doc.key} className="flex flex-col gap-2 p-2 border border-border/50 rounded-md">
+                            <div className="flex items-center justify-between">
+                              <span className="text-xs font-bold text-ink">{doc.label}</span>
+                              {doc.verified ? <CheckCircle className="w-3 h-3 text-bazaar-green" /> : <XCircle className="w-3 h-3 text-danger" />}
+                            </div>
+                            {doc.url ? (
+                              <button 
+                                onClick={() => setSelectedImage(doc.url)}
+                                className="text-xs text-primary underline w-fit text-left"
+                              >
+                                View Doc
+                              </button>
+                            ) : (
+                              <span className="text-xs text-ink-muted italic">Not Uploaded</span>
+                            )}
+                            <div className="flex gap-1 mt-auto pt-2">
+                              <Button variant="outline" size="sm" className="w-full text-[10px] h-6 px-1 border-bazaar-green text-bazaar-green hover:bg-bazaar-green/10"
+                                onClick={() => handleDocumentVerify(p.id, doc.key, true)}>
+                                Verify
+                              </Button>
+                              <Button variant="outline" size="sm" className="w-full text-[10px] h-6 px-1 border-danger text-danger hover:bg-danger/10"
+                                onClick={() => handleDocumentVerify(p.id, doc.key, false)}>
+                                Reject
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
                       </div>
+
                     </div>
-                  )}
-                </div>
-              </div>
-              <div className="flex items-center gap-2 w-full sm:w-auto">
-                {p.verificationStatus === 'PENDING' && (
-                  <>
-                    <Button variant="outline" size="sm" onClick={() => handlePartnerVerify(p.id, 'REJECTED')} className="w-full sm:w-auto text-danger hover:text-danger hover:bg-danger/10 border-danger/20">
-                      <XCircle className="w-4 h-4 mr-2" /> Reject
-                    </Button>
-                    <Button variant="primary" size="sm" onClick={() => handlePartnerVerify(p.id, 'APPROVED')} className="w-full sm:w-auto bg-primary hover:bg-primary-dark">
-                      <CheckCircle className="w-4 h-4 mr-2" /> Approve
-                    </Button>
-                  </>
-                )}
-                {p.verificationStatus !== 'PENDING' && (
-                  <Button variant="outline" size="sm" onClick={() => handlePartnerVerify(p.id, p.verificationStatus === 'APPROVED' ? 'REJECTED' : 'APPROVED')} className="w-full sm:w-auto">
-                    {p.verificationStatus === 'APPROVED' ? 'Revoke Access' : 'Re-Approve'}
+                  </div>
+              <div className="flex flex-col gap-2 w-full sm:w-auto p-4 sm:p-0 border-t border-border sm:border-0 mt-4 sm:mt-0">
+                <Button variant="primary" size="sm" onClick={() => handleSendKycEmail(p.id)} className="w-full sm:w-48 bg-primary hover:bg-primary-dark">
+                  Send Final KYC Mail
+                </Button>
+                {p.verificationStatus === 'APPROVED' && (
+                  <Button variant="outline" size="sm" onClick={() => handlePartnerVerify(p.id, 'REJECTED')} className="w-full sm:w-48">
+                    Revoke Access
                   </Button>
                 )}
               </div>
@@ -160,7 +193,11 @@ export function SystemAdminDelivery() {
             <button className="absolute top-4 right-4 bg-black/50 text-white rounded-full p-2 hover:bg-black/70" onClick={() => setSelectedImage(null)}>
               <XCircle className="w-6 h-6" />
             </button>
-            <img src={selectedImage} alt="Document View" className="w-full h-full object-contain" />
+            {selectedImage.toLowerCase().endsWith('.pdf') ? (
+              <iframe src={selectedImage} className="w-full h-[80vh] border-0" title="PDF Document" />
+            ) : (
+              <img src={selectedImage} alt="Document View" className="w-full h-full object-contain" />
+            )}
           </div>
         </div>
       )}

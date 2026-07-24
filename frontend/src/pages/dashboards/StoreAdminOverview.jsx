@@ -1,8 +1,9 @@
 import React from 'react';
-import { Package, ListOrdered, TrendingUp, User, Share2, Phone, Plus, Clock, ExternalLink } from 'lucide-react';
+import { Share2, Phone, Plus, Clock, ExternalLink } from 'lucide-react';
 import { Link } from 'react-router';
 import { Card } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { Icon3D } from '../../components/ui/Icon3D';
 
 export function StoreAdminOverview({ store, orders }) {
   return (
@@ -26,40 +27,40 @@ export function StoreAdminOverview({ store, orders }) {
       </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-surface shadow-sm border-border p-4 flex flex-col items-start justify-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-warning/10 text-warning flex items-center justify-center">
-            <ListOrdered className="h-5 w-5" />
+        <Card className="p-4 flex flex-col items-start justify-center gap-2">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.1)' }}>
+            <Icon3D name="cart" size={30} />
           </div>
           <div>
-            <p className="text-2xl font-bold">{orders?.length || 0}</p>
-            <p className="text-xs text-ink-muted uppercase tracking-wider font-bold">Orders</p>
+            <p className="font-display text-2xl font-black" style={{ color: '#12131A' }}>{orders?.length || 0}</p>
+            <p className="font-mono text-xs uppercase tracking-wider font-bold" style={{ color: '#6B6D76' }}>Orders</p>
           </div>
         </Card>
-        <Card className="bg-surface shadow-sm border-border p-4 flex flex-col items-start justify-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center">
-            <Package className="h-5 w-5" />
+        <Card className="p-4 flex flex-col items-start justify-center gap-2">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(22, 163, 74,0.1)' }}>
+            <Icon3D name="snacks" size={30} />
           </div>
           <div>
-            <p className="text-2xl font-bold">12</p>
-            <p className="text-xs text-ink-muted uppercase tracking-wider font-bold">Low Stock</p>
+            <p className="font-display text-2xl font-black" style={{ color: '#12131A' }}>12</p>
+            <p className="font-mono text-xs uppercase tracking-wider font-bold" style={{ color: '#6B6D76' }}>Low Stock</p>
           </div>
         </Card>
-        <Card className="bg-surface shadow-sm border-border p-4 flex flex-col items-start justify-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-ink/10 text-ink flex items-center justify-center">
-            <TrendingUp className="h-5 w-5" />
+        <Card className="p-4 flex flex-col items-start justify-center gap-2">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(34, 197, 94,0.1)' }}>
+            <Icon3D name="star" size={30} />
           </div>
           <div>
-            <p className="text-2xl font-bold">$450</p>
-            <p className="text-xs text-ink-muted uppercase tracking-wider font-bold">Today</p>
+            <p className="font-display text-2xl font-black" style={{ color: '#12131A' }}>₹450</p>
+            <p className="font-mono text-xs uppercase tracking-wider font-bold" style={{ color: '#6B6D76' }}>Today</p>
           </div>
         </Card>
-        <Card className="bg-surface shadow-sm border-border p-4 flex flex-col items-start justify-center gap-2">
-          <div className="w-10 h-10 rounded-full bg-ink-muted/10 text-ink-muted flex items-center justify-center">
-            <User className="h-5 w-5" />
+        <Card className="p-4 flex flex-col items-start justify-center gap-2">
+          <div className="w-11 h-11 rounded-xl flex items-center justify-center" style={{ background: 'rgba(22, 163, 74,0.08)' }}>
+            <Icon3D name="check" size={30} />
           </div>
           <div>
-            <p className="text-2xl font-bold">{store?.freshnessScore || 98}</p>
-            <p className="text-xs text-ink-muted uppercase tracking-wider font-bold">Score</p>
+            <p className="font-display text-2xl font-black" style={{ color: '#12131A' }}>{store?.freshnessScore || 98}</p>
+            <p className="font-mono text-xs uppercase tracking-wider font-bold" style={{ color: '#6B6D76' }}>Score</p>
           </div>
         </Card>
       </div>

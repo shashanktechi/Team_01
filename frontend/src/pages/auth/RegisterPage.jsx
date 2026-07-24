@@ -8,6 +8,8 @@ import { BrandStamp } from '../../components/ui/BrandStamp';
 import { BrandMark } from '../../components/ui/BrandMark';
 import { Mail, Phone, User, Lock, Store, MapPin, Building2, Loader2, KeyRound, Locate } from 'lucide-react';
 import { getUserLocation } from '../../utils/geo';
+import { HeroSphere3D } from '../../components/ui/HeroSphere3D';
+import { MapPicker } from '../../components/ui/MapPicker';
 
 export function RegisterPage() {
   const [formData, setFormData] = useState({ 
@@ -78,7 +80,10 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4 lg:p-0 overflow-hidden relative">
+    <div className="min-h-screen flex items-center justify-center bg-transparent p-4 lg:p-0 overflow-hidden relative">
+      <div className="fixed inset-0 pointer-events-none -z-10">
+        <HeroSphere3D />
+      </div>
       {/* Top Left Logo */}
       <button 
         onClick={() => navigate('/')} 
@@ -87,16 +92,16 @@ export function RegisterPage() {
         <BrandMark />
       </button>
 
-      <div className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row bg-background rounded-2xl shadow-xl border border-border overflow-hidden min-h-[700px]">
+      <div className="w-full max-w-5xl mx-auto flex flex-col lg:flex-row bg-white/20 backdrop-blur-2xl rounded-2xl shadow-[0_8px_32px_rgba(18,19,26,0.1)] border border-white/30 overflow-hidden min-h-[700px]">
         
         {/* Left Col - Illustration */}
-        <div className="hidden lg:flex w-1/2 bg-surface p-12 flex-col justify-between border-r border-border relative">
+        <div className="hidden lg:flex w-1/2 bg-transparent p-12 flex-col justify-between border-r border-white/20 relative">
           <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
           <div>
-            <h1 className="font-display font-black text-5xl text-ink leading-tight tracking-tight mt-8 relative z-10">
+            <h1 className="font-display font-black text-5xl text-black leading-tight tracking-tight mt-8 relative z-10">
               Fresh From <br/> The Market
             </h1>
-            <p className="font-body text-ink-muted mt-4 max-w-sm relative z-10">
+            <p className="font-body text-black mt-4 max-w-sm relative z-10">
               Join QuickCart to get the freshest produce delivered directly from the farm to your door.
             </p>
           </div>
@@ -106,7 +111,7 @@ export function RegisterPage() {
         </div>
 
         {/* Right Col - Form */}
-        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 relative bg-background overflow-y-auto">
+        <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 relative bg-transparent overflow-y-auto">
           <div className="w-full max-w-sm">
             
             {error && (
@@ -119,7 +124,7 @@ export function RegisterPage() {
               <form onSubmit={handleSendOtp} className="space-y-6">
                 <div className="text-center lg:text-left mb-6">
                   <h2 className="font-display font-black text-3xl text-ink tracking-tight">Create Account</h2>
-                  <p className="font-body text-sm text-ink-muted mt-2">Join our growing community.</p>
+                  <p className="font-body text-sm text-black mt-2">Join our growing community.</p>
                 </div>
                 
                 <div className="space-y-4">
@@ -310,25 +315,18 @@ export function RegisterPage() {
                               className="pl-10 h-12 border-border focus:border-bazaar-green"
                             />
                           </div>
-                          <div className="relative">
-                            <Button 
-                              type="button" 
-                              variant="outline" 
-                              className="w-full h-12 border-border focus:border-bazaar-green flex items-center justify-center gap-2"
-                              onClick={async () => {
-                                try {
-                                  const loc = await getUserLocation();
-                                  setFormData(prev => ({ ...prev, storeLat: loc.lat, storeLng: loc.lng }));
-                                  alert('Location captured successfully!');
-                                } catch (err) {
-                                  alert('Failed to get location. Please enable permissions.');
-                                }
+                          <div className="relative z-10 w-full rounded-lg overflow-hidden border border-border">
+                            <MapPicker 
+                              onLocationSelect={(lat, lng) => {
+                                setFormData(prev => ({ ...prev, storeLat: lat, storeLng: lng }));
                               }}
-                            >
-                              <Locate className="h-5 w-5" /> 
-                              {formData.storeLat ? 'Location Captured' : 'Detect Store Location'}
-                            </Button>
+                            />
                           </div>
+                          {formData.storeLat && (
+                            <div className="text-xs text-bazaar-green font-mono uppercase tracking-wider flex items-center justify-center">
+                              ✓ Location Pinned Successfully
+                            </div>
+                          )}
                         </>
                       )}
                     </div>

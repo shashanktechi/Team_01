@@ -2,7 +2,7 @@ import React from 'react';
 import { Navigate, Outlet } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
 
-export function RoleProtectedRoute({ role }) {
+export function RoleProtectedRoute({ allowedRoles }) {
   const { user, loading } = useAuth();
 
   if (loading) {
@@ -17,7 +17,7 @@ export function RoleProtectedRoute({ role }) {
     return <Navigate to="/login" replace />;
   }
 
-  if (user.role !== role) {
+  if (!allowedRoles.includes(user.role)) {
     // Redirect to their respective dashboard
     if (user.role === 'SYSTEM_ADMIN') return <Navigate to="/admin-dashboard" replace />;
     if (user.role === 'STORE_ADMIN') return <Navigate to="/store-dashboard" replace />;

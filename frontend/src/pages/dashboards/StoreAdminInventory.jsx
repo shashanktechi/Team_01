@@ -2,9 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
-import { Loader2, Plus, Save, Download, Package, AlertTriangle, XCircle } from 'lucide-react';
+import { Plus, Save, Download, AlertTriangle, XCircle } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Badge } from '../../components/ui/Badge';
+import { LoadingSpinner3D } from '../../components/ui/LoadingSpinner3D';
+import { EmptyState3D } from '../../components/ui/EmptyState3D';
+import { Icon3D } from '../../components/ui/Icon3D';
 
 export function StoreAdminInventory() {
   const [inventory, setInventory] = useState([]);
@@ -153,19 +156,26 @@ export function StoreAdminInventory() {
   };
 
   if (loading) {
-    return <div className="flex justify-center p-12"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+    return (
+      <div className="flex flex-col items-center justify-center p-16 gap-4">
+        <LoadingSpinner3D size={64} />
+        <p className="font-mono text-xs uppercase tracking-widest" style={{ color: '#6B6D76' }}>Loading inventory…</p>
+      </div>
+    );
   }
 
   if (fetchError) {
     return (
-      <div className="flex flex-col items-center justify-center p-12 text-center">
-        <AlertTriangle className="w-12 h-12 text-danger mb-4" />
-        <h3 className="text-lg font-bold text-ink mb-2">Couldn't load inventory</h3>
-        <p className="text-sm text-ink-muted mb-4">There was an error loading your inventory list. Please try again.</p>
-        <Button onClick={fetchInventory} className="flex items-center gap-2">
-          Try Again
-        </Button>
-      </div>
+      <EmptyState3D
+        variant="crate"
+        title="Couldn't load inventory"
+        description="There was an error fetching your inventory. Please check your connection and try again."
+        action={
+          <Button onClick={fetchInventory} variant="primary" className="flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" /> Try Again
+          </Button>
+        }
+      />
     );
   }
 
@@ -174,7 +184,7 @@ export function StoreAdminInventory() {
   const outOfStockCount = inventory.filter(i => i.quantity === 0).length;
 
   return (
-    <div className="flex flex-col gap-6 p-4">
+    <div className="flex flex-col gap-6 p-4 fm-dashboard-bg">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="font-bold text-2xl text-ink">Inventory Management</h2>
@@ -190,47 +200,61 @@ export function StoreAdminInventory() {
         </div>
       </div>
 
-      {/* Metrics */}
+      {/* Metrics — floating glass stat cards with 3D icons */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <Package className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(22, 163, 74,0.1)' }}>
+              <Icon3D name="snacks" size={32} />
             </div>
             <div>
-              <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Total SKUs</p>
-              <h3 className="text-2xl font-bold text-ink mt-1">{totalItems}</h3>
+              <p className="font-mono text-xs font-bold uppercase tracking-wider" style={{ color: '#6B6D76' }}>Total SKUs</p>
+              <h3 className="font-display text-2xl font-black" style={{ color: '#12131A' }}>{totalItems}</h3>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-warning/10 flex items-center justify-center text-warning">
-              <AlertTriangle className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(245,158,11,0.1)' }}>
+              <AlertTriangle className="w-6 h-6" style={{ color: '#F59E0B' }} />
             </div>
             <div>
-              <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Low Stock</p>
-              <h3 className="text-2xl font-bold text-ink mt-1">{lowStockCount}</h3>
+              <p className="font-mono text-xs font-bold uppercase tracking-wider" style={{ color: '#6B6D76' }}>Low Stock</p>
+              <h3 className="font-display text-2xl font-black" style={{ color: '#12131A' }}>{lowStockCount}</h3>
             </div>
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6 flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-danger/10 flex items-center justify-center text-danger">
-              <XCircle className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center" style={{ background: 'rgba(229,62,62,0.1)' }}>
+              <XCircle className="w-6 h-6" style={{ color: '#E53E3E' }} />
             </div>
             <div>
-              <p className="text-xs font-semibold text-ink-muted uppercase tracking-wider">Out of Stock</p>
-              <h3 className="text-2xl font-bold text-ink mt-1">{outOfStockCount}</h3>
+              <p className="font-mono text-xs font-bold uppercase tracking-wider" style={{ color: '#6B6D76' }}>Out of Stock</p>
+              <h3 className="font-display text-2xl font-black" style={{ color: '#12131A' }}>{outOfStockCount}</h3>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card className="bg-surface shadow-sm border-border overflow-hidden">
+      {/* Inventory Table — 3D-framed panel, sharp legible data inside */}
+      {inventory.length === 0 ? (
+        <EmptyState3D
+          variant="crate"
+          title="No products yet"
+          description="Start adding products to your inventory to see them here."
+          action={
+            <Button onClick={() => setIsModalOpen(true)} variant="primary" className="flex items-center gap-2">
+              <Plus className="w-4 h-4" /> Add First Product
+            </Button>
+          }
+        />
+      ) : (
+      <Card className="overflow-hidden" floating={false}>
         <div className="overflow-x-auto">
           <table className="w-full text-left font-body">
-            <thead className="bg-background/30 border-b border-border text-ink-muted font-bold uppercase tracking-wider text-xs font-mono">
+            <thead style={{ background: 'rgba(255, 255, 255,0.8)', borderBottom: '1px solid rgba(18,19,26,0.08)' }}
+              className="text-xs font-mono font-bold uppercase tracking-widest" style2={{ color: '#6B6D76' }}>
               <tr>
                 <th className="p-4 font-semibold">Product Name</th>
                 <th className="p-4 font-semibold">SKU</th>
@@ -279,19 +303,11 @@ export function StoreAdminInventory() {
                     </tr>
                   )
               })}
-              {inventory.length === 0 && (
-                  <tr>
-                      <td colSpan="7" className="p-12 text-center text-ink-muted">
-                        <Package className="w-12 h-12 mx-auto mb-4 opacity-20" />
-                        <p className="font-medium">No inventory found.</p>
-                        <p className="text-sm opacity-80 mt-1">Add a product to get started.</p>
-                      </td>
-                  </tr>
-              )}
             </tbody>
           </table>
         </div>
       </Card>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] bg-ink/50 backdrop-blur-sm flex items-center justify-center p-4">

@@ -5,8 +5,9 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../components/ui/Card';
 import { BrandStamp } from '../../components/ui/BrandStamp';
-import { HeroSphere3D } from '../../components/ui/HeroSphere3D';
 import { BrandMark } from '../../components/ui/BrandMark';
+import { useEnvironment } from '../../context/EnvironmentContext';
+import { HeroSphere3D } from '../../components/ui/HeroSphere3D';
 
 export function LoginPage() {
   const [identifier, setIdentifier] = useState('');
@@ -15,6 +16,11 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { setMode } = useEnvironment();
+
+  React.useEffect(() => {
+    setMode('hero');
+  }, [setMode]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -42,7 +48,11 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-background relative">
+    <div className="min-h-screen flex bg-transparent relative">
+      <div className="fixed inset-0 pointer-events-none -z-10">
+        <HeroSphere3D />
+      </div>
+
       {/* Top Left Logo */}
       <button 
         onClick={() => navigate('/')} 
@@ -51,18 +61,17 @@ export function LoginPage() {
         <BrandMark />
       </button>
 
-      {/* Left Column: 3D Sphere */}
-      <div className="hidden lg:flex lg:w-1/2 bg-surface border-r border-border flex-col items-center justify-center p-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0l10 10M10 0l10 10M0 10l10 10M10 10l10 10M0 20l10-10M10 20l10-10' stroke='%231F2A24' stroke-width='0.5' fill='none'/%3E%3C/svg%3E\")" }}></div>
-        <HeroSphere3D />
+      {/* Left Column: Transparent area for 3D Sphere */}
+      <div className="hidden lg:flex lg:w-1/2 bg-transparent flex-col items-center justify-center p-12 relative overflow-hidden pointer-events-none">
+        {/* Global Night Market scene shows through here */}
       </div>
 
       {/* Right Column: Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 bg-white/20 backdrop-blur-2xl border-l border-white/30 shadow-night-lg">
         <Card className="w-full max-w-md border-0 shadow-none bg-transparent">
           <CardHeader className="text-center px-0 flex flex-col items-center">
             <BrandStamp className="w-32 md:w-40 h-auto mb-4" />
-            <CardDescription className="font-body text-ink-muted">Enter your credentials to access your account</CardDescription>
+            <CardDescription className="font-body text-black">Enter your credentials to access your account</CardDescription>
           </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -97,7 +106,7 @@ export function LoginPage() {
             <Button type="submit" className="w-full" isLoading={loading}>
               Sign In
             </Button>
-            <div className="text-center text-sm text-ink-muted">
+            <div className="text-center text-sm text-black">
               Don't have an account?{' '}
               <Link to="/register" className="text-xs font-mono uppercase tracking-wider text-primary hover:underline">
                 Sign up

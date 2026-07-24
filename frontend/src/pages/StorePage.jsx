@@ -7,8 +7,8 @@ import { Button } from '../components/ui/Button';
 import { Badge } from '../components/ui/Badge';
 import { BrandMark } from '../components/ui/BrandMark';
 import { ProductCard } from '../components/ui/ProductCard';
-import { ProductCard3D } from '../components/ui/ProductCard3D';
 import { ConflictModal } from '../components/ui/ConflictModal';
+import { useEnvironment } from '../context/EnvironmentContext';
 
 export function StorePage() {
   const navigate = useNavigate();
@@ -18,6 +18,11 @@ export function StorePage() {
   const [products, setProducts] = useState([]);
   const [storeDetails, setStoreDetails] = useState(location.state?.storeDetails || null);
   const [conflictState, setConflictState] = useState({ isOpen: false });
+  const { setMode } = useEnvironment();
+
+  useEffect(() => {
+    setMode('storefront');
+  }, [setMode]);
   
   const { cartItems, addToCart, removeFromCart, clearCart, getCartTotal, getCartCount } = useCart();
 
@@ -139,23 +144,22 @@ export function StorePage() {
                   Featured Deals
                 </h3>
               </div>
-              <div className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar snap-x">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                 {filteredProducts.slice(0, 4).map(p => (
-                  <div key={p.id} className="snap-start">
-                    <ProductCard3D 
-                      id={p.id}
-                      name={p.name}
-                      size={p.size}
-                      price={p.price}
-                      mrp={p.price * 1.2}
-                      discountPercent={15}
-                      image={p.image}
-                      storeId={storeDetails?.id}
-                      storeName={storeDetails?.name}
-                      isOutOfStock={p.stock === 0}
-                      onConflict={handleConflict}
-                    />
-                  </div>
+                  <ProductCard 
+                    key={p.id}
+                    id={p.id}
+                    name={p.name}
+                    size={p.size}
+                    price={p.price}
+                    mrp={p.price * 1.2}
+                    discountPercent={15}
+                    image={p.image}
+                    storeId={storeDetails?.id}
+                    storeName={storeDetails?.name}
+                    isOutOfStock={p.stock === 0}
+                    onConflict={handleConflict}
+                  />
                 ))}
               </div>
             </div>

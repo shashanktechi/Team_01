@@ -53,6 +53,38 @@ public class User {
     @Column(name = "vehicle_doc_url")
     private String vehicleDocUrl;
 
+    // --- KYC Documents (Delivery Agent) ---
+    @Column(name = "ssc_cert_url")
+    private String sscCertUrl;
+    @Column(name = "ssc_verified")
+    private Boolean sscVerified = false;
+
+    @Column(name = "inter_cert_url")
+    private String interCertUrl;
+    @Column(name = "inter_verified")
+    private Boolean interVerified = false;
+
+    @Column(name = "driver_license_url")
+    private String driverLicenseUrl;
+    @Column(name = "driver_license_verified")
+    private Boolean driverLicenseVerified = false;
+
+    @Column(name = "bike_rc_url")
+    private String bikeRcUrl;
+    @Column(name = "bike_rc_verified")
+    private Boolean bikeRcVerified = false;
+
+    @Column(name = "other_cert_url")
+    private String otherCertUrl;
+    @Column(name = "other_cert_verified")
+    private Boolean otherCertVerified = false;
+
+    @Column(name = "aadhar_url")
+    private String aadharUrl;
+    @Column(name = "aadhar_verified")
+    private Boolean aadharVerified = false;
+    // ----------------------------------------
+
     @Column(name = "verification_status")
     private String verificationStatus = "PENDING";
 

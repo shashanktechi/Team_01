@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useNavigate, Routes, Route, NavLink, Navigate, useLocation } from 'react-router';
 import { useAuth } from '../../context/AuthContext';
 import { BrandMark } from '../../components/ui/BrandMark';
 import { Button } from '../../components/ui/Button';
+import { useEnvironment } from '../../context/EnvironmentContext';
 import { LayoutDashboard, Users, Store, DollarSign, LogOut, Shield } from 'lucide-react';
 
 import { SystemAdminOverview } from './SystemAdminOverview';
@@ -15,6 +16,11 @@ export function SystemAdminDashboard() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { setMode } = useEnvironment();
+
+  useEffect(() => {
+    setMode('dashboard');
+  }, [setMode]);
 
   const handleLogout = () => {
     logout();
@@ -28,8 +34,8 @@ export function SystemAdminDashboard() {
   };
 
   return (
-    <div className="bg-background font-body text-ink min-h-screen">
-      <header className="fixed top-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-border shadow-sm">
+    <div className="bg-transparent font-body text-ink min-h-screen">
+      <header className="fixed top-0 w-full z-50 bg-[var(--color-surface)]/90 backdrop-blur-md border-b border-border shadow-night">
         <div className="flex items-center justify-between px-6 py-4 w-full">
           <BrandMark />
           <div className="flex items-center gap-4">

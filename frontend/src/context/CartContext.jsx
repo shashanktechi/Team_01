@@ -13,10 +13,7 @@ export const CartProvider = ({ children }) => {
     const targetStoreId = storeId || product.storeId;
     const targetStoreName = storeName || product.storeName || 'another store';
 
-    if (cartItems.length > 0 && currentStoreId && targetStoreId && currentStoreId !== targetStoreId) {
-       // Conflict detected
-       return { success: false, conflictStoreName: currentStoreName || 'another store' };
-    }
+    // We now allow items from multiple vendors.
 
     if (cartItems.length === 0 && targetStoreId) {
       setCurrentStoreId(targetStoreId);

@@ -86,6 +86,37 @@ public class MediaController {
         }
     }
 
+    @PatchMapping("/kyc-documents")
+    @PreAuthorize("hasRole('DELIVERY_PARTNER')")
+    public ResponseEntity<?> uploadKycDocument(@RequestParam("docType") String docType, @RequestParam("file") MultipartFile file) {
+        Long userId = currentUserProvider.getCurrentUserId();
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Unauthorized"));
+        }
+        String ext = getExtensionAndValidate(file.getContentType());
+        if (ext == null && !file.getContentType().equalsIgnoreCase("application/pdf")) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", "Invalid content type. Allowed: JPEG, PNG, WebP, PDF."));
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        try {
+            String url = cloudinaryService.uploadFile(file, "users/" + userId + "/kyc");
+            switch (docType) {
+                case "ssc": user.setSscCertUrl(url); break;
+                case "inter": user.setInterCertUrl(url); break;
+                case "driverLicense": user.setDriverLicenseUrl(url); break;
+                case "bikeRc": user.setBikeRcUrl(url); break;
+                case "otherCert": user.setOtherCertUrl(url); break;
+                case "aadhar": user.setAadharUrl(url); break;
+                default: return ResponseEntity.badRequest().body(Map.of("error", "Invalid docType"));
+            }
+            userRepository.save(user);
+            return ResponseEntity.ok(Map.of("success", true, "url", url, "docType", docType));
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Failed to upload file"));
+        }
+    }
+
     @PatchMapping("/store/{storeId}/logo")
     @PreAuthorize("hasRole('STORE_ADMIN')")
     public ResponseEntity<?> confirmStoreLogo(@PathVariable Long storeId, @RequestParam("file") MultipartFile file) {
